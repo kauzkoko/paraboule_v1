@@ -10,11 +10,13 @@
     "postinstall": "nuxt prepare",
     "dev-sw": "SW=true nuxi dev",
     "dev-sws": "SW=true nuxi dev --host",
-    "build-sw": "SW=true nuxi build"
+    "build-sw": "SW=true nuxi build",
+    "cloudflared": "cloudflared tunnel --url http://localhost:3000"
   },
   "dependencies": {
     "@tresjs/cientos": "^4.1.1",
     "@tresjs/core": "^4.3.3",
+    "cloudflared": "^0.7.0",
     "gsap": "^3.12.7",
     "inferencejs": "^1.0.16",
     "nuxt": "^3.15.4",
@@ -27,6 +29,7 @@
     "@nuxtjs/supabase": "^1.5.0",
     "@pinia/nuxt": "^0.10.1",
     "@unocss/nuxt": "^66.1.0-beta.3",
+    "@vite-pwa/assets-generator": "^0.2.6",
     "@vueuse/nuxt": "^12.8.2",
     "pinia-plugin-persistedstate": "^4.2.0"
   }

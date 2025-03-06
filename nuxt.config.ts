@@ -1,8 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { transformerDirectives } from "unocss";
-import process from 'node:process'
+import process from "node:process";
 
-const sw = process.env.SW === 'true'
+const sw = process.env.SW === "true";
 
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
@@ -31,22 +31,27 @@ export default defineNuxtConfig({
     rules: [],
     transformers: [transformerDirectives()],
   },
+  vite: {
+    server: {
+      allowedHosts: ["transition-tmp-catalyst-jpg.trycloudflare.com"],
+    },
+  },
   future: {
     typescriptBundlerResolution: true,
   },
   experimental: {
     payloadExtraction: true,
-    watcher: 'parcel',
+    watcher: "parcel",
   },
   nitro: {
     esbuild: {
       options: {
-        target: 'esnext',
+        target: "esnext",
       },
     },
-    prerender: {
-      routes: ['/', '/about'],
-    },
+    // prerender: {
+    //   routes: ['/', '/about'],
+    // },
   },
   imports: {
     autoImport: true,
@@ -57,10 +62,17 @@ export default defineNuxtConfig({
     filename: sw ? "sw.ts" : undefined,
     registerType: "autoUpdate",
     manifest: {
-      name: "Nuxt Vite PWA",
-      short_name: "NuxtVitePWA",
-      theme_color: "#ffffff",
+      name: "Parab0o0ules",
+      short_name: "0o0",
+      theme_color: "#000000",
+      background_color: "#000000",
+      display: "standalone",
       icons: [
+        {
+          src: "pwa-64x64.png",
+          sizes: "64x64",
+          type: "image/png",
+        },
         {
           src: "pwa-192x192.png",
           sizes: "192x192",
@@ -72,10 +84,10 @@ export default defineNuxtConfig({
           type: "image/png",
         },
         {
-          src: "pwa-512x512.png",
+          src: "maskable-icon-512x512.png",
           sizes: "512x512",
           type: "image/png",
-          purpose: "any maskable",
+          purpose: "maskable",
         },
       ],
     },
@@ -86,10 +98,10 @@ export default defineNuxtConfig({
       globPatterns: ["**/*.{js,css,html,png,svg,ico}"],
     },
     client: {
-      installPrompt: true,
+      // installPrompt: true,
       // you don't need to include this: only for testing purposes
       // if enabling periodic sync for update use 1 hour or so (periodicSyncForUpdates: 3600)
-      periodicSyncForUpdates: 20,
+      // periodicSyncForUpdates: 20,
     },
     devOptions: {
       enabled: true,
