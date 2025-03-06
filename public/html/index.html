@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebXR Floor Position</title>
+</head>
+<body>
+    <button id="start-ar">Start AR</button>
+    <script>
+        document.getElementById('start-ar').addEventListener('click', async () => {
+            if (!navigator.xr) {
+                alert("WebXR not supported");
+                return;
+            }
+
+            const session = await navigator.xr.requestSession('immersive-ar', { requiredFeatures: ['hit-test', 'local-floor'] });
+            const refSpace = await session.requestReferenceSpace('local-floor');
+            const viewerSpace = await session.requestReferenceSpace('viewer');
+            const hitTestSource = await session.requestHitTestSource({ space: viewerSpace });
+
+            session.requestAnimationFrame((time, xrFrame) => {
+                const viewerPose = xrFrame.getViewerPose(refSpace);
+                if (!viewerPose) return;
+
+                // Convert pixel (400,500) to normalized device coordinates
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+                const ndcX = (400 / screenWidth) * 2 - 1;
+                const ndcY = 1 - (500 / screenHeight) * 2;
+
+                const results = xrFrame.getHitTestResults(hitTestSource);
+                if (results.length > 0) {
+                    const hitPose = results[0].getPose(refSpace);
+                    console.log("Hit position:", hitPose.transform.position);
+                    alert(`Floor position: X=${hitPose.transform.position.x}, Y=${hitPose.transform.position.y}, Z=${hitPose.transform.position.z}`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
