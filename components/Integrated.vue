@@ -99,6 +99,19 @@ const startXR = async () => {
     // window.addEventListener("click", onClick);
   }
 
+  async function stopXR() {
+    const session = renderer.value.xr.getSession();
+    if (session) {
+      await session.end();
+      renderer.value.xr.enabled = false;
+      console.log("XR session ended");
+    }
+  }
+
+  bus.on((message) => {
+    if (message === "stopXR") stopXR();
+  });
+
   let bitmap;
   let counter = 0;
   let blobs = [];

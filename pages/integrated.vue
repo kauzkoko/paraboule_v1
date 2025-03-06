@@ -5,6 +5,7 @@
         <Integrated />
       </Suspense>
     </TresCanvas>
+    <Interface @scanCamera="toggleCamera()" class="opacity-50" />
     <div class="fixed left-0 bottom-0">
       <div
         v-for="(prediction, index) in predictions"
@@ -18,7 +19,7 @@
       </div>
       <pre class="bg-white opacity-30">intersections: {{ intersections }}</pre>
       <pre class="bg-white opacity-30">plane detected: {{ planeDetected }}</pre>
-      <button class="text-30px" @click="startXR()">StartXR</button>
+      <!-- <button class="text-30px" @click="startXR()">StartXR</button> -->
       <button class="text-30px" @click="refreshPage()">refreshPage</button>
     </div>
   </div>
@@ -28,19 +29,24 @@
 // 823 1920
 import { TresCanvas } from "@tresjs/core";
 
-const supabase = useSupabaseClient();
-let channel = supabase.channel("xr-controller");
-
-channel
-  .on("broadcast", { event: "intersections" }, (event) => {
-    console.log("received intersections: ", event);
-  })
-  .subscribe();
+const { sendIntersections } = useXrController();
 
 const bus = useEventBus("tresjs");
 const startXR = () => {
+  console.log("startXR");
   bus.emit("startXR")
-  console.log("sending startXR");
+};
+
+const stopXR = () => {
+  console.log("stopXR");
+  bus.emit("stopXR")
+};
+
+const xrRunning = ref(false);
+const toggleCamera = () => {
+  console.log("toggleCamera");
+  xrRunning.value ? stopXR() : startXR();
+  xrRunning.value = !xrRunning.value;
 };
 
 const planeDetected = ref(false);
@@ -53,11 +59,7 @@ bus.on((event, payload) => {
   }
   if (event === "intersections" && planeDetected.value) {
     intersections.value = payload;
-    channel.send({
-      type: "broadcast",
-      event: "intersections",
-      payload: payload,
-    });
+    sendIntersections(payload);
   }
 
   if (event === "plane") {
