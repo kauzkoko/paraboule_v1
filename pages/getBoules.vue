@@ -192,7 +192,6 @@ watch(cochonetteSound, () => {
 
 const helpers = ref(true);
 const grid = ref(true);
-const showImage = ref(false);
 const controller = ref(true);
 
 onKeyStroke("g", (e) => {
@@ -203,10 +202,7 @@ onKeyStroke("q", (e) => {
   e.preventDefault();
   helpers.value = !helpers.value;
 });
-onKeyStroke("i", (e) => {
-  e.preventDefault();
-  showImage.value = !showImage.value;
-});
+
 onKeyStroke("o", (e) => {
   e.preventDefault();
   controller.value = !controller.value;
