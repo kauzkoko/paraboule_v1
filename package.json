@@ -7,7 +7,10 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "dev-sw": "SW=true nuxi dev",
+    "dev-sws": "SW=true nuxi dev --host",
+    "build-sw": "SW=true nuxi build"
   },
   "dependencies": {
     "@tresjs/cientos": "^4.1.1",
