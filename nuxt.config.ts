@@ -49,9 +49,9 @@ export default defineNuxtConfig({
         target: "esnext",
       },
     },
-    // prerender: {
-    //   routes: ['/', '/about'],
-    // },
+    prerender: {
+      routes: ['/'],
+    },
   },
   imports: {
     autoImport: true,
@@ -96,6 +96,7 @@ export default defineNuxtConfig({
     },
     injectManifest: {
       globPatterns: ["**/*.{js,css,html,png,svg,ico}"],
+      maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
     },
     client: {
       // installPrompt: true,
