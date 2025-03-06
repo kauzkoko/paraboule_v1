@@ -1,7 +1,7 @@
 <template>
   <main>
     <slot />
-    <ClientOnly>
+    <!-- <ClientOnly>
       <div
         v-if="$pwa?.offlineReady || $pwa?.needRefresh"
         class="pwa-toast"
@@ -42,7 +42,7 @@
           Cancel
         </button>
       </div>
-    </ClientOnly>
+    </ClientOnly> -->
   </main>
 </template>
 
