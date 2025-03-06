@@ -11,7 +11,8 @@
     "dev-sw": "SW=true nuxi dev",
     "dev-sws": "SW=true nuxi dev --host",
     "build-sw": "SW=true nuxi build",
-    "cloudflared": "cloudflared tunnel --url http://localhost:3000"
+    "cloudflared": "cloudflared tunnel --url http://localhost:3000",
+    "ngrok": "ngrok http --url=elephant-emerging-uniformly.ngrok-free.app 3000"
   },
   "dependencies": {
     "@tresjs/cientos": "^4.1.1",

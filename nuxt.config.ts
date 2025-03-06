@@ -33,7 +33,7 @@ export default defineNuxtConfig({
   },
   vite: {
     server: {
-      allowedHosts: ["transition-tmp-catalyst-jpg.trycloudflare.com"],
+      allowedHosts: ["elephant-emerging-uniformly.ngrok-free.app"],
     },
   },
   future: {
@@ -63,7 +63,7 @@ export default defineNuxtConfig({
     registerType: "autoUpdate",
     manifest: {
       name: "Parab0o0ules",
-      short_name: "0o0",
+      short_name: "Parab0o0ules",
       theme_color: "#000000",
       background_color: "#000000",
       display: "standalone",

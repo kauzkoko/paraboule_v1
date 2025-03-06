@@ -5,7 +5,7 @@
         <Integrated />
       </Suspense>
     </TresCanvas>
-    <Interface @scanCamera="toggleCamera()" class="opacity-50" />
+    <Interface @scanCamera="toggleCamera()" class="opacity-50 outer" :xrRunning="xrRunning" />
     <div class="fixed left-0 bottom-0">
       <div
         v-for="(prediction, index) in predictions"
@@ -71,10 +71,3 @@ const refreshPage = () => {
   window.location.reload();
 };
 </script>
-
-<style>
-html {
-  margin: 0;
-  padding: 0;
-}
-</style>
