@@ -4,13 +4,13 @@
       <div class="grid-item" @click="scanCamera()">
         <img src="/icons/scancamera.png" />
       </div>
-      <div class="grid-item" @click="ping()">
+      <div class="grid-item" @click="sendPlay()">
         <img src="/icons/ping.png" />
       </div>
-      <div class="grid-item">
+      <div class="grid-item" @click="startCircularRotation()">
         <img src="/icons/aroundcocho.png" />
       </div>
-      <div class="grid-item">
+      <div class="grid-item" @click="flyToCochonetteAndBack()">
         <img src="/icons/flythrough.png" />
       </div>
     </div>
@@ -37,17 +37,14 @@ watch(() => props.xrRunning, (newVal) => {
 
 
 const emit = defineEmits(["scanCamera"]);
-
 const scanCamera = () => {
   emit("scanCamera");
 };
 
 const { sendPlay } = useSoundController();
+const { startCircularRotation, flyToCochonetteAndBack } = useAnimationController();
 
-const ping = () => {
-  console.log("ping");
-  sendPlay();
-};
+
 </script>
 
 <style>
