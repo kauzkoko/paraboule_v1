@@ -1,26 +1,26 @@
 <template>
   <div id="overlay">
     <TresCanvas>
-      <Suspense>
-        <Integrated />
-      </Suspense>
+      <Integrated />
     </TresCanvas>
-    <Interface @scanCamera="toggleCamera()" class="opacity-50 outer" :xrRunning="xrRunning" />
-    <div class="fixed left-0 bottom-0">
+    <!-- <div class="fixed left-0 top-0 w-screen h-screen bg-black opacity-20" /> -->
+    <Interface @scanCamera="toggleCamera()" :xrRunning="xrRunning" />
+    <div class="fixed left-0 bottom-0" v-show="xrRunning">
       <div
         v-for="(prediction, index) in predictions"
-        class="fixed bg-yellow rounded-full aspect-1 w-10px text-10px text-center opacity-50"
+        class="predictions"
         :style="{
           left: prediction.bbox.x / 2 + 'px',
           top: prediction.bbox.y / 2 + 'px',
+          borderColor: prediction.class === 'cochonette' ? 'yellow' : prediction.class === 'dark' ? 'blue' : 'red',
         }"
       >
-        {{ index }}
+        <div>{{ index }}</div>
       </div>
-      <pre class="bg-white opacity-30">intersections: {{ intersections }}</pre>
-      <pre class="bg-white opacity-30">plane detected: {{ planeDetected }}</pre>
+      <!-- <pre class="bg-white opacity-30">intersections: {{ intersections }}</pre> -->
+      <!-- <pre class="bg-white opacity-30">plane detected: {{ planeDetected }}</pre> -->
       <!-- <button class="text-30px" @click="startXR()">StartXR</button> -->
-      <button class="text-30px" @click="refreshPage()">refreshPage</button>
+      <!-- <button class="text-30px" @click="refreshPage()">refreshPage</button> -->
     </div>
   </div>
 </template>
@@ -33,28 +33,34 @@ const { sendIntersections } = useXrController();
 
 const bus = useEventBus("tresjs");
 const startXR = () => {
-  console.log("startXR");
-  bus.emit("startXR")
+  console.log("startXR in parent");
+  bus.emit("startXR");
 };
 
 const stopXR = () => {
   console.log("stopXR");
-  bus.emit("stopXR")
+  bus.emit("stopXR");
 };
 
+const scanCounter = ref(0);
 const xrRunning = ref(false);
 const toggleCamera = () => {
+  scanCounter.value++;
   console.log("toggleCamera");
-  xrRunning.value ? stopXR() : startXR();
+  if (xrRunning.value) {
+    stopXR();
+  } else {
+    startXR();
+  }
   xrRunning.value = !xrRunning.value;
 };
 
 const planeDetected = ref(false);
 const predictions = ref(null);
 const intersections = ref([{ x: 1, z: 4 }]);
-let lastPredictions = [];
 bus.on((event, payload) => {
   if (event === "predictions") {
+    console.log("predictions", payload);
     predictions.value = payload;
   }
   if (event === "intersections" && planeDetected.value) {
@@ -71,3 +77,23 @@ const refreshPage = () => {
   window.location.reload();
 };
 </script>
+
+<style>
+.predictions {
+  position: fixed;
+  background-color: transparent;
+  border-style: solid;
+  border-color: #ff0000;
+  border-width: 3px;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  width: 15px;
+  height: 15px;
+  text-align: center;
+  opacity: 1;
+  position: flex;
+  justify-content: center;
+  align-items: center;
+  /* color: #ff0000; */
+}
+</style>

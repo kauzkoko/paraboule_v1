@@ -3,7 +3,6 @@
     <TresPerspectiveCamera
       :position="[cameraX, cameraY, cameraZ]"
       :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
-      :args="[82, 1, 0.1, 1000]"
     />
     <TresMesh
       v-for="(boule, i) in boules"
@@ -38,7 +37,7 @@
       <Html center transform>
         <div class="mt--120px flex flex-col items-center">
           <div class="mirror">You</div>
-          <div class="w-2px h-100px bg-black"></div>
+          <div class="w-2px h-100px bg-gray"></div>
         </div>
       </Html> </TresMesh
     >/
@@ -52,32 +51,21 @@
         </div>
       </Html>
     </TresMesh>
-    <TresAmbientLight :intensity="3" />
+    <TresAmbientLight :intensity="5" />
     <TresDirectionalLight :position="[2, 2, 2]" :intensity="1" />
     <TresGridHelper v-if="grid" :args="[45, 10]" :scale="[1, 1, 0.8]" />
   </TresCanvas>
   <div
     v-show="controller"
-    class="fixed top-0 right-0 flex flex-row mr-1 children:text-20px children:mt-1"
+    class="fixed top-0 left-0 flex flex-row ml-5 mt-5 children:text-20px children:mt-1"
   >
-    <div class="flex flex-col mr-1 children:text-20px children:mt-1">
-      <div>Animations</div>
-      <button @click="flyToStart()">flyToStart</button>
+    <div class="flex flex-col children:text-20px children:mt-1">
+      <button class="mt-0!" @click="flyToStart()">flyToStart</button>
       <button @click="flyToCochonetteAndBack()">flyToCochonetteAndBack</button>
-      <button @click="flyThroughCochonetteToTheEndless()">
-        flyThroughCochonetteToTheEndless
-      </button>
       <button @click="startCircularRotation()">startCircularRotation</button>
-      <button @click="flyToRealisticStart()">flyToRealisticStart</button>
-    </div>
-    <div class="flex flex-col mr-1 children:text-20px children:mt-1">
-      <div>Cameras</div>
       <button @click="topCamera()">topCamera</button>
-      <button @click="halfCamera()">halfCamera</button>
       <button @click="frontCamera()">frontCamera</button>
-    </div>
-    <div class="flex flex-col mr-1 children:text-20px children:mt-1">
-      <div>Controls</div>
+      <button @click="toggleLock()">{{ locked ? "unlock" : "lock" }}</button>
       <div class="flex">
         <input
           type="checkbox"
@@ -85,14 +73,8 @@
           id="test"
           v-model="cochonetteSound"
         />
-        <label for="test">cochonetteSound</label>
+        <label for="test" class="text-white">cochonetteSound</label>
       </div>
-    </div>
-    <div class="flex flex-col mr-1 children:text-20px children:mt-1">
-      <div>Debug</div>
-      <button @click="trigger++">reloadSounds</button>
-      <button @click="killTweens()">killTweens</button>
-      <button @click="clearIntervals()">clearIntervals</button>
     </div>
   </div>
   <div
@@ -111,14 +93,24 @@ import { gsap } from "gsap";
 const supabase = useSupabaseClient();
 let channel = supabase.channel("xr-controller");
 
-const boules = ref([])
+const locked = ref(false);
+const toggleLock = useToggle(locked);
+const intersections = ref([]);
+const { history } = useRefHistory(intersections, { deep: true });
+const boules = ref([]);
 channel
   .on("broadcast", { event: "intersections" }, (event) => {
-    boules.value = [];
     console.log("payload received: ", event.payload);
+    intersections.value = event.payload;
+    console.log(history.value);
+
+    let maxPayload = history.value.reduce((max, payload) => {
+      return payload.length > max.length ? payload : max;
+    }, []);
+    console.log("Payload with the most items: ", maxPayload);
 
     // Find the cochonette's position
-    let cochonette = event.payload.find(item => item.class === "cochonette");
+    let cochonette = event.payload.find((item) => item.class === "cochonette");
     let offsetX = 0;
     let offsetY = 0;
 
@@ -127,35 +119,48 @@ channel
       offsetY = cochonette.z * 30;
     }
 
-    event.payload.forEach((item) => {
-      let boule = {
-        x: (item.x * 30) - offsetX,
-        y: (item.z * 30) - offsetY,
-        color: "yellow",
-        size: 1,
-        player: 3,
-      };
+    if (!locked.value) {
+      boules.value = [];
+      event.payload.forEach((item) => {
+        let boule = {
+          x: item.x * 30 - offsetX,
+          y: item.z * 30 - offsetY,
+          color: "yellow",
+          size: 1,
+          player: 3,
+        };
 
-      if (item.class === "cochonette") {
-        boule.color = "red";
-        boule.size = 0.4;
-        boule.player = 0;
-      } else if (item.class === "dark") {
-        boule.color = "blue";
-        boule.player = 1;
-      } else if (item.class === "light") {
-        boule.color = "black";
-        boule.player = 2;
-      }
+        if (item.class === "cochonette") {
+          boule.color = "orange";
+          boule.size = 0.4;
+          boule.player = 0;
+        } else if (item.class === "dark") {
+          boule.color = "blue";
+          boule.player = 1;
+        } else if (item.class === "light") {
+          boule.color = "red";
+          boule.player = 2;
+        }
 
-      boules.value.push(boule);
-    });
+        boules.value.push(boule);
+      });
+    }
+  })
+  .subscribe();
+
+let animationController = supabase.channel("animation-controller");
+animationController
+  .on("broadcast", { event: "startCircularRotation" }, (event) => {
+    console.log("startCircularRotation payload received: ", event.payload);
+    startCircularRotation();
+  })
+  .on("broadcast", { event: "flyToCochonetteAndBack" }, (event) => {
+    console.log("flyToCochonetteAndBack payload received: ", event.payload);
+    flyToCochonetteAndBack();
   })
   .subscribe();
 
 const gl = {
-  // clearColor: "transparent",
-  shadows: true,
   alpha: true,
   windowSize: true,
 };
@@ -175,12 +180,6 @@ sounds.colors = {
   white: "/sounds/white.mp3",
   blue: "/sounds/blue.mp3",
 };
-
-
-
-const player1shoots = new Audio("/sounds/elevenlabs/x.mp3");
-const player2shoots = new Audio("/sounds/elevenlabs/x.mp3");
-const player1wins = new Audio("/sounds/elevenlabs/x.mp3");
 
 //interface controls
 const trigger = ref(0);
@@ -206,17 +205,6 @@ onKeyStroke("q", (e) => {
 onKeyStroke("o", (e) => {
   e.preventDefault();
   controller.value = !controller.value;
-});
-
-onKeyStroke("x", (e) => {
-  e.preventDefault();
-  for (let i = 0; i < 6; i++) {
-    goToNext();
-  }
-  halfCamera();
-  setTimeout(() => {
-    startCircularRotation();
-  }, 3500);
 });
 
 // camera controls / animations
@@ -255,7 +243,6 @@ onKeyStroke("e", (e) => {
   e.preventDefault();
   flyToRealisticStart();
 });
-
 
 function topCamera() {
   gsap.to(cameraX, {
@@ -331,10 +318,29 @@ function frontCamera() {
   });
 }
 
+function flyToStart() {
+  killTweens();
+  gsap.to(cameraX, {
+    value: 0,
+    duration: 1,
+    ease: "power2.out",
+  });
+  gsap.to(cameraZ, {
+    value: 20,
+    duration: 1,
+    ease: "power2.out",
+  });
+  gsap.to(alpha, {
+    value: 0,
+    duration: 1,
+    ease: "power2.out",
+  });
+}
+
 function killTweens() {
-  frontCamera();
-  gsap.killTweensOf([alpha, cameraX, cameraZ]);
+  // frontCamera();
   clearIntervals();
+  gsap.killTweensOf([alpha, cameraX, cameraZ]);
 }
 
 function flyToCochonetteAndBack() {
@@ -419,36 +425,22 @@ function flyToRealisticStart() {
   });
 }
 
-function flyToStart() {
-  killTweens();
-  gsap.to(cameraX, {
-    value: 0,
-    duration: 2,
-    ease: "power2.out",
-  });
-  gsap.to(cameraZ, {
-    value: 50,
-    duration: 2,
-    ease: "power2.out",
-  });
-  gsap.to(alpha, {
-    value: 0,
-    duration: 2,
-    ease: "power2.out",
-  });
-}
-
 let intervalIdPlayer, intervalIdFront;
 function clearIntervals() {
   if (intervalIdFront) {
     clearInterval(intervalIdFront);
+    intervalIdFront = null; // Reset the intervalIdFront to null
   }
   if (intervalIdPlayer) {
     clearInterval(intervalIdPlayer);
+    intervalIdPlayer = null; // Reset the intervalIdPlayer to null
   }
 }
 
+const frontAudio = new Audio("/sounds/strudel/hh.mp3");
+const startAudio = new Audio("/sounds/strudel/hh2.mp3");
 function startCircularRotation() {
+  let counter = 0;
   killTweens();
   const targetX = 0;
   const targetZ = 0;
@@ -469,24 +461,25 @@ function startCircularRotation() {
     repeat: -1, // Infinite repetition
     ease: "none",
     onStart: () => {
-      const audio1 = new Audio("/strudel/hh.mp3");
-      const audio2 = new Audio("/strudel/hh2.mp3");
-
       console.log("startCircularRotation");
       intervalIdFront = setInterval(() => {
         console.log("looking to front");
-        audio1.play();
+        frontAudio.play();
       }, 10000);
       setTimeout(() => {
-        audio2.play();
+        startAudio.play();
         intervalIdPlayer = setInterval(() => {
           console.log("looking at player");
-          audio2.play();
+          startAudio.play();
         }, 10000);
       }, 5000);
     },
     onRepeat: () => {
-      flyToRealisticStart();
+      if (counter > 0) {
+        flyToStart();
+        clearIntervals();
+      }
+      counter++;
     },
     onComplete: () => {
       clearIntervals();
@@ -494,13 +487,13 @@ function startCircularRotation() {
   });
 }
 
-setTimeout(() => {
-  gsap.to(cameraZ, {
-    value: 20.001,
-    duration: 1,
-    ease: "power1.out",
-  });
-}, 200);
+// setTimeout(() => {
+//   gsap.to(cameraZ, {
+//     value: 20.001,
+//     duration: 1,
+//     ease: "power1.out",
+//   });
+// }, 200);
 </script>
 
 <style>

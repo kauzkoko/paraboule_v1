@@ -13,5 +13,6 @@ html, body {
   background-color: black;
   margin: 0;
   padding: 0;
+  font-family: Gambetta, sans-serif;
 }
 </style>

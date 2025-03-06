@@ -8,6 +8,7 @@
 <script setup lang="ts">
 import { useTresContext } from "@tresjs/core";
 import * as THREE from "three";
+import { convertColorSpace } from "three/tsl";
 
 const { predictFromImage } = await useInference();
 
@@ -15,7 +16,10 @@ const { renderer, scene, camera } = useTresContext();
 
 const bus = useEventBus("tresjs");
 bus.on((message) => {
-  if (message === "startXR") startXR()
+  if (message === "startXR") {
+    console.log("Starting XR in component");
+    startXR()
+  }
 });
 
 const startXR = async () => {
@@ -95,7 +99,7 @@ const startXR = async () => {
 
     scene.value.add(reticle);
 
-    window.addEventListener("touchstart", onClick);
+    // window.addEventListener("touchstart", onClick);
     // window.addEventListener("click", onClick);
   }
 
@@ -116,50 +120,50 @@ const startXR = async () => {
   let counter = 0;
   let blobs = [];
   let clicked = false;
-  async function onClick(event) {
-    clicked = true;
-    counter++;
-    console.log("Clicked", counter);
-    const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-    const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+  // async function onClick(event) {
+  //   clicked = true;
+  //   counter++;
+  //   console.log("Clicked", counter);
+  //   const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+  //   const clientY = event.touches ? event.touches[0].clientY : event.clientY;
 
-    const intersectionBall = new THREE.Mesh(
-      new THREE.SphereGeometry(0.05, 32, 32),
-      new THREE.MeshBasicMaterial({
-        color: 0x00ff00,
-        transparent: true,
-        opacity: 0.5,
-      })
-    );
+  //   const intersectionBall = new THREE.Mesh(
+  //     new THREE.SphereGeometry(0.05, 32, 32),
+  //     new THREE.MeshBasicMaterial({
+  //       color: 0x00ff00,
+  //       transparent: true,
+  //       opacity: 0.5,
+  //     })
+  //   );
 
-    let testPrediction;
-    const predictions = await predictFromImage(bitmap);
-    if (predictions.length > 0) {
-      bus.emit("predictions", predictions);
-      testPrediction = predictions[0];
-    }
+  //   let testPrediction;
+  //   const predictions = await predictFromImage(bitmap);
+  //   if (predictions.length > 0) {
+  //     bus.emit("predictions", predictions);
+  //     testPrediction = predictions[0];
+  //   }
 
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
+  //   const raycaster = new THREE.Raycaster();
+  //   const mouse = new THREE.Vector2();
 
-    // mouse.x = (clientX / window.innerWidth) * 2 - 1;
-    // mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+  //   // mouse.x = (clientX / window.innerWidth) * 2 - 1;
+  //   // mouse.y = -(clientY / window.innerHeight) * 2 + 1;
 
-    (mouse.x = (testPrediction.bbox.x / 2 / window.innerWidth) * 2 - 1),
-      (mouse.y = -(testPrediction.bbox.y / 2 / window.innerHeight) * 2 + 1);
+  //   (mouse.x = (testPrediction.bbox.x / 2 / window.innerWidth) * 2 - 1),
+  //     (mouse.y = -(testPrediction.bbox.y / 2 / window.innerHeight) * 2 + 1);
 
-    raycaster.setFromCamera(mouse, camera.value);
+  //   raycaster.setFromCamera(mouse, camera.value);
 
-    const intersects = raycaster.intersectObject(plane);
+  //   const intersects = raycaster.intersectObject(plane);
 
-    if (intersects.length > 0) {
-      const intersectPoint = intersects[0].point;
-      intersectionBall.position.copy(intersectPoint);
-    }
+  //   if (intersects.length > 0) {
+  //     const intersectPoint = intersects[0].point;
+  //     intersectionBall.position.copy(intersectPoint);
+  //   }
 
-    scene.value.add(intersectionBall);
-    clicked = false;
-  }
+  //   scene.value.add(intersectionBall);
+  //   clicked = false;
+  // }
 
   function intersectPrediction(prediction) {
     const raycaster = new THREE.Raycaster();
