@@ -1,7 +1,13 @@
 <template>
-  <div>
+  <div class="w-screen h-screen flex justify-center items-center">
     <div>
-      <button @click="send">send xy</button>
+      <button
+        @click="sendPlay"
+        class="w-30vw aspect-1 rounded-full"
+        :style="{backgroundColor: isPlaying ? 'blue' : ''}"
+      >
+        sendPlay
+      </button>
     </div>
   </div>
 </template>
@@ -12,19 +18,21 @@ const noz = new Audio("/sounds/noz.mp3");
 const supabase = useSupabaseClient();
 let channel = supabase.channel("sound-controller");
 
-
+const isPlaying = ref(false);
 channel
   .on("broadcast", { event: "play" }, (event) => {
     console.log("received event on vue page: ", event);
     noz.play();
+    isPlaying.value = true;
     setTimeout(() => {
       noz.pause();
       noz.currentTime = 0;
+      isPlaying.value = false;
     }, 3000);
   })
   .subscribe();
 
-let send = () => {
+let sendPlay = () => {
   channel.send({
     type: "broadcast",
     event: "play",
