@@ -14,4 +14,11 @@
 const route = useRoute();
 const router = useRouter();
 const routes = router.getRoutes();
+routes.sort((a, b) => a.path.length - b.path.length);
 </script>
+
+<style>
+li {
+    font-size: 40px;
+}
+</style>
