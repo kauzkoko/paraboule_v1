@@ -6,13 +6,13 @@
         v-for="(item, index) in selectedPage"
         :key="index"
         class="grid-item"
-        :index="index"
+        :index="index + 1"
         @click="item.clickFunction()"
       >
         <img :src="item.imgSrc" />
       </div>
     </div>
-    <div class="center-circle">
+    <div class="center-circle" ref="swiper" index="0">
       <div class="text-hex-ff0000 text-35px mt-1">1</div>
     </div>
   </div>
@@ -27,6 +27,7 @@ const props = defineProps({
 });
 
 const explanations = [
+new Audio("/sounds/elevenlabs/explanation_scanner.mp3"),
   new Audio("/sounds/elevenlabs/explanation_scanner.mp3"),
   new Audio("/sounds/elevenlabs/explanation_pinger.mp3"),
   new Audio("/sounds/elevenlabs/explanation_pirateradar.mp3"),
@@ -35,24 +36,20 @@ const explanations = [
 
 let lastIndex = 0;
 const longPressCallback = (e) => {
-  console.log("long press");
-  const index = e.srcElement.getAttribute('index');
+  const index = e.srcElement.getAttribute("index");
+  console.log("long press", index);
   explanations[lastIndex].pause();
   explanations[lastIndex].currentTime = 0;
   explanations[index].play();
   lastIndex = index;
 };
 
-const refs = useTemplateRefsList()
-onLongPress(
-  refs,
-  longPressCallback,
-  {
-    modifiers: {
-      prevent: true
-    }
-  }
-)
+const refs = useTemplateRefsList();
+onLongPress(refs, longPressCallback, {
+  modifiers: {
+    prevent: true,
+  },
+});
 
 const { vibrate: vibrateOnce } = useVibrate({ pattern: [50] });
 const { vibrate: vibrateTwice } = useVibrate({ pattern: [50, 30, 50] });
@@ -62,10 +59,25 @@ const { vibrate: vibrateThrice } = useVibrate({
 const { vibrate: vibrateQuadrice } = useVibrate({
   pattern: [50, 30, 50, 30, 50, 30, 50],
 });
+const { vibrate: vibrateLong } = useVibrate({
+  pattern: [100, 20, 50, 20, 10],
+});
+
+const swiper = useTemplateRef("swiper");
+onLongPress(swiper, longPressCallback, {
+  modifiers: {
+    prevent: true,
+  },
+});
+
+const { isSwiping, direction } = useSwipe(swiper)
+watch(isSwiping, (val) => {
+  console.log(direction.value);
+  selectedPageIndex.value++;
+  vibrateLong();
+});
 
 const el = ref(null);
-const { isSwiping, direction } = useSwipe(el);
-
 watch(
   () => props.xrRunning,
   (newVal) => {
@@ -118,7 +130,9 @@ const pages = ref([
     { clickFunction: flyCochoBack, imgSrc: "/icons/standing.svg" },
   ],
 ]);
-const selectedPage = computed(() => pages.value[selectedPageIndex.value]);
+const selectedPage = computed(
+  () => pages.value[selectedPageIndex.value % pages.value.length]
+);
 </script>
 
 <style>
@@ -188,7 +202,6 @@ const selectedPage = computed(() => pages.value[selectedPageIndex.value]);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: -1;
   border: 3px solid red;
   display: flex;
   justify-content: center;
