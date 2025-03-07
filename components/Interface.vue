@@ -8,12 +8,15 @@
         class="grid-item"
         :index="index + 1"
         @click="item.clickFunction()"
+        @touchstart="item.vibrationFunction()"
       >
         <img :src="item.imgSrc" />
       </div>
     </div>
     <div class="center-circle" ref="swiper" index="0">
-      <div class="text-hex-ff0000 text-35px mt-1">1</div>
+      <div class="text-hex-ff0000 text-35px mt-1">\\§
+        {{ Math.abs(selectedPageIndex.value) % pages.value.length }}
+      </div>
     </div>
   </div>
 </template>
@@ -27,7 +30,7 @@ const props = defineProps({
 });
 
 const explanations = [
-new Audio("/sounds/elevenlabs/explanation_scanner.mp3"),
+  new Audio("/sounds/elevenlabs/explanation_pageOne.mp3"),
   new Audio("/sounds/elevenlabs/explanation_scanner.mp3"),
   new Audio("/sounds/elevenlabs/explanation_pinger.mp3"),
   new Audio("/sounds/elevenlabs/explanation_pirateradar.mp3"),
@@ -59,8 +62,13 @@ const { vibrate: vibrateThrice } = useVibrate({
 const { vibrate: vibrateQuadrice } = useVibrate({
   pattern: [50, 30, 50, 30, 50, 30, 50],
 });
-const { vibrate: vibrateLong } = useVibrate({
-  pattern: [100, 20, 50, 20, 10],
+
+const { vibrate: vibratePageOne } = useVibrate({
+  pattern: [100, 20, 50, 20],
+});
+
+const { vibrate: vibratePageTwo } = useVibrate({
+  pattern: [100, 20, 50, 20, 50, 20],
 });
 
 const swiper = useTemplateRef("swiper");
@@ -70,11 +78,16 @@ onLongPress(swiper, longPressCallback, {
   },
 });
 
-const { isSwiping, direction } = useSwipe(swiper)
+const { isSwiping, direction } = useSwipe(swiper);
 watch(isSwiping, (val) => {
-  console.log(direction.value);
-  selectedPageIndex.value++;
-  vibrateLong();
+  if (val) {
+    if (direction.value === "right") selectedPageIndex.value++;
+    if (direction.value === "left") selectedPageIndex.value--;
+
+    // announce the page with a vibration
+    if (selectedPageIndex.value % pages.value.length === 0) vibratePageOne();
+    else vibratePageTwo();
+  }
 });
 
 const el = ref(null);
@@ -92,23 +105,35 @@ watch(
 
 const emit = defineEmits(["scanCamera"]);
 const scanCamera = () => {
-  vibrateOnce();
   emit("scanCamera");
 };
 
 const ping = () => {
-  vibrateTwice();
   sendPlay("ping");
 };
 
 const startCocho = () => {
-  vibrateThrice();
   startCircularRotation();
 };
 
 const flyCochoBack = () => {
-  vibrateQuadrice();
   flyToCochonetteAndBack();
+};
+
+const orientation = () => {
+  console.log("orientation");
+};
+
+const qr = () => {
+  console.log("qr");
+};
+
+const focusBoule1 = () => {
+  console.log("focusBoule1");
+};
+
+const scoreStandings = () => {
+  console.log("scoreStandings");
 };
 
 const { sendPlay } = useSoundController();
@@ -118,21 +143,56 @@ const { startCircularRotation, flyToCochonetteAndBack } =
 const selectedPageIndex = ref(0);
 const pages = ref([
   [
-    { clickFunction: scanCamera, imgSrc: "/icons/scan.svg" },
-    { clickFunction: ping, imgSrc: "/icons/cocho.svg" },
-    { clickFunction: startCocho, imgSrc: "/icons/around.svg" },
-    { clickFunction: flyCochoBack, imgSrc: "/icons/through.svg" },
+    {
+      clickFunction: scanCamera,
+      imgSrc: "/icons/scan.svg",
+      vibrationFunction: vibrateOnce,
+    },
+    {
+      clickFunction: ping,
+      imgSrc: "/icons/cocho.svg",
+      vibrationFunction: vibrateTwice,
+    },
+    {
+      clickFunction: startCocho,
+      imgSrc: "/icons/around.svg",
+      vibrationFunction: vibrateThrice,
+    },
+    {
+      clickFunction: flyCochoBack,
+      imgSrc: "/icons/through.svg",
+      vibrationFunction: vibrateQuadrice,
+    },
   ],
   [
-    { clickFunction: scanCamera, imgSrc: "/icons/ns.svg" },
-    { clickFunction: ping, imgSrc: "/icons/qr.png" },
-    { clickFunction: startCocho, imgSrc: "/icons/boule1.svg" },
-    { clickFunction: flyCochoBack, imgSrc: "/icons/standing.svg" },
+    {
+      clickFunction: orientation,
+      imgSrc: "/icons/ns.svg",
+      vibrationFunction: vibrateOnce,
+    },
+    {
+      clickFunction: qr,
+      imgSrc: "/icons/qr.png",
+      vibrationFunction: vibrateTwice,
+    },
+    {
+      clickFunction: focusBoule1,
+      imgSrc: "/icons/boule1.svg",
+      vibrationFunction: vibrateThrice,
+    },
+    {
+      clickFunction: scoreStandings,
+      imgSrc: "/icons/standing.svg",
+      vibrationFunction: vibrateQuadrice,
+    },
   ],
 ]);
 const selectedPage = computed(
-  () => pages.value[selectedPageIndex.value % pages.value.length]
+  () => pages.value[Math.abs(selectedPageIndex.value) % pages.value.length]
 );
+watch(selectedPage, (val) => {
+  console.log(val);
+});
 </script>
 
 <style>
