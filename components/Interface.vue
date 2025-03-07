@@ -14,8 +14,8 @@
       </div>
     </div>
     <div class="center-circle" ref="swiper" index="0">
-      <div class="text-hex-ff0000 text-35px mt-1">\\§
-        {{ Math.abs(selectedPageIndex.value) % pages.value.length }}
+      <div class="text-hex-ff0000 text-35px mt-1">
+        {{ Math.abs(selectedPageIndex) % pages.length }}
       </div>
     </div>
   </div>
