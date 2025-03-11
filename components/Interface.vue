@@ -26,7 +26,7 @@
       :index="null"
       @click="announcePage()"
     >
-      <div class="text-hex-ff0000 text-35px mt-1">
+      <div class="text-hex-ff0000 text-38px mt-1">
         {{ (Math.abs(selectedPageIndex) % pages.length) + 1 }}
       </div>
     </div>
@@ -111,14 +111,6 @@ const qrStatus = () => {
   console.log("qrStatus");
 };
 
-// const player1 = ref({
-//   shotsTaken: 0,
-// });
-
-// const player2 = ref({
-//   shotsTaken: 0,
-// });
-
 const players = ref({
   player1: {
     shotsTaken: 0,
@@ -134,8 +126,12 @@ const { history, undo, redo } = useRefHistory(players, {
 
 const incrementPlayer1 = () => {
   console.log("incrementPlayer1");
-  if (players.value.player1.shotsTaken > 3 && players.value.player2.shotsTaken === 3) {
+  if (
+    players.value.player1.shotsTaken === 3 &&
+    players.value.player2.shotsTaken === 3
+  ) {
     players.value.player1.shotsTaken = 0;
+    players.value.player2.shotsTaken = 0;
   }
   if (players.value.player1.shotsTaken < 3) {
     players.value.player1.shotsTaken++;
@@ -144,40 +140,45 @@ const incrementPlayer1 = () => {
 
 const incrementPlayer2 = () => {
   console.log("incrementPlayer2");
-  if (players.value.player2.shotsTaken > 3 && players.value.player1.shotsTaken === 3) {
+  if (
+    players.value.player2.shotsTaken === 3 &&
+    players.value.player1.shotsTaken === 3
+  ) {
     players.value.player2.shotsTaken = 0;
+    players.value.player1.shotsTaken = 0;
   }
   if (players.value.player2.shotsTaken < 3) {
     players.value.player2.shotsTaken++;
   }
 };
 
+const computedNextShot = computed(
+  () =>
+    players.value.player1.shotsTaken === 3 &&
+    players.value.player2.shotsTaken === 3
+);
 const computedAnnounceBallsPlayedHtml = computed(() => {
-  return players.value.player1.shotsTaken === 3 && players.value.player2.shotsTaken === 3
+  return computedNextShot.value
     ? `<div class='text-40px'>
             <div>Next round?</div>
         </div>`
     : `
-        <div class='text-40px'>
+        <div class='text-48px'>
           <div>${players.value.player1.shotsTaken} / 3</div><br />
           <div class='h-3px bg-hex-ff0000 w-100%'></div><br/>
           <div>${players.value.player2.shotsTaken} / 3</div>
         </div>`;
 });
 
-
-// const incrementPlayer2 = () => {
-//   console.log("incrementPlayer2");
-//   if (player2.value.shotsTaken === 3 && player1.value.shotsTaken === 3) {
-//     player2.value.shotsTaken = 0;
-//   }
-//   if (player2.value.shotsTaken < 3) {
-//     player2.value.shotsTaken++;
-//   }
-// };
-
+const { speak } = useSpeech();
+const text = ref("");
 const announceBallsPlayed = () => {
   console.log("announceBallsPlayed");
+  text.value = `Player 1 has played ${players.value.player1.shotsTaken} ${players.value.player1.shotsTaken === 1 ? 'ball' : 'balls'}. Player 2 has played ${players.value.player2.shotsTaken} ${players.value.player2.shotsTaken === 1 ? 'ball' : 'balls'}. `;
+  if (players.value.player1.shotsTaken === 3 && players.value.player2.shotsTaken === 3) {
+    text.value += "The next round starts automatically by incrementing the balls played score.";
+  }
+  speak(text.value);
 };
 
 const rewind = () => {
@@ -416,9 +417,6 @@ onLongPress(refs, longPressCallback, {
 const selectedPage = computed(
   () => pages.value[absoluteSelectedPageIndex.value % pages.value.length]
 );
-watch(selectedPage, (val) => {
-  console.log(val);
-});
 
 const swiper = useTemplateRef("swiper");
 onLongPress(swiper, longPressCallback, {
