@@ -3,24 +3,24 @@
     <div>
       <button
         @click="sendPlay"
-        class="w-30vw aspect-1 rounded-full"
-        :style="{backgroundColor: isPlaying ? 'blue' : ''}"
+        class="w-30vw aspect-1 rounded-full bg-hex-ff0000 border-none"
+        :style="{backgroundColor: isPlaying ? 'blue' : 'red'}"
       >
-        sendPlay
+        sendPlayShoes
       </button>
     </div>
   </div>
 </template>
 
 <script setup>
-const noz = new Audio("/sounds/noz.mp3");
+const noz = new Audio("/sounds/strudel/startpoint.mp3");
 
 const supabase = useSupabaseClient();
 let channel = supabase.channel("sound-controller");
 
 const isPlaying = ref(false);
 channel
-  .on("broadcast", { event: "play" }, (event) => {
+  .on("broadcast", { event: "playShoes" }, (event) => {
     console.log("received event on vue page: ", event);
     noz.play();
     isPlaying.value = true;
@@ -35,7 +35,7 @@ channel
 let sendPlay = () => {
   channel.send({
     type: "broadcast",
-    event: "play",
+    event: "playShoes",
   });
 };
 </script>

@@ -20,5 +20,17 @@ routes.sort((a, b) => a.path.length - b.path.length);
 <style>
 li {
     font-size: 40px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    color: white;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:visited li {
+    color: gray;
 }
 </style>

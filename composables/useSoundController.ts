@@ -4,12 +4,19 @@ export function useSoundController() {
 
   channel.subscribe();
 
-  function sendPlay() {
+  function sendPlayCocho() {
     channel.send({
       type: "broadcast",
-      event: "play",
+      event: "playCocho",
     });
   }
 
-  return { sendPlay };
+  function sendPlayShoes() {
+    channel.send({
+      type: "broadcast",
+      event: "playShoes",
+    });
+  }
+
+  return { sendPlayCocho, sendPlayShoes };
 }

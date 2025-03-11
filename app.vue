@@ -13,6 +13,7 @@ html, body {
   background-color: black;
   margin: 0;
   padding: 0;
-  font-family: Gambetta, sans-serif;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, "Trebuchet MS", Verdana, sans-serif;
+  font-weight: 300;
 }
 </style>
