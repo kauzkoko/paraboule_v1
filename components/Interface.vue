@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute top-0 left-0 w-100dvw h-100dvh">
+  <div class="absolute top--100px left-0 w-100dvw h-100dvh">
     <VirtualAudioSpace />
   </div>
   <div class="outer" ref="el">
