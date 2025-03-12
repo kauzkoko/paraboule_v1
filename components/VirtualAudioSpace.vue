@@ -3,10 +3,12 @@
     <TresPerspectiveCamera
       :position="[cameraX, cameraY, cameraZ]"
       :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
+      ref="camera"
     />
     <TresMesh
       v-for="(boule, i) in boules"
       :key="i"
+      ref="boulesRefs"
       :position="[boule.x, 0, boule.y]"
     >
       <TresSphereGeometry :args="[boule.size, 16, 16]" />
@@ -84,12 +86,26 @@ const gl = {
   // windowSize: true,
 };
 
+const camera = useTemplateRef("camera");
+const meshRefs = useTemplateRef("boulesRefs");
+function getScreenPosition(object, camera) {
+  const vector = object.position.clone().project(camera);
+
+  // Convert NDC (-1 to 1) to screen coordinates
+  const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
+  const y = (1 - (vector.y * 0.5 + 0.5)) * window.innerHeight;
+
+  return { x, y };
+}
+
 const props = defineProps({
   isTouching: {
     type: Boolean,
     default: false,
   },
 });
+
+const screenPositions = ref([]);
 watch(
   () => props.isTouching,
   (newVal) => {
@@ -97,6 +113,16 @@ watch(
     if (newVal) {
       // Perform actions when isTouching becomes true
       topCamera();
+      setTimeout(() => {
+        if (meshRefs.value.length < 1) return;
+        meshRefs.value.forEach((mesh) => {
+          const screenPos = getScreenPosition(mesh, camera.value);
+          console.log(`Mesh ${mesh.name} screen position:`, screenPos);
+          screenPositions.value.push(screenPos);
+          console.log('before emit', screenPositions.value)
+          bus.emit("screenPositions", screenPositions.value);
+        });
+      }, 1000);
     } else {
       frontCamera();
       // Perform actions when isTouching becomes false

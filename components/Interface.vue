@@ -1,5 +1,8 @@
 <template>
-  <div class="absolute left-0 w-100dvw h-100dvh" :style="{ top: isTouching ? '0' : '-40px' }">
+  <div
+    class="absolute left-0 w-100dvw h-100dvh"
+    :style="{ top: isTouching ? '0' : '-40px' }"
+  >
     <VirtualAudioSpace :isTouching="isTouching" />
   </div>
   <VibrationGrid :isTouching="isTouching" />
@@ -383,9 +386,8 @@ const vibrateByIndex = (index) => {
   if (index === 3) vibrateQuadrice();
 };
 
-
 const onTouchStart = (index, explanationSrc) => {
-  if ( explanationSrc.endsWith("hapticGrid.mp3") ) {
+  if (explanationSrc && explanationSrc.endsWith("hapticGrid.mp3")) {
     isTouching.value = true;
   }
   vibrateByIndex(index);

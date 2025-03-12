@@ -33,9 +33,16 @@ const { isTouching } = defineProps({
   },
 });
 
+const bus = useEventBus("tresjs");
+bus.on((message, payload) => {
+  if (message === "screenPositions") {
+    console.log("screenPositions", payload);
+  }
+});
+
 const { x, y } = useMouse();
 const { width, height } = useWindowSize();
-const boules = [
+const boules = ref([
   {
     class: "cochonet",
     x: width.value / 2,
@@ -54,14 +61,14 @@ const boules = [
     y: 300,
     audio: new Audio("/sounds/elevenlabs/lightboule.mp3"),
   },
-];
+]);
 const pattern = ref([0]);
 const { vibrate } = useVibrate({ pattern });
 
 watch([x, y], ([x, y]) => {
   console.log(isTouching);
   if (!isTouching) return;
-  boules.forEach((boule) => {
+  boules.value.forEach((boule) => {
     const distance = Math.sqrt(
       Math.pow(x - boule.x, 2) + Math.pow(y - boule.y, 2)
     );
