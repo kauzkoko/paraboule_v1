@@ -25,7 +25,7 @@ export default defineNuxtConfig({
     components: false,
     shortcuts: [
       ["fullScreen", "w-screen h-screen"],
-      ["fullScreenAll", "w-screen h-screen fixed top-0 left-0 overflow-hidden"],
+      ["fullScreenAll", "w-100dvw h-100dvh fixed top-0 left-0 overflow-hidden"],
       ["flexCenter", "flex justify-center items-center"],
       ["circle", "w-10 h-10 rounded-full bg-blue-500"],
     ],

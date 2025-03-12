@@ -1,7 +1,8 @@
 <template>
-  <div class="absolute top--100px left-0 w-100dvw h-100dvh">
-    <VirtualAudioSpace />
+  <div class="absolute left-0 w-100dvw h-100dvh" :style="{ top: isTouching ? '0' : '-40px' }">
+    <VirtualAudioSpace :isTouching="isTouching" />
   </div>
+  <VibrationGrid :isTouching="isTouching" />
   <div class="outer" ref="el">
     <div class="container">
       <div
@@ -11,7 +12,8 @@
         class="grid-item"
         :index="index"
         @click="item.clickFunction()"
-        @touchstart="vibrateByIndex(index)"
+        @touchstart="onTouchStart(index, item.explanationSrc)"
+        @touchend="isTouching = false"
       >
         <img
           v-if="item.imgSrc"
@@ -50,6 +52,7 @@ const props = defineProps({
   },
 });
 const emit = defineEmits(["scanCamera"]);
+const isTouching = ref(false);
 
 const {
   vibrateOnce,
@@ -380,7 +383,15 @@ const vibrateByIndex = (index) => {
   if (index === 3) vibrateQuadrice();
 };
 
-const selectedPageIndex = ref(1);
+
+const onTouchStart = (index, explanationSrc) => {
+  if ( explanationSrc.endsWith("hapticGrid.mp3") ) {
+    isTouching.value = true;
+  }
+  vibrateByIndex(index);
+};
+
+const selectedPageIndex = ref(4);
 const absoluteSelectedPageIndex = computed(() =>
   Math.abs(selectedPageIndex.value)
 );
@@ -481,9 +492,10 @@ const pages = ref([
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
     },
     {
-      clickFunction: orientation,
-      imgSrc: "/icons/calibrator2.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
+      clickFunction: onTouchStart,
+      // imgSrc: "/icons/calibrator2.svg",
+      html: "Tap and hold",
+      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
     },
     {
       clickFunction: orientation,

@@ -53,19 +53,56 @@
     </TresMesh>
     <TresAmbientLight :intensity="5" />
     <TresDirectionalLight :position="[2, 2, 2]" :intensity="1" />
-    <TresGridHelper v-if="grid" :args="[45, 10]" :scale="[1, 1, 0.8]" />
+    <!-- <TresGridHelper
+      v-if="grid"
+      :args="[45, 10]"
+      :scale="[1, 1, 0.8]"
+    /> -->
+    <Grid
+      :args="[10.5, 10.5]"
+      cell-color="#ff0000"
+      :cell-size="0.6"
+      :cell-thickness="0.5"
+      section-color="#ff0000"
+      :section-size="2"
+      :section-thickness="1.3"
+      :infinite-grid="true"
+      :fade-from="0"
+      :fade-distance="18"
+      :fade-strength="1"
+    />
   </TresCanvas>
 </template>
 
 <script setup>
 import { TresCanvas } from "@tresjs/core";
-import { Html, PositionalAudio } from "@tresjs/cientos";
+import { Html, PositionalAudio, Grid } from "@tresjs/cientos";
 import { gsap } from "gsap";
 
 const gl = {
   alpha: true,
   // windowSize: true,
 };
+
+const props = defineProps({
+  isTouching: {
+    type: Boolean,
+    default: false,
+  },
+});
+watch(
+  () => props.isTouching,
+  (newVal) => {
+    console.log("isTouching changed:", newVal);
+    if (newVal) {
+      // Perform actions when isTouching becomes true
+      topCamera();
+    } else {
+      frontCamera();
+      // Perform actions when isTouching becomes false
+    }
+  }
+);
 
 const bus = useEventBus("tresjs");
 bus.on((message) => {
@@ -74,7 +111,6 @@ bus.on((message) => {
     flyToCochonetteAndBack();
   }
 });
-
 
 const supabase = useSupabaseClient();
 let channel = supabase.channel("xr-controller");
@@ -96,7 +132,9 @@ channel
     // console.log("Payload with the most items: ", maxPayload);
 
     // Find the cochonette's position
-    let cochonette = data.payload.intersections.find((item) => item.class === "cochonette");
+    let cochonette = data.payload.intersections.find(
+      (item) => item.class === "cochonette"
+    );
     let offsetX = 0;
     let offsetY = 0;
 
@@ -197,7 +235,8 @@ function topCamera() {
     ease: "power2.out",
   });
   gsap.to(cameraY, {
-    value: 20,
+    // value: 20,
+    value: 30,
     duration: 1,
     ease: "power2.out",
   });

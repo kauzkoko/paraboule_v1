@@ -45,7 +45,19 @@ let fixedIntersections = [
       x: 0.29827494002689575,
       y: 0.11757755279540984,
       z: -1.873205403607142,
-      class: "light"
+      class: "light",
+    },
+    {
+      x: 0.35239538925638664,
+      y: 0.10841178894042934,
+      z: -2.040454871744344,
+      class: "dark",
+    },
+    {
+      x: 0.40640927469181287,
+      y: 0.10841178894042956,
+      z: -1.9825655394221926,
+      class: "light",
     },
   ],
   [
@@ -65,7 +77,7 @@ let fixedIntersections = [
       x: 0.40640927469181287,
       y: 0.10841178894042956,
       z: -1.9825655394221926,
-      class: "light"
+      class: "light",
     },
   ],
 ];
@@ -83,8 +95,8 @@ let send = () => {
   channel.send({
     type: "broadcast",
     event: "intersections",
-    payload: fixedIntersections[counter % 2],
+    payload: { intersections: fixedIntersections[0] },
   });
-  counter++;
+  // counter++;
 };
 </script>

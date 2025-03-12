@@ -11,16 +11,16 @@
     >
       <div
         v-for="(prediction, index) in predictions"
-        class="predictions transition-all transition-duration-200"
+        class="predictions transition-all transition-duration-200 opacity-50"
         :style="{
           left: prediction.bbox.x / 2 + 'px',
           top: prediction.bbox.y / 2 + 'px',
           borderColor:
             prediction.class === 'cochonette'
-              ? 'yellow'
+              ? 'red'
               : prediction.class === 'dark'
-              ? 'blue'
-              : 'red',
+              ? '#999'
+              : '#eee',
         }"
       >
         <div>{{ index }}</div>
