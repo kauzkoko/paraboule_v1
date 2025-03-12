@@ -8,7 +8,6 @@
 <script setup lang="ts">
 import { useTresContext } from "@tresjs/core";
 import * as THREE from "three";
-import { convertColorSpace } from "three/tsl";
 
 const { predictFromImage } = await useInference();
 

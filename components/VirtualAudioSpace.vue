@@ -55,34 +55,6 @@
     <TresDirectionalLight :position="[2, 2, 2]" :intensity="1" />
     <TresGridHelper v-if="grid" :args="[45, 10]" :scale="[1, 1, 0.8]" />
   </TresCanvas>
-  <div
-    v-show="controller"
-    class="fixed top-0 left-0 flex flex-row ml-5 mt-5 children:text-20px children:mt-1"
-  >
-    <div class="flex flex-col children:text-20px children:mt-1">
-      <button class="mt-0!" @click="flyToStart()">flyToStart</button>
-      <button @click="flyToCochonetteAndBack()">flyToCochonetteAndBack</button>
-      <button @click="startCircularRotation()">startCircularRotation</button>
-      <button @click="topCamera()">topCamera</button>
-      <button @click="frontCamera()">frontCamera</button>
-      <button @click="toggleLock()">{{ locked ? "unlock" : "lock" }}</button>
-      <div class="flex">
-        <input
-          type="checkbox"
-          name="test"
-          id="test"
-          v-model="cochonetteSound"
-        />
-        <label for="test" class="text-white">cochonetteSound</label>
-      </div>
-    </div>
-  </div>
-  <div
-    v-if="trigger < 1"
-    class="w-screen h-screen bg-white fixed top-0 left-0 flexCenter"
-  >
-    <div @click="trigger++" class="text-black text-80px">START</div>
-  </div>
 </template>
 
 <script setup>
@@ -90,11 +62,25 @@ import { TresCanvas } from "@tresjs/core";
 import { Html, PositionalAudio } from "@tresjs/cientos";
 import { gsap } from "gsap";
 
+const gl = {
+  alpha: true,
+  // windowSize: true,
+};
+
+const bus = useEventBus("tresjs");
+bus.on((message) => {
+  if (message === "flyToCochonetteAndBack") {
+    console.log("flyToCochonetteAndBack");
+    flyToCochonetteAndBack();
+  }
+});
+
+
 const supabase = useSupabaseClient();
 let channel = supabase.channel("xr-controller");
 
 const locked = ref(false);
-const toggleLock = useToggle(locked);
+
 const intersections = ref([]);
 const { history } = useRefHistory(intersections, { deep: true });
 const boules = ref([]);
@@ -111,7 +97,6 @@ channel
 
     // Find the cochonette's position
     let cochonette = data.payload.intersections.find((item) => item.class === "cochonette");
-    console.log("cochonette: ", cochonette);
     let offsetX = 0;
     let offsetY = 0;
 
@@ -161,11 +146,6 @@ animationController
   })
   .subscribe();
 
-const gl = {
-  alpha: true,
-  windowSize: true,
-};
-
 // audio
 let sounds = {};
 sounds.noise = {
@@ -186,7 +166,11 @@ sounds.colors = {
 const trigger = ref(0);
 const cochonetteSound = ref(false);
 watch(cochonetteSound, () => {
-  console.log("chocho");
+  console.log("cochonetteSound");
+  trigger.value++;
+});
+
+onMounted(() => {
   trigger.value++;
 });
 
@@ -194,56 +178,12 @@ const helpers = ref(true);
 const grid = ref(true);
 const controller = ref(true);
 
-onKeyStroke("g", (e) => {
-  e.preventDefault();
-  grid.value = !grid.value;
-});
-onKeyStroke("q", (e) => {
-  e.preventDefault();
-  helpers.value = !helpers.value;
-});
-
-onKeyStroke("o", (e) => {
-  e.preventDefault();
-  controller.value = !controller.value;
-});
-
 // camera controls / animations
 const alpha = ref(0);
 const rotationX = ref(0);
 const cameraZ = ref(20);
 const cameraX = ref(0);
 const cameraY = ref(1);
-
-onKeyStroke("t", (e) => {
-  e.preventDefault();
-  topCamera();
-});
-
-onKeyStroke("h", (e) => {
-  e.preventDefault();
-  halfCamera();
-});
-
-onKeyStroke("f", (e) => {
-  e.preventDefault();
-  frontCamera();
-});
-
-onKeyStroke("c", (e) => {
-  e.preventDefault();
-  startCircularRotation();
-});
-
-onKeyStroke("s", (e) => {
-  e.preventDefault();
-  flyToStart();
-});
-
-onKeyStroke("e", (e) => {
-  e.preventDefault();
-  flyToRealisticStart();
-});
 
 function topCamera() {
   gsap.to(cameraX, {
@@ -487,14 +427,6 @@ function startCircularRotation() {
     },
   });
 }
-
-// setTimeout(() => {
-//   gsap.to(cameraZ, {
-//     value: 20.001,
-//     duration: 1,
-//     ease: "power1.out",
-//   });
-// }, 200);
 </script>
 
 <style>

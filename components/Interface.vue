@@ -1,4 +1,7 @@
 <template>
+  <div class="absolute top-0 left-0 w-100dvw h-100dvh">
+    <VirtualAudioSpace />
+  </div>
   <div class="outer" ref="el">
     <div class="container">
       <div
@@ -24,13 +27,18 @@
       class="center-circle"
       ref="swiper"
       :index="null"
-      @click="announcePage()"
+      @click="onSingleClick"
+      v-on:dblclick.native="onDoubleClick()"
     >
       <div class="text-hex-ff0000 text-38px mt-1">
         {{ (Math.abs(selectedPageIndex) % pages.length) + 1 }}
       </div>
     </div>
-    <QrScanner v-if="scanForQr" @qrCodeFound="onQrCode" />
+    <QrScanner
+      v-if="scanForQr"
+      :scanForQr="scanForQr"
+      @qrCodeFound="onQrCode"
+    />
   </div>
 </template>
 
@@ -107,8 +115,133 @@ const qr = () => {
   console.log("qr");
 };
 
+const qrStatusAudio = new Audio(
+  "/sounds/elevenlabs/click_pairingStatusAnnouncer.mp3"
+);
 const qrStatus = () => {
   console.log("qrStatus");
+  if (qrStatusAudio.paused) {
+    qrStatusAudio.play();
+  } else {
+    qrStatusAudio.pause();
+    qrStatusAudio.currentTime = 0;
+  }
+};
+
+let clickTimeout = null;
+const micUpAudio = new Audio("/sounds/strudel/micup.mp3");
+const micDownAudio = new Audio("/sounds/strudel/micdown.mp3");
+const { isListening, isFinal, result, start, stop } = useSpeechRecognition();
+
+const onSingleClick = () => {
+  if (clickTimeout) {
+    console.log("if");
+    clearTimeout(clickTimeout);
+    clickTimeout = null;
+    onDoubleClick();
+  } else {
+    console.log("else");
+    clickTimeout = setTimeout(() => {
+      announcePage();
+      clickTimeout = null;
+    }, 300);
+  }
+};
+
+const onDoubleClick = () => {
+  console.log("onDoubleClick");
+  if (clickTimeout) {
+    clearTimeout(clickTimeout);
+    clickTimeout = null;
+  }
+  if (isListening.value) {
+    micDownAudio.play();
+    stop();
+    let res = result.value;
+    console.log("stop listening", res);
+    if (res) {
+      if (res.includes("ping jack")) {
+        sendPlayCocho();
+      }
+      if (res.includes("ping shoes")) {
+        sendPlayShoes();
+      }
+      if (res.includes("scan field")) {
+        scanCamera();
+      }
+      if (res.includes("pairing status")) {
+        qrStatus();
+      }
+      if (res.includes("current score")) {
+        scoreStandings();
+      }
+      if (
+        res.includes("player one incrementer") ||
+        res.includes("increment player one")
+      ) {
+        incrementPlayer1();
+      }
+      if (
+        res.includes(
+          "player two incrementer" || res.includes("increment player two")
+        )
+      ) {
+        incrementPlayer2();
+      }
+      if (res.includes("announce balls played")) {
+        announceBallsPlayed();
+      }
+      if (res.includes("rewind")) {
+        rewind();
+      }
+      if (res.includes("pirate radar")) {
+        startCocho();
+      }
+      if (res.includes("boomerang")) {
+        flyCochoBack();
+      }
+      if (res.includes("boule focuser")) {
+        bouleFocuser();
+      }
+      if (res.includes("boules before")) {
+        focusBoulesBefore();
+      }
+      if (res.includes("calibrator")) {
+        orientation();
+      }
+      if (res.includes("unique QR")) {
+        qr();
+      }
+      if (res.includes("QR code")) {
+        qr();
+      }
+      if (res.includes("QR scanner")) {
+        scanqr();
+      }
+      if (res.includes("page announcer")) {
+        console.log("announcePage");
+        announcePage();
+      }
+      const pageNumber = res.endsWith("page one")
+        ? 1
+        : res.endsWith("page two")
+        ? 2
+        : res.endsWith("page three")
+        ? 3
+        : res.endsWith("page four")
+        ? 4
+        : res.endsWith("page five")
+        ? 5
+        : null;
+      if (pageNumber >= 1 && pageNumber <= pages.value.length) {
+        selectedPageIndex.value = pageNumber - 1;
+      }
+    }
+  } else {
+    start();
+    console.log("start listening");
+    micUpAudio.play();
+  }
 };
 
 const players = ref({
@@ -119,11 +252,9 @@ const players = ref({
     shotsTaken: 0,
   },
 });
-
 const { history, undo, redo } = useRefHistory(players, {
   deep: true,
 });
-
 const incrementPlayer1 = () => {
   console.log("incrementPlayer1");
   if (
@@ -137,7 +268,6 @@ const incrementPlayer1 = () => {
     players.value.player1.shotsTaken++;
   }
 };
-
 const incrementPlayer2 = () => {
   console.log("incrementPlayer2");
   if (
@@ -151,7 +281,6 @@ const incrementPlayer2 = () => {
     players.value.player2.shotsTaken++;
   }
 };
-
 const computedNextShot = computed(
   () =>
     players.value.player1.shotsTaken === 3 &&
@@ -174,9 +303,14 @@ const { speak } = useSpeech();
 const text = ref("");
 const announceBallsPlayed = () => {
   console.log("announceBallsPlayed");
-  text.value = `Player 1 has played ${players.value.player1.shotsTaken} ${players.value.player1.shotsTaken === 1 ? 'ball' : 'balls'}. Player 2 has played ${players.value.player2.shotsTaken} ${players.value.player2.shotsTaken === 1 ? 'ball' : 'balls'}. `;
-  if (players.value.player1.shotsTaken === 3 && players.value.player2.shotsTaken === 3) {
-    text.value += "The next round starts automatically by incrementing the balls played score.";
+  text.value = `Player 1 has played ${players.value.player1.shotsTaken} ${
+    players.value.player1.shotsTaken === 1 ? "ball" : "balls"
+  }. Player 2 has played ${players.value.player2.shotsTaken} ${
+    players.value.player2.shotsTaken === 1 ? "ball" : "balls"
+  }. `;
+  if (computedNextShot.value) {
+    text.value +=
+      "The next round starts automatically by incrementing the balls played score.";
   }
   speak(text.value);
 };
@@ -186,6 +320,7 @@ const rewind = () => {
   undo();
 };
 
+const scanForQr = ref(false);
 const lastQrCode = ref("");
 const onQrCode = (code) => {
   console.log("qrCodeFound", code);
@@ -193,7 +328,6 @@ const onQrCode = (code) => {
   scanForQr.value = false;
 };
 
-const scanForQr = ref(false);
 const scanqr = () => {
   console.log("scanqr");
   scanForQr.value = !scanForQr.value;
@@ -228,7 +362,14 @@ const pingShoes = () => {
   }
 };
 
-const { sendPlayCocho, sendPlayShoes } = useSoundController();
+const pingPhone = () => {
+  console.log("pingPhone");
+  if (!afterLongPress) {
+    sendPlayPhone();
+  }
+};
+
+const { sendPlayCocho, sendPlayShoes, sendPlayPhone } = useSoundController();
 const { startCircularRotation, flyToCochonetteAndBack } =
   useAnimationController();
 
@@ -239,7 +380,7 @@ const vibrateByIndex = (index) => {
   if (index === 3) vibrateQuadrice();
 };
 
-const selectedPageIndex = ref(3);
+const selectedPageIndex = ref(1);
 const absoluteSelectedPageIndex = computed(() =>
   Math.abs(selectedPageIndex.value)
 );
@@ -279,7 +420,7 @@ const pages = ref([
     },
     {
       clickFunction: bouleFocuser,
-      imgSrc: "/icons/bouleFocuser11.svg",
+      imgSrc: "/icons/bouleFocuser.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_bouleFocuser.mp3",
     },
     {
@@ -290,37 +431,37 @@ const pages = ref([
   ],
   [
     {
-      clickFunction: orientation,
-      imgSrc: "/icons/ns.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_orientation.mp3",
+      clickFunction: qrStatus,
+      explanationSrc:
+        "/sounds/elevenlabs/explanation_pairingStatusAnnouncer.mp3",
+      html: "Pairing-Status:<br />Connected to 3wasds3w2.",
     },
     {
-      clickFunction: qrStatus,
-      // imgSrc: "/icons/qrStatus.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_qrStatus.mp3",
-      html: "QR-Status:<br />Connected to 3wasds3w2.",
+      clickFunction: pingPhone,
+      imgSrc: "/icons/pingPhone3.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_pingPhone3.mp3",
+    },
+    {
+      clickFunction: scanqr,
+      imgSrc: "/icons/scanQr1.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_qrScanner.mp3",
     },
     {
       clickFunction: qr,
       imgSrc: "/icons/uniqueQr.png",
       explanationSrc: "/sounds/elevenlabs/explanation_uniqueQr.mp3",
     },
-    {
-      clickFunction: scanqr,
-      imgSrc: "/icons/scanqr.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_qrScanner.mp3",
-    },
   ],
   [
     {
       clickFunction: incrementPlayer1,
       imgSrc: "/icons/plus.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_incrementPlayer1.mp3",
+      explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
     },
     {
       clickFunction: incrementPlayer2,
       imgSrc: "/icons/plus.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_incrementPlayer2.mp3",
+      explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
     },
     {
       clickFunction: announceBallsPlayed,
@@ -330,7 +471,29 @@ const pages = ref([
     {
       clickFunction: rewind,
       imgSrc: "/icons/rewind.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_rewind.mp3",
+      explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
+    },
+  ],
+  [
+    {
+      clickFunction: orientation,
+      imgSrc: "/icons/calibrator2.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
+    },
+    {
+      clickFunction: orientation,
+      imgSrc: "/icons/calibrator2.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
+    },
+    {
+      clickFunction: orientation,
+      imgSrc: "/icons/calibrator2.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
+    },
+    {
+      clickFunction: orientation,
+      imgSrc: "/icons/calibrator2.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
     },
   ],
 ]);
@@ -350,23 +513,17 @@ for (let i = 1; i <= pages.value.length; i++) {
   );
 }
 
-const isAnnouncingPage = ref(false);
 const announcePage = () => {
-  console.log("announcePage", announcePageAudioArray);
-
-  if (!afterLongPress && !isAnnouncingPage.value) {
+  console.log("announcePage");
+  let audio =
     announcePageAudioArray[
       absoluteSelectedPageIndex.value % announcePageAudioArray.length
-    ].play();
-    isAnnouncingPage.value = true;
-  } else if (isAnnouncingPage.value) {
-    announcePageAudioArray[
-      absoluteSelectedPageIndex.value % announcePageAudioArray.length
-    ].pause();
-    announcePageAudioArray[
-      absoluteSelectedPageIndex.value % announcePageAudioArray.length
-    ].currentTime = 0;
-    isAnnouncingPage.value = false;
+    ];
+  if (audio.paused && !afterLongPress) {
+    audio.play();
+  } else {
+    audio.pause();
+    audio.currentTime = 0;
   }
 };
 
@@ -428,8 +585,8 @@ onLongPress(swiper, longPressCallback, {
 const { isSwiping, direction } = useSwipe(swiper);
 watch(isSwiping, (val) => {
   if (val) {
-    if (direction.value === "right") selectedPageIndex.value++;
-    if (direction.value === "left") selectedPageIndex.value--;
+    if (direction.value === "right") selectedPageIndex.value--;
+    if (direction.value === "left") selectedPageIndex.value++;
 
     // announce the page with a vibration
     if (selectedPageIndex.value % pages.value.length === 0) vibratePageOne();

@@ -5,10 +5,11 @@ export function useXrController() {
   channel.subscribe();
 
   function sendIntersections(payload) {
+    console.log("sendIntersections", payload);
     channel.send({
       type: "broadcast",
       event: "intersections",
-      payload: payload,
+      payload: { intersections: payload },
     });
   }
 

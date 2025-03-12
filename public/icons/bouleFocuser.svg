@@ -1,12 +1,12 @@
-<svg width="203" height="243" viewBox="0 0 203 243" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="139.847" cy="142.847" r="38.5" transform="rotate(21.4246 139.847 142.847)" fill="black" stroke="#FF0000" stroke-width="3"/>
-<circle cx="111.847" cy="71.847" r="38.5" transform="rotate(21.4246 111.847 71.847)" fill="black" stroke="#FF0000" stroke-width="3"/>
-<circle cx="148.144" cy="109.744" r="38.5" transform="rotate(30.2491 148.144 109.744)" fill="black" stroke="#FF0000" stroke-width="3"/>
-<circle cx="103.522" cy="124.924" r="18.5" transform="rotate(21.4246 103.522 124.924)" fill="black" stroke="#FF0000" stroke-width="3"/>
-<circle cx="139.793" cy="142.847" r="38.5" transform="rotate(21.4246 139.793 142.847)" fill="black" stroke="#FF0000" stroke-width="3"/>
-<path d="M106.054 98.3553C125.58 78.8291 157.238 78.8291 176.765 98.3553" stroke="#FF0000" stroke-width="3"/>
-<path d="M91.0539 84.4975C118.391 57.1608 162.712 57.1608 190.049 84.4975" stroke="#FF0000" stroke-width="3"/>
-<circle cx="87.793" cy="190.847" r="38.5" transform="rotate(21.4246 87.793 190.847)" fill="black" stroke="#FF0000" stroke-width="3"/>
-<path d="M106.054 186.752C125.58 206.279 157.238 206.279 176.765 186.752" stroke="#FF0000" stroke-width="3"/>
-<path d="M91.0539 200.61C118.391 227.947 162.712 227.947 190.049 200.61" stroke="#FF0000" stroke-width="3"/>
+<svg width="202" height="223" viewBox="0 0 202 223" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="104.847" cy="122.847" r="38.5" transform="rotate(21.4246 104.847 122.847)" fill="black" stroke="#FF0000" stroke-width="3"/>
+<circle cx="76.847" cy="51.847" r="38.5" transform="rotate(21.4246 76.847 51.847)" fill="black" stroke="#FF0000" stroke-width="3"/>
+<circle cx="113.144" cy="89.7439" r="38.5" transform="rotate(30.2491 113.144 89.7439)" fill="black" stroke="#FF0000" stroke-width="3"/>
+<circle cx="68.5224" cy="104.924" r="18.5" transform="rotate(21.4246 68.5224 104.924)" fill="black" stroke="#FF0000" stroke-width="3"/>
+<circle cx="104.529" cy="122.427" r="38.5" transform="rotate(137.026 104.529 122.427)" fill="black" stroke="#FF0000" stroke-width="3"/>
+<path d="M159.231 111.226C168.403 137.273 154.723 165.823 128.676 174.994" stroke="#FF0000" stroke-width="3"/>
+<path d="M178.21 103.687C191.05 140.152 171.898 180.122 135.433 192.962" stroke="#FF0000" stroke-width="3"/>
+<circle cx="52.793" cy="170.847" r="38.5" transform="rotate(21.4246 52.793 170.847)" fill="black" stroke="#FF0000" stroke-width="3"/>
+<path d="M79.5132 73.0284C53.4666 82.2 39.7866 110.75 48.9581 136.797" stroke="#FF0000" stroke-width="3"/>
+<path d="M73.4976 53.513C37.0323 66.3532 17.8803 106.323 30.7205 142.789" stroke="#FF0000" stroke-width="3"/>
 </svg>

@@ -36,6 +36,7 @@ let sendPlay = () => {
   channel.send({
     type: "broadcast",
     event: "playShoes",
+    payload: {},
   });
 };
 </script>

@@ -18,24 +18,25 @@
     "@tresjs/cientos": "^4.1.1",
     "@tresjs/core": "^4.3.3",
     "@vite-pwa/nuxt": "^0.10.6",
-    "@vueuse/components": "^12.8.2",
-    "@vueuse/core": "^12.8.2",
+    "@vueuse/components": "^13.0.0",
+    "@vueuse/core": "^13.0.0",
     "cloudflared": "^0.7.0",
     "gsap": "^3.12.7",
     "inferencejs": "^1.0.16",
-    "nuxt": "^3.15.4",
+    "nuxt": "^3.16.0",
     "qr-scanner": "^1.4.2",
     "sass": "^1.85.1",
     "three": "^0.174.0",
     "vue": "^3.5.13",
-    "vue-router": "^4.5.0"
+    "vue-router": "^4.5.0",
+    "vue3-touch-events": "^5.0.13"
   },
   "devDependencies": {
     "@nuxtjs/supabase": "^1.5.0",
     "@pinia/nuxt": "^0.10.1",
     "@unocss/nuxt": "^66.1.0-beta.3",
     "@vite-pwa/assets-generator": "^0.2.6",
-    "@vueuse/nuxt": "^12.8.2",
+    "@vueuse/nuxt": "^13.0.0",
     "pinia-plugin-persistedstate": "^4.2.0"
   }
 }

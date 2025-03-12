@@ -8,6 +8,7 @@ export function useSoundController() {
     channel.send({
       type: "broadcast",
       event: "playCocho",
+      payload: {},
     });
   }
 
@@ -15,8 +16,17 @@ export function useSoundController() {
     channel.send({
       type: "broadcast",
       event: "playShoes",
+      payload: {},
     });
   }
 
-  return { sendPlayCocho, sendPlayShoes };
+  function sendPlayPhone() {
+    channel.send({
+      type: "broadcast",
+      event: "playPhone",
+      payload: {},
+    });
+  }
+
+  return { sendPlayCocho, sendPlayShoes, sendPlayPhone };
 }

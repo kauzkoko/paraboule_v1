@@ -11,8 +11,9 @@ const emit = defineEmits(["qrCodeFound"]);
 const videoElem = ref();
 const code = ref("");
 
+let qrScanner
 onMounted(() => {
-  let qrScanner = new QrScanner(
+  qrScanner = new QrScanner(
     videoElem.value,
     (data) => {
       code.value = data.data;
@@ -21,5 +22,9 @@ onMounted(() => {
     { returnDetailedScanResult: false, highlightScanRegion: false }
   );
   qrScanner.start();
+});
+
+onUnmounted(() => {
+  qrScanner.stop();
 });
 </script>
