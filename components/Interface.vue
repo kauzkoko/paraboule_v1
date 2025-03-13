@@ -501,12 +501,12 @@ const pages = ref([
     },
     {
       clickFunction: orientation,
-      imgSrc: "/icons/calibrator2.svg",
+      // imgSrc: "/icons/calibrator2.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
     },
     {
       clickFunction: orientation,
-      imgSrc: "/icons/calibrator2.svg",
+      // imgSrc: "/icons/calibrator2.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
     },
   ],

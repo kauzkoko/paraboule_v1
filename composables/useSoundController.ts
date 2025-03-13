@@ -2,6 +2,8 @@ export function useSoundController() {
   const supabase = useSupabaseClient();
   let channel = supabase.channel("sound-controller");
 
+  const { sendCochonet, sendHoola } = useMqtt();
+
   channel.subscribe();
 
   function sendPlayCocho() {
@@ -10,6 +12,7 @@ export function useSoundController() {
       event: "playCocho",
       payload: {},
     });
+    sendCochonet("5");
   }
 
   function sendPlayShoes() {
@@ -18,6 +21,7 @@ export function useSoundController() {
       event: "playShoes",
       payload: {},
     });
+    sendHoola("3");
   }
 
   function sendPlayPhone() {
