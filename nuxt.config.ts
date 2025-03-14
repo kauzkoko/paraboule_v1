@@ -15,6 +15,7 @@ export default defineNuxtConfig({
     "pinia-plugin-persistedstate",
     "@unocss/nuxt",
     "@vite-pwa/nuxt",
+    "@vueuse/sound/nuxt",
   ],
   supabase: {
     redirect: false,
@@ -116,7 +117,12 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       ADAFRUIT_AIO_USERNAME: process.env.ADAFRUIT_AIO_USERNAME,
-      ADAFRUIT_AIO_KEY: process.env.ADAFRUIT_AIO_KEY
-    }
-  }
+      ADAFRUIT_AIO_KEY: process.env.ADAFRUIT_AIO_KEY,
+    },
+  },
+  sound: {
+    sounds: {
+      scan: true,
+    },
+  },
 });

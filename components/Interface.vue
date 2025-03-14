@@ -31,7 +31,7 @@
     <div
       class="center-circle"
       ref="swiper"
-      :index="null"
+      :index="'pageAnnouncer'"
       @click="onSingleClick"
       v-on:dblclick.native="onDoubleClick()"
     >
@@ -48,6 +48,8 @@
 </template>
 
 <script setup>
+import { Howler } from 'howler';
+
 const props = defineProps({
   xrRunning: {
     type: Boolean,
@@ -121,24 +123,15 @@ const qr = () => {
   console.log("qr");
 };
 
-const qrStatusAudio = new Audio(
+const pairingStatusAnnouncer = useSoundComposable(
   "/sounds/elevenlabs/click_pairingStatusAnnouncer.mp3"
 );
 const qrStatus = () => {
-  console.log("qrStatus");
-  if (qrStatusAudio.paused) {
-    qrStatusAudio.play();
-  } else {
-    qrStatusAudio.pause();
-    qrStatusAudio.currentTime = 0;
-  }
+  pairingStatusAnnouncer.play();
 };
 
 let clickTimeout = null;
-const micUpAudio = new Audio("/sounds/strudel/micup.mp3");
-const micDownAudio = new Audio("/sounds/strudel/micdown.mp3");
 const { isListening, isFinal, result, start, stop } = useSpeechRecognition();
-
 const onSingleClick = () => {
   if (clickTimeout) {
     console.log("if");
@@ -161,7 +154,9 @@ const onDoubleClick = () => {
     clickTimeout = null;
   }
   if (isListening.value) {
-    micDownAudio.play();
+    useSound("/sounds/strudel/micup.mp3", {
+      interrupt: true,
+    }).play();
     stop();
     let res = result.value;
     console.log("stop listening", res);
@@ -246,7 +241,9 @@ const onDoubleClick = () => {
   } else {
     start();
     console.log("start listening");
-    micUpAudio.play();
+    useSound("/sounds/strudel/micdown.mp3", {
+      interrupt: true,
+    }).play();
   }
 };
 
@@ -316,7 +313,7 @@ const announceBallsPlayed = () => {
   }. `;
   if (computedNextShot.value) {
     text.value +=
-      "The next round starts automatically by incrementing the balls played score.";
+      "Current round is over. Please start a new round by pressing the plus button.";
   }
   speak(text.value);
 };
@@ -342,23 +339,13 @@ const scanqr = () => {
   }, 10000);
 };
 
-const isSoundPlaying = ref(false);
-const currentScoreAudio = new Audio(
+const currentScoreSound = useSoundComposable(
   "/sounds/elevenlabs/click_currentScore.mp3"
 );
+
 const scoreStandings = () => {
   console.log("scoreStandings");
-  if (isSoundPlaying.value) {
-    currentScoreAudio.pause();
-    currentScoreAudio.currentTime = 0;
-    isSoundPlaying.value = false;
-  } else if (!afterLongPress) {
-    isSoundPlaying.value = true;
-    currentScoreAudio.play();
-    currentScoreAudio.onended = () => {
-      isSoundPlaying.value = false;
-    };
-  }
+  currentScoreSound.play();
 };
 
 const pingShoes = () => {
@@ -393,7 +380,7 @@ const onTouchStart = (index, explanationSrc) => {
   vibrateByIndex(index);
 };
 
-const selectedPageIndex = ref(4);
+const selectedPageIndex = ref(0);
 const absoluteSelectedPageIndex = computed(() =>
   Math.abs(selectedPageIndex.value)
 );
@@ -512,60 +499,48 @@ const pages = ref([
   ],
 ]);
 
-let pageAnnouncerExplanation = new Audio(
-  "/sounds/elevenlabs/explanation_pageAnnouncer.mp3"
+const pageOneAnnouncer = useSoundComposable(
+  "/sounds/elevenlabs/announce_page1.mp3"
 );
-const explanations = pages.value
-  .flat()
-  .map((item) => new Audio(item.explanationSrc));
-console.log(explanations);
-
-let announcePageAudioArray = [];
-for (let i = 1; i <= pages.value.length; i++) {
-  announcePageAudioArray.push(
-    new Audio(`/sounds/elevenlabs/announce_page${i}.mp3`)
-  );
-}
-
+const pageTwoAnnouncer = useSoundComposable(
+  "/sounds/elevenlabs/announce_page2.mp3"
+);
 const announcePage = () => {
   console.log("announcePage");
-  let audio =
-    announcePageAudioArray[
-      absoluteSelectedPageIndex.value % announcePageAudioArray.length
-    ];
-  if (audio.paused && !afterLongPress) {
-    audio.play();
+  if (absoluteSelectedPageIndex.value % pages.value.length === 0) {
+    pageOneAnnouncer.play();
   } else {
-    audio.pause();
-    audio.currentTime = 0;
+    pageTwoAnnouncer.play();
   }
 };
 
+const explanations = pages.value
+  .flat()
+  .map((item) => useSoundComposable(item.explanationSrc));
+
+const pageAnnouncerExplanation = useSoundComposable(
+  "/sounds/elevenlabs/explanation_pageAnnouncer.mp3"
+);
 let lastIndex = 0;
 const longPressCallback = (e) => {
   afterLongPress = true;
   const index = e.srcElement.getAttribute("index");
   console.log("long press on index", index);
 
-  if (!index) {
+  if (index === "pageAnnouncer") {
     pageAnnouncerExplanation.play();
-    lastIndex = null;
+    lastIndex = "pageAnnouncer";
     return;
   }
 
-  let explanationIndex = absoluteSelectedPageIndex.value * 4 + parseInt(index);
-  console.log("explanationIndex", explanationIndex);
+  if (!isNaN(index) && index !== null) {
+    let explanationIndex =
+      (absoluteSelectedPageIndex.value * 4 + parseInt(index)) %
+      explanations.length;
 
-  if (lastIndex) {
-    explanations[lastIndex].pause();
-    explanations[lastIndex].currentTime = 0;
-  } else {
-    pageAnnouncerExplanation.pause();
-    pageAnnouncerExplanation.currentTime = 0;
+    explanations[explanationIndex].play();
+    lastIndex = explanationIndex;
   }
-
-  explanations[explanationIndex].play();
-  lastIndex = explanationIndex;
 };
 
 let afterLongPress = false;
@@ -577,8 +552,8 @@ onLongPress(refs, longPressCallback, {
   },
   // distanceThreshold: 5,
   onMouseUp: () => {
-    explanations[lastIndex].pause();
-    explanations[lastIndex].currentTime = 0;
+    console.log("onMouseUp");
+    Howler.stop();
     setTimeout(() => {
       afterLongPress = false;
     }, 100);
@@ -602,7 +577,6 @@ watch(isSwiping, (val) => {
     if (direction.value === "right") selectedPageIndex.value--;
     if (direction.value === "left") selectedPageIndex.value++;
 
-    // announce the page with a vibration
     if (selectedPageIndex.value % pages.value.length === 0) vibratePageOne();
     else vibratePageTwo();
   }
