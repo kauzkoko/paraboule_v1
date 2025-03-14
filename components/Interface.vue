@@ -3,7 +3,7 @@
     class="absolute left-0 w-100dvw h-100dvh"
     :style="{ top: isTouching ? '0' : '-40px' }"
   >
-    <VirtualAudioSpace :isTouching="isTouching" />
+    <VirtualAudioSpaceFancy :isTouching="isTouching" />
   </div>
   <VibrationGrid :isTouching="isTouching" />
   <div class="outer" ref="el">
@@ -16,7 +16,8 @@
         :index="index"
         @click="item.clickFunction()"
         @touchstart="onTouchStart(index, item.explanationSrc)"
-        @touchend="isTouching = false"
+        @touchend="onTouchEnd"
+        :style="{background: touchedIndex === index ? 'rgba(255,0,0,.25)' : 'transparent'}"
       >
         <img
           v-if="item.imgSrc"
@@ -373,11 +374,20 @@ const vibrateByIndex = (index) => {
   if (index === 3) vibrateQuadrice();
 };
 
+const touchedIndex = ref(null);
 const onTouchStart = (index, explanationSrc) => {
+  touchedIndex.value = index;
   if (explanationSrc && explanationSrc.endsWith("hapticGrid.mp3")) {
     isTouching.value = true;
   }
   vibrateByIndex(index);
+};
+
+const onTouchEnd = () => {
+  setTimeout(() => {
+    touchedIndex.value = null;
+  }, 300);
+  isTouching.value = false;
 };
 
 const selectedPageIndex = ref(0);
@@ -456,12 +466,12 @@ const pages = ref([
     {
       clickFunction: incrementPlayer1,
       imgSrc: "/icons/plus.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
+      explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
     },
     {
       clickFunction: incrementPlayer2,
       imgSrc: "/icons/plus.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
+      explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
     },
     {
       clickFunction: announceBallsPlayed,
@@ -581,6 +591,13 @@ watch(isSwiping, (val) => {
     else vibratePageTwo();
   }
 });
+
+onMounted(() => {
+  for (let i = 0; i < pages.value.length; i++) {
+      selectedPageIndex.value = i;
+  }
+  selectedPageIndex.value = 0;
+});
 </script>
 
 <style>
@@ -623,6 +640,7 @@ watch(isSwiping, (val) => {
   user-select: none;
   pointer-events: auto;
   overflow: hidden;
+  transition: all 100ms;
   img {
     pointer-events: none;
     /* width: 90px; */
