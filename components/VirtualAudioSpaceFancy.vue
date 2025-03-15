@@ -151,9 +151,17 @@ watch(
       topCamera();
       setTimeout(() => {
         if (meshRefs.value.length < 1) return;
+        let darkCounter = 0;
+        let lightCounter = 0;
         meshRefs.value.forEach((mesh) => {
           const screenPos = getScreenPosition(mesh, camera.value);
-          screenPositions.value.push({ ...screenPos, class: mesh.iClass });
+          if (mesh.iClass === "dark") {
+            darkCounter++;
+          }
+          if (mesh.iClass === "light") {
+            lightCounter++;
+          }
+          screenPositions.value.push({ ...screenPos, class: mesh.iClass, classNumber: mesh.iClass === "dark" ? darkCounter : lightCounter });
         });
         bus.emit("screenPositions", screenPositions.value);
       }, 1000);

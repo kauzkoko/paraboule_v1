@@ -1,6 +1,10 @@
 <template>
-  <div class="fullScreenAll flexCenter text-white z-999" :style="{
-  pointerEvents: isTouching ? 'auto' : 'none' }" />
+  <div
+    class="fullScreenAll flexCenter text-white z-999"
+    :style="{
+      pointerEvents: isTouching ? 'auto' : 'none',
+    }"
+  />
 </template>
 
 <script setup>
@@ -41,8 +45,6 @@ const lightBouleAudios = [
 
 watch([x, y], ([x, y]) => {
   if (!isTouching) return;
-  let darkCounter = 0;
-  let lightCounter = 0;
   boules.value.forEach((boule) => {
     const distance = Math.sqrt(
       Math.pow(x - boule.x, 2) + Math.pow(y - boule.y, 2)
@@ -54,17 +56,14 @@ watch([x, y], ([x, y]) => {
       if (boule.class === "cochonette" || boule.class === "cochonet") {
         cochonet.play();
       } else if (boule.class === "dark") {
-        darkCounter++;
-        darkBouleAudios[darkCounter - 1].play();
+        darkBouleAudios[boule.classNumber - 1].play();
       } else if (boule.class === "light") {
-        lightCounter++;
-        lightBouleAudios[lightCounter - 1].play();
+        lightBouleAudios[boule.classNumber - 1].play();
       }
     }
-    if (distance < 100) {
+    else if (distance < 50) {
       console.log("Near", boule.class);
-      pattern.value = [150];
-      useVibrate({ pattern: [100, 0] }).vibrate();
+      useVibrate({ pattern: [50, 0] }).vibrate();
     }
   });
 });
