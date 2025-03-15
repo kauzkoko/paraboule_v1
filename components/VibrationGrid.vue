@@ -1,6 +1,6 @@
 <template>
-  <div class="fullScreenAll flexCenter text-white">
-    <div
+  <div class="fullScreenAll flexCenter text-white z-999" :style="{ pointerEvents: isTouching ? 'auto' : 'none' }">
+    <!-- <div
       v-if="false"
       class="transition-all transition-duration-500"
       :style="{ opacity: isTouching ? 100 : 0 }"
@@ -21,7 +21,7 @@
           width: boule.class === 'cochonet' ? '30px' : '50px',
         }"
       ></div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -33,59 +33,77 @@ const { isTouching } = defineProps({
   },
 });
 
+// const boules = useState('boules', () => []);
+const boules = ref([]);
 const bus = useEventBus("tresjs");
 bus.on((message, payload) => {
   if (message === "screenPositions") {
     console.log("screenPositions", payload);
+    boules.value = payload;
   }
 });
 
 const { x, y } = useMouse();
 const { width, height } = useWindowSize();
-const boules = ref([
-  {
-    class: "cochonet",
-    x: width.value / 2,
-    y: height.value / 2,
-    audio: new Audio("/sounds/elevenlabs/cochonet.mp3"),
-  },
-  {
-    class: "dark",
-    x: 200,
-    y: height.value - 200,
-    audio: new Audio("/sounds/elevenlabs/darkboule.mp3"),
-  },
-  {
-    class: "light",
-    x: 300,
-    y: 300,
-    audio: new Audio("/sounds/elevenlabs/lightboule.mp3"),
-  },
-]);
-const pattern = ref([0]);
-const { vibrate } = useVibrate({ pattern });
 
+// const boules = ref([
+//   {
+//     class: "cochonet",
+//     x: width.value / 2,
+//     y: height.value / 2,
+//     audio: new Audio("/sounds/elevenlabs/cochonet.mp3"),
+//   },
+//   {
+//     class: "dark",
+//     x: 200,
+//     y: height.value - 200,
+//     audio: new Audio("/sounds/elevenlabs/darkboule.mp3"),
+//   },
+//   {
+//     class: "light",
+//     x: 300,
+//     y: 300,
+//     audio: new Audio("/sounds/elevenlabs/lightboule.mp3"),
+//   },
+// ]);
+// console.log(boules.value);
+const pattern = ref([0]);
+const { vibrate, intervalControls } = useVibrate({ pattern });
+
+const cochonet = new Audio("/sounds/elevenlabs/cochonet.mp3");
+const dark = new Audio("/sounds/elevenlabs/darkboule.mp3");
+const light = new Audio("/sounds/elevenlabs/lightboule.mp3");
 watch([x, y], ([x, y]) => {
-  console.log(isTouching);
   if (!isTouching) return;
   boules.value.forEach((boule) => {
     const distance = Math.sqrt(
       Math.pow(x - boule.x, 2) + Math.pow(y - boule.y, 2)
     );
-    if (distance < 10) {
+    console.log('distance', distance)
+    console.log('intervalControls', intervalControls)
+    if (distance < 200) {
       console.log("Touching", boule.class);
-      if (boule.audio.paused) {
-        boule.audio.play();
-      }
+      pattern.value = [150];
+      useVibrate({ pattern: [100,0] }).vibrate();
+      // pattern.value = [500];
+      // if (boule.class === "cochonette") cochonet.play();
+      // if (boule.class === "dark") dark.play();
+      // if (boule.class === "light") light.play();
     }
-    if (distance < 20) pattern.value = [200];
-    else if (distance < 50) pattern.value = [100];
-    else if (distance < 100) pattern.value = [50];
-    else {
-      pattern.value = [0];
-      return;
-    }
-    vibrate();
+    // if (distance < 20) pattern.value = [150];
+    // else if (distance < 100) pattern.value = [200];
+    // else if (distance < 100) pattern.value = [80];
+    // else if (distance < 200) pattern.value = [200-distance];
+    // else {
+    //   // pattern.value = [0];
+    //   return;
+    // }
+    // if (distance < 200) pattern.value = [200-Math.floor(distance)];
+    // else {
+    //   pattern.value = [0];
+    //   return;
+    // }
+    // vibrate();
     console.log(`Distance to ${boule.class}:`, distance);
   });
 });

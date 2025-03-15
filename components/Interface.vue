@@ -5,8 +5,8 @@
   >
     <VirtualAudioSpaceFancy :isTouching="isTouching" />
   </div>
-  <VibrationGrid :isTouching="isTouching" />
-  <div class="outer" ref="el">
+  <VibrationGrid :isTouching="isTouching" @click="isTouching = !isTouching" />
+  <div class="outer" ref="el" v-show="!isTouching">
     <div class="container">
       <div
         :ref="refs.set"
@@ -17,7 +17,7 @@
         @click="item.clickFunction()"
         @touchstart="onTouchStart(index, item.explanationSrc)"
         @touchend="onTouchEnd"
-        :style="{background: touchedIndex === index ? 'rgba(255,0,0,.25)' : 'transparent'}"
+        :style="{background: touchedIndex === index ? 'rgba(255,0,0,.25)' : 'transparent', transition: touchedIndex === index ? 'background 50ms' : 'background 500ms'}"
       >
         <img
           v-if="item.imgSrc"
@@ -34,8 +34,12 @@
       ref="swiper"
       :index="'pageAnnouncer'"
       @click="onSingleClick"
+      @touchstart="onTouchStart('pageAnnouncer')"
+      @touchend="onTouchEnd"
       v-on:dblclick.native="onDoubleClick()"
+      :style="{background: touchedIndex === 'pageAnnouncer' ? 'rgba(255,0,0,.25)' : 'transparent', transition: touchedIndex === 'pageAnnouncer' ? 'background 50ms' : 'background 500ms'}"
     >
+
       <div class="text-hex-ff0000 text-38px mt-1">
         {{ (Math.abs(selectedPageIndex) % pages.length) + 1 }}
       </div>
@@ -363,6 +367,11 @@ const pingPhone = () => {
   }
 };
 
+const tapAndHold = () => {
+  console.log("tapAndHold");
+  isTouching.value = !isTouching.value;
+};
+
 const { sendPlayCocho, sendPlayShoes, sendPlayPhone } = useSoundController();
 const { startCircularRotation, flyToCochonetteAndBack } =
   useAnimationController();
@@ -374,12 +383,15 @@ const vibrateByIndex = (index) => {
   if (index === 3) vibrateQuadrice();
 };
 
+const touchCounter = useState('touchCounter', () => 0);
 const touchedIndex = ref(null);
 const onTouchStart = (index, explanationSrc) => {
   touchedIndex.value = index;
-  if (explanationSrc && explanationSrc.endsWith("hapticGrid.mp3")) {
-    isTouching.value = true;
-  }
+  console.log('touchCounter', touchCounter);
+  touchCounter.value++;
+  // if (explanationSrc && explanationSrc.endsWith("hapticGrid.mp3")) {
+  //   isTouching.value = true;
+  // }
   vibrateByIndex(index);
 };
 
@@ -387,7 +399,7 @@ const onTouchEnd = () => {
   setTimeout(() => {
     touchedIndex.value = null;
   }, 300);
-  isTouching.value = false;
+  // isTouching.value = false;
 };
 
 const selectedPageIndex = ref(0);
@@ -491,7 +503,7 @@ const pages = ref([
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
     },
     {
-      clickFunction: onTouchStart,
+      clickFunction: tapAndHold,
       // imgSrc: "/icons/calibrator2.svg",
       html: "Tap and hold",
       explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
@@ -551,6 +563,8 @@ const longPressCallback = (e) => {
     explanations[explanationIndex].play();
     lastIndex = explanationIndex;
   }
+
+  touchCounter.value++
 };
 
 let afterLongPress = false;
@@ -612,7 +626,6 @@ onMounted(() => {
   user-select: none;
   position: fixed;
   left: 0;
-  transition: opacity 100ms;
   bottom: 0;
 }
 
@@ -640,7 +653,7 @@ onMounted(() => {
   user-select: none;
   pointer-events: auto;
   overflow: hidden;
-  transition: all 100ms;
+  transition: all 50ms;
   img {
     pointer-events: none;
     /* width: 90px; */

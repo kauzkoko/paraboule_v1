@@ -8,8 +8,9 @@
     <TresMesh
       v-for="(boule, i) in boules"
       :key="i"
+      :iClass="boule.class"
       ref="boulesRefs"
-      :position="[boule.x, boule.size, boule.y]"
+      :position="[boule.x, 0, boule.y]"
     >
       <TresSphereGeometry :args="[boule.size, 16, 16]" />
       <Outline :thickness="3" color="#ff0000" />
@@ -38,48 +39,55 @@
         />
       </Suspense>
     </TresMesh>
-    <TresMesh :position="[0, 1, 20]">
-      <TresBoxGeometry :args="[1, 2, 1]" />
-      <TresMeshStandardMaterial color="gray" transparent :opacity="0" />
-      <Html center transform>
-        <div class="mt--500px flex flex-col items-center">
-          <!-- <div class="mirror">You</div> -->
-          <div class="w-2px h-500px bg-gray"></div>
-        </div>
-      </Html>
-    </TresMesh>
-    <TresMesh :position="[-20, 1, 0]" :rotation="[0, Math.PI / 2, 0]">
-      <TresBoxGeometry :args="[1, 2, 1]" />
-      <TresMeshStandardMaterial color="gray" transparent :opacity="0" />
-      <Html center transform>
-        <div class="mt--500px flex flex-col items-center">
-          <!-- <div class="mirror">You</div> -->
-          <div class="w-2px h-500px bg-gray"></div>
-        </div>
-      </Html>
-    </TresMesh>
-    <TresMesh :position="[20, 1, 0]" :rotation="[0, Math.PI / 2, 0]">
-      <TresBoxGeometry :args="[1, 2, 1]" />
-      <TresMeshStandardMaterial color="gray" transparent :opacity="0" />
-      <Html center transform>
-        <div class="mt--500px flex flex-col items-center">
-          <!-- <div class="mirror">You</div> -->
-          <div class="w-2px h-500px bg-gray"></div>
-        </div>
-      </Html> </TresMesh
-    >/
-    <TresMesh :position="[0, 1, -20]" v-if="trigger > 0">
-      <TresBoxGeometry :args="[1, 1, 1]" />
-      <TresMeshStandardMaterial color="gray" transparent :opacity="0" />
-      <Html center transform>
-        <div class="mt--500px flex flex-col items-center">
-          <!-- <div>Front</div> -->
-          <div class="w-2px h-500px bg-gray"></div>
-        </div>
-      </Html>
-    </TresMesh>
+    <TresGroup v-if="circleAroundCochonet">
+      <TresMesh :position="[0, 1, 20]">
+        <TresBoxGeometry :args="[1, 2, 1]" />
+        <TresMeshStandardMaterial color="gray" transparent :opacity="0" />
+        <Html center transform>
+          <div class="mt--500px flex flex-col items-center">
+            <!-- <div class="mirror">You</div> -->
+            <div class="w-2px h-500px bg-gray"></div>
+          </div>
+        </Html>
+      </TresMesh>
+      <TresMesh :position="[-20, 1, 0]" :rotation="[0, Math.PI / 2, 0]">
+        <TresBoxGeometry :args="[1, 2, 1]" />
+        <TresMeshStandardMaterial color="gray" transparent :opacity="0" />
+        <Html center transform>
+          <div class="mt--500px flex flex-col items-center">
+            <!-- <div class="mirror">You</div> -->
+            <div class="w-2px h-500px bg-gray"></div>
+          </div>
+        </Html>
+      </TresMesh>
+      <TresMesh :position="[20, 1, 0]" :rotation="[0, Math.PI / 2, 0]">
+        <TresBoxGeometry :args="[1, 2, 1]" />
+        <TresMeshStandardMaterial color="gray" transparent :opacity="0" />
+        <Html center transform>
+          <div class="mt--500px flex flex-col items-center">
+            <!-- <div class="mirror">You</div> -->
+            <div class="w-2px h-500px bg-gray"></div>
+          </div>
+        </Html>
+      </TresMesh>
+      <TresMesh :position="[0, 1, -20]" v-if="trigger > 0">
+        <TresBoxGeometry :args="[1, 1, 1]" />
+        <TresMeshStandardMaterial color="gray" transparent :opacity="0" />
+        <Html center transform>
+          <div class="mt--500px flex flex-col items-center">
+            <!-- <div>Front</div> -->
+            <div class="w-2px h-500px bg-gray"></div>
+          </div>
+        </Html>
+      </TresMesh>
+    </TresGroup>
     <TresAmbientLight :intensity="230" />
-    <TresDirectionalLight :position="[0, 0, 20]" :intensity="5" />
+    <TresDirectionalLight
+      ref="directionalLightRef"
+      :position="[cameraX, cameraY, cameraZ]"
+      :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
+      :intensity="5"
+    />
     <Grid
       :args="[10.5, 10.5]"
       cell-color="#ff0000"
@@ -112,6 +120,8 @@ const gl = {
   // windowSize: true,
 };
 
+const directionalLight = useTemplateRef("directionalLightRef");
+
 const camera = useTemplateRef("camera");
 const meshRefs = useTemplateRef("boulesRefs");
 function getScreenPosition(object, camera) {
@@ -143,11 +153,9 @@ watch(
         if (meshRefs.value.length < 1) return;
         meshRefs.value.forEach((mesh) => {
           const screenPos = getScreenPosition(mesh, camera.value);
-          console.log(`Mesh ${mesh.name} screen position:`, screenPos);
-          screenPositions.value.push(screenPos);
-          console.log("before emit", screenPositions.value);
-          bus.emit("screenPositions", screenPositions.value);
+          screenPositions.value.push({ ...screenPos, class: mesh.iClass });
         });
+        bus.emit("screenPositions", screenPositions.value);
       }, 1000);
     } else {
       frontCamera();
@@ -202,7 +210,8 @@ const intersections = ref([
   },
 ]);
 const { history } = useRefHistory(intersections, { deep: true });
-const boules = ref([]);
+// const boules = ref([]);
+const boules = useState("boules", () => []);
 
 const setFromIntersections = (intersections) => {
   let cochonette = intersections.find((item) => item.class === "cochonette");
@@ -223,6 +232,7 @@ const setFromIntersections = (intersections) => {
         color: "yellow",
         size: 1,
         player: 3,
+        class: item.class,
       };
 
       if (item.class === "cochonette") {
@@ -491,16 +501,20 @@ function clearIntervals() {
   if (intervalIdFront) {
     clearInterval(intervalIdFront);
     intervalIdFront = null; // Reset the intervalIdFront to null
+    circleAroundCochonet.value = false;
   }
   if (intervalIdPlayer) {
     clearInterval(intervalIdPlayer);
     intervalIdPlayer = null; // Reset the intervalIdPlayer to null
+    circleAroundCochonet.value = false;
   }
 }
 
+const circleAroundCochonet = ref(false);
 const frontAudio = new Audio("/sounds/strudel/hh.mp3");
 const startAudio = new Audio("/sounds/strudel/hh2.mp3");
 function startCircularRotation() {
+  circleAroundCochonet.value = true;
   let counter = 0;
   killTweens();
   const targetX = 0;
@@ -517,7 +531,7 @@ function startCircularRotation() {
   });
   gsap.to(alpha, {
     value: alpha.value + 360, // Full rotation
-    duration: 10,
+    duration: 3,
     delay: 1,
     repeat: -1, // Infinite repetition
     ease: "none",
