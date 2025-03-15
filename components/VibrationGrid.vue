@@ -15,7 +15,6 @@ const { isTouching } = defineProps({
   },
 });
 
-// const boules = useState('boules', () => []);
 const boules = ref([]);
 const bus = useEventBus("tresjs");
 bus.on((message, payload) => {

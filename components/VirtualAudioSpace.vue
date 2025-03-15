@@ -8,17 +8,24 @@
     <TresMesh
       v-for="(boule, i) in boules"
       :key="i"
+      :iClass="boule.class"
       ref="boulesRefs"
       :position="[boule.x, 0, boule.y]"
     >
       <TresSphereGeometry :args="[boule.size, 16, 16]" />
-      <TresMeshStandardMaterial :color="boule.color" />
+      <Outline :thickness="3" color="#ff0000" />
+      <TresMeshPhysicalMaterial
+        :roughness="0.4"
+        :metalness="1"
+        :emissive="boule.color"
+      />
       <Suspense>
         <PositionalAudio
           ref="positionalAudioRef"
           :ready="true"
           loop
-          :helper="helpers"
+          v-if="props.selectedBoule === i"
+          :helper="true"
           :autoplay="false"
           :key="trigger"
           :url="
@@ -33,44 +40,25 @@
         />
       </Suspense>
     </TresMesh>
-    <TresMesh :position="[0, 1, 20]">
-      <TresBoxGeometry :args="[1, 2, 1]" />
-      <TresMeshStandardMaterial color="gray" transparent :opacity="0" />
-      <Html center transform>
-        <div class="mt--120px flex flex-col items-center">
-          <div class="mirror">You</div>
-          <div class="w-2px h-100px bg-gray"></div>
-        </div>
-      </Html> </TresMesh
-    >/
-    <TresMesh :position="[0, 1, -20]" v-if="trigger > 0">
-      <TresBoxGeometry :args="[1, 1, 1]" />
-      <TresMeshStandardMaterial color="gray" transparent :opacity="0" />
-      <Html center transform>
-        <div class="mt--120px flex flex-col items-center">
-          <div>Front</div>
-          <div class="w-2px h-100px bg-gray"></div>
-        </div>
-      </Html>
-    </TresMesh>
-    <TresAmbientLight :intensity="5" />
-    <TresDirectionalLight :position="[2, 2, 2]" :intensity="1" />
-    <!-- <TresGridHelper
-      v-if="grid"
-      :args="[45, 10]"
-      :scale="[1, 1, 0.8]"
-    /> -->
+    <DegreesOrientation />
+    <TresAmbientLight :intensity="230" />
+    <TresDirectionalLight
+      ref="directionalLightRef"
+      :position="[cameraX, cameraY, cameraZ]"
+      :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
+      :intensity="5"
+    />
     <Grid
       :args="[10.5, 10.5]"
       cell-color="#ff0000"
-      :cell-size="0.6"
+      :cell-size="1"
       :cell-thickness="0.5"
       section-color="#ff0000"
-      :section-size="2"
-      :section-thickness="1.3"
+      :section-size="1"
+      :section-thickness="2"
       :infinite-grid="true"
       :fade-from="0"
-      :fade-distance="18"
+      :fade-distance="30"
       :fade-strength="1"
     />
   </TresCanvas>
@@ -78,13 +66,21 @@
 
 <script setup>
 import { TresCanvas } from "@tresjs/core";
-import { Html, PositionalAudio, Grid } from "@tresjs/cientos";
+import {
+  Html,
+  PositionalAudio,
+  Grid,
+  Outline,
+  Superformula,
+} from "@tresjs/cientos";
 import { gsap } from "gsap";
 
 const gl = {
   alpha: true,
   // windowSize: true,
 };
+
+const directionalLight = useTemplateRef("directionalLightRef");
 
 const camera = useTemplateRef("camera");
 const meshRefs = useTemplateRef("boulesRefs");
@@ -103,7 +99,22 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  trigger: {
+    type: Number,
+    required: true,
+  },
+  selectedBoule: {
+    type: Number,
+    default: 0,
+  },
 });
+
+watch(
+  () => props.trigger,
+  (newVal) => {
+    trigger.value++;
+  }
+);
 
 const screenPositions = ref([]);
 watch(
@@ -115,13 +126,19 @@ watch(
       topCamera();
       setTimeout(() => {
         if (meshRefs.value.length < 1) return;
+        let darkCounter = 0;
+        let lightCounter = 0;
         meshRefs.value.forEach((mesh) => {
           const screenPos = getScreenPosition(mesh, camera.value);
-          console.log(`Mesh ${mesh.name} screen position:`, screenPos);
-          screenPositions.value.push(screenPos);
-          console.log('before emit', screenPositions.value)
-          bus.emit("screenPositions", screenPositions.value);
+          if (mesh.iClass === "dark") {
+            darkCounter++;
+          }
+          if (mesh.iClass === "light") {
+            lightCounter++;
+          }
+          screenPositions.value.push({ ...screenPos, class: mesh.iClass, classNumber: mesh.iClass === "dark" ? darkCounter : lightCounter });
         });
+        bus.emit("screenPositions", screenPositions.value);
       }, 1000);
     } else {
       frontCamera();
@@ -143,58 +160,90 @@ let channel = supabase.channel("xr-controller");
 
 const locked = ref(false);
 
-const intersections = ref([]);
+const intersections = ref([
+  {
+    x: 0.15217870875827644,
+    y: 0.11757755279540989,
+    z: -2.14242094133827,
+    class: "cochonette",
+  },
+  {
+    x: 0.3014103032020119,
+    y: 0.11757755279540989,
+    z: -2.1185530158534984,
+    class: "dark",
+  },
+  {
+    x: 0.29827494002689575,
+    y: 0.11757755279540984,
+    z: -1.873205403607142,
+    class: "light",
+  },
+  {
+    x: 0.35239538925638664,
+    y: 0.10841178894042934,
+    z: -2.040454871744344,
+    class: "dark",
+  },
+  {
+    x: 0.40640927469181287,
+    y: 0.10841178894042956,
+    z: -1.9825655394221926,
+    class: "light",
+  },
+]);
 const { history } = useRefHistory(intersections, { deep: true });
-const boules = ref([]);
+
+const store = useProtoStore();
+const { boules } = storeToRefs(store);
+
+const setFromIntersections = (intersections) => {
+  let cochonette = intersections.find((item) => item.class === "cochonette");
+  let offsetX = 0;
+  let offsetY = 0;
+
+  if (cochonette) {
+    offsetX = cochonette.x * 30;
+    offsetY = cochonette.z * 30;
+  }
+
+  if (!locked.value) {
+    boules.value = [];
+    intersections.forEach((item) => {
+      let boule = {
+        x: item.x * 30 - offsetX,
+        y: item.z * 30 - offsetY,
+        color: "yellow",
+        size: 1,
+        player: 3,
+        class: item.class,
+      };
+
+      if (item.class === "cochonette") {
+        boule.color = "orange";
+        boule.size = 0.4;
+        boule.player = 0;
+      } else if (item.class === "dark") {
+        boule.color = "#111";
+        boule.player = 1;
+      } else if (item.class === "light") {
+        boule.color = "#333";
+        boule.player = 2;
+      }
+
+      boules.value.push(boule);
+    });
+  }
+};
+setFromIntersections(intersections.value);
+
 channel
   .on("broadcast", { event: "intersections" }, (data) => {
     console.log("payload received: ", data.payload.intersections);
     intersections.value = data.payload.intersections;
     console.log(history.value);
 
-    // let maxPayload = history.value.reduce((max, payload) => {
-    //   return payload.length > max.length ? payload : max;
-    // }, []);
-    // console.log("Payload with the most items: ", maxPayload);
-
-    // Find the cochonette's position
-    let cochonette = data.payload.intersections.find(
-      (item) => item.class === "cochonette"
-    );
-    let offsetX = 0;
-    let offsetY = 0;
-
-    if (cochonette) {
-      offsetX = cochonette.x * 30;
-      offsetY = cochonette.z * 30;
-    }
-
-    if (!locked.value) {
-      boules.value = [];
-      data.payload.intersections.forEach((item) => {
-        let boule = {
-          x: item.x * 30 - offsetX,
-          y: item.z * 30 - offsetY,
-          color: "yellow",
-          size: 1,
-          player: 3,
-        };
-
-        if (item.class === "cochonette") {
-          boule.color = "orange";
-          boule.size = 0.4;
-          boule.player = 0;
-        } else if (item.class === "dark") {
-          boule.color = "blue";
-          boule.player = 1;
-        } else if (item.class === "light") {
-          boule.color = "red";
-          boule.player = 2;
-        }
-
-        boules.value.push(boule);
-      });
-    }
+    setFromIntersections(data.payload.intersections);
   })
   .subscribe();
 
@@ -231,10 +280,6 @@ const trigger = ref(0);
 const cochonetteSound = ref(false);
 watch(cochonetteSound, () => {
   console.log("cochonetteSound");
-  trigger.value++;
-});
-
-onMounted(() => {
   trigger.value++;
 });
 
@@ -436,16 +481,20 @@ function clearIntervals() {
   if (intervalIdFront) {
     clearInterval(intervalIdFront);
     intervalIdFront = null; // Reset the intervalIdFront to null
+    circleAroundCochonet.value = false;
   }
   if (intervalIdPlayer) {
     clearInterval(intervalIdPlayer);
     intervalIdPlayer = null; // Reset the intervalIdPlayer to null
+    circleAroundCochonet.value = false;
   }
 }
 
+const circleAroundCochonet = ref(false);
 const frontAudio = new Audio("/sounds/strudel/hh.mp3");
 const startAudio = new Audio("/sounds/strudel/hh2.mp3");
 function startCircularRotation() {
+  circleAroundCochonet.value = true;
   let counter = 0;
   killTweens();
   const targetX = 0;
@@ -462,7 +511,7 @@ function startCircularRotation() {
   });
   gsap.to(alpha, {
     value: alpha.value + 360, // Full rotation
-    duration: 10,
+    duration: 3,
     delay: 1,
     repeat: -1, // Infinite repetition
     ease: "none",
@@ -489,6 +538,7 @@ function startCircularRotation() {
     },
     onComplete: () => {
       clearIntervals();
+      console.log("animation complete");
     },
   });
 }
@@ -497,5 +547,6 @@ function startCircularRotation() {
 <style>
 .mirror {
   transform: scaleX(-1);
+  color: gray;
 }
 </style>

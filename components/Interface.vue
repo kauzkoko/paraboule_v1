@@ -3,7 +3,11 @@
     class="absolute left-0 w-100dvw h-100dvh"
     :style="{ top: isTouching ? '0' : '-40px' }"
   >
-    <VirtualAudioSpaceFancy :isTouching="isTouching" />
+    <VirtualAudioSpace
+      :isTouching="isTouching"
+      :trigger="audioTrigger"
+      :selected-boule="store.boulesStepper.index+1"
+    />
   </div>
   <VibrationGrid :isTouching="isTouching" @click="isTouching = !isTouching" />
   <div class="outer" ref="el" v-show="!isTouching">
@@ -129,8 +133,14 @@ const orientation = () => {
   console.log("orientation");
 };
 
+const store = useProtoStore();
 const bouleFocuser = () => {
-  console.log("bouleFocuser");
+  if (store.boulesStepper.isLast) {
+    const firstStep = store.boulesStepper.stepNames[0];
+    store.boulesStepper.goTo(firstStep);
+  } else {
+    store.boulesStepper.goToNext();
+  }
 };
 
 const focusBoulesBefore = () => {
@@ -148,6 +158,7 @@ const qrStatus = () => {
   pairingStatusAnnouncer.play();
 };
 
+const audioTrigger = ref(0);
 let clickTimeout = null;
 const { isListening, isFinal, result, start, stop } = useSpeechRecognition();
 const onSingleClick = () => {
@@ -273,7 +284,7 @@ const players = ref({
     shotsTaken: 0,
   },
 });
-const { history, undo, redo } = useRefHistory(players, {
+const { undo } = useRefHistory(players, {
   deep: true,
 });
 const incrementPlayer1 = () => {
@@ -380,8 +391,8 @@ const pingPhone = () => {
   }
 };
 
-const tapAndHold = () => {
-  console.log("tapAndHold");
+const click_hapticGrid = () => {
+  console.log("click_hapticGrid");
   isTouching.value = !isTouching.value;
 };
 
@@ -400,6 +411,8 @@ const touchCounter = useState("touchCounter", () => 0);
 const touchedIndex = ref(null);
 const onTouchStart = (index, explanationSrc) => {
   touchedIndex.value = index;
+  audioTrigger.value++;
+  console.log("audioTrigger", audioTrigger.value);
   console.log("touchCounter", touchCounter);
   touchCounter.value++;
   // if (explanationSrc && explanationSrc.endsWith("hapticGrid.mp3")) {
@@ -455,9 +468,10 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_bouleFocuser.mp3",
     },
     {
-      clickFunction: focusBoulesBefore,
-      imgSrc: "/icons/boulesBefore.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_boulesBefore.mp3",
+      clickFunction: click_hapticGrid,
+      // imgSrc: "/icons/calibrator2.svg",
+      html: "Tap to toggle haptic feedback",
+      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
     },
   ],
   [
@@ -512,10 +526,9 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
     },
     {
-      clickFunction: tapAndHold,
-      // imgSrc: "/icons/calibrator2.svg",
-      html: "Click to toggle haptic feedback",
-      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      clickFunction: focusBoulesBefore,
+      imgSrc: "/icons/boulesBefore.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_boulesBefore.mp3",
     },
     {
       clickFunction: orientation,
@@ -534,12 +547,12 @@ const {
   goToPrevious,
   goTo,
   stepNames,
-  steps,
   isLast,
   isFirst,
   index: stepperIndex,
   current: currentPage,
 } = useStepper(pages);
+goToNext();
 
 const pageOneAnnouncer = useSoundComposable(
   "/sounds/elevenlabs/announce_page1.mp3"
@@ -634,7 +647,7 @@ watch(isSwiping, (val) => {
     }
 
     if (stepperIndex.value === 0) vibratePageOne();
-    else if(stepperIndex.value === 1) vibratePageTwo();
+    else if (stepperIndex.value === 1) vibratePageTwo();
   }
 });
 </script>
