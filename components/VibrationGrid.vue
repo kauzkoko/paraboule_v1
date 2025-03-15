@@ -1,28 +1,6 @@
 <template>
-  <div class="fullScreenAll flexCenter text-white z-999" :style="{ pointerEvents: isTouching ? 'auto' : 'none' }">
-    <!-- <div
-      v-if="false"
-      class="transition-all transition-duration-500"
-      :style="{ opacity: isTouching ? 100 : 0 }"
-    >
-      <div
-        class="fixed top-0 left-0 w-50px aspect-1 rounded-full bg-hex-ff0000 transform translate-x--50% translate-y--50%"
-        v-for="(boule, index) in boules"
-        :key="index"
-        :style="{
-          top: boule.y + 'px',
-          left: boule.x + 'px',
-          backgroundColor:
-            boule.class === 'cochonet'
-              ? '#ff0000'
-              : boule.class === 'dark'
-              ? '#999'
-              : '#eee',
-          width: boule.class === 'cochonet' ? '30px' : '50px',
-        }"
-      ></div>
-    </div> -->
-  </div>
+  <div class="fullScreenAll flexCenter text-white z-999" :style="{
+  pointerEvents: isTouching ? 'auto' : 'none' }" />
 </template>
 
 <script setup>
@@ -46,65 +24,48 @@ bus.on((message, payload) => {
 const { x, y } = useMouse();
 const { width, height } = useWindowSize();
 
-// const boules = ref([
-//   {
-//     class: "cochonet",
-//     x: width.value / 2,
-//     y: height.value / 2,
-//     audio: new Audio("/sounds/elevenlabs/cochonet.mp3"),
-//   },
-//   {
-//     class: "dark",
-//     x: 200,
-//     y: height.value - 200,
-//     audio: new Audio("/sounds/elevenlabs/darkboule.mp3"),
-//   },
-//   {
-//     class: "light",
-//     x: 300,
-//     y: 300,
-//     audio: new Audio("/sounds/elevenlabs/lightboule.mp3"),
-//   },
-// ]);
-// console.log(boules.value);
 const pattern = ref([0]);
 const { vibrate, intervalControls } = useVibrate({ pattern });
 
 const cochonet = new Audio("/sounds/elevenlabs/cochonet.mp3");
-const dark = new Audio("/sounds/elevenlabs/darkboule.mp3");
-const light = new Audio("/sounds/elevenlabs/lightboule.mp3");
+const darkBouleAudios = [
+  new Audio("/sounds/elevenlabs/darkboule1.mp3"),
+  new Audio("/sounds/elevenlabs/darkboule2.mp3"),
+  new Audio("/sounds/elevenlabs/darkboule3.mp3"),
+];
+const lightBouleAudios = [
+  new Audio("/sounds/elevenlabs/lightboule1.mp3"),
+  new Audio("/sounds/elevenlabs/lightboule2.mp3"),
+  new Audio("/sounds/elevenlabs/lightboule3.mp3"),
+];
+
 watch([x, y], ([x, y]) => {
   if (!isTouching) return;
+  let darkCounter = 0;
+  let lightCounter = 0;
   boules.value.forEach((boule) => {
     const distance = Math.sqrt(
       Math.pow(x - boule.x, 2) + Math.pow(y - boule.y, 2)
     );
-    console.log('distance', distance)
-    console.log('intervalControls', intervalControls)
-    if (distance < 200) {
-      console.log("Touching", boule.class);
-      pattern.value = [150];
-      useVibrate({ pattern: [100,0] }).vibrate();
-      // pattern.value = [500];
-      // if (boule.class === "cochonette") cochonet.play();
-      // if (boule.class === "dark") dark.play();
-      // if (boule.class === "light") light.play();
-    }
-    // if (distance < 20) pattern.value = [150];
-    // else if (distance < 100) pattern.value = [200];
-    // else if (distance < 100) pattern.value = [80];
-    // else if (distance < 200) pattern.value = [200-distance];
-    // else {
-    //   // pattern.value = [0];
-    //   return;
-    // }
-    // if (distance < 200) pattern.value = [200-Math.floor(distance)];
-    // else {
-    //   pattern.value = [0];
-    //   return;
-    // }
-    // vibrate();
     console.log(`Distance to ${boule.class}:`, distance);
+
+    if (distance < 10) {
+      console.log("Touching", boule.class);
+      if (boule.class === "cochonette" || boule.class === "cochonet") {
+        cochonet.play();
+      } else if (boule.class === "dark") {
+        darkCounter++;
+        darkBouleAudios[darkCounter - 1].play();
+      } else if (boule.class === "light") {
+        lightCounter++;
+        lightBouleAudios[lightCounter - 1].play();
+      }
+    }
+    if (distance < 100) {
+      console.log("Near", boule.class);
+      pattern.value = [150];
+      useVibrate({ pattern: [100, 0] }).vibrate();
+    }
   });
 });
 </script>

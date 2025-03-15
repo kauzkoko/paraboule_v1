@@ -10,14 +10,19 @@
     <div class="container">
       <div
         :ref="refs.set"
-        v-for="(item, index) in selectedPage"
+        v-for="(item, index) in currentPage"
         :key="index"
         class="grid-item"
         :index="index"
         @click="item.clickFunction()"
         @touchstart="onTouchStart(index, item.explanationSrc)"
         @touchend="onTouchEnd"
-        :style="{background: touchedIndex === index ? 'rgba(255,0,0,.25)' : 'transparent', transition: touchedIndex === index ? 'background 50ms' : 'background 500ms'}"
+        :style="{
+          background:
+            touchedIndex === index ? 'rgba(255,0,0,.25)' : 'transparent',
+          transition:
+            touchedIndex === index ? 'background 50ms' : 'background 500ms',
+        }"
       >
         <img
           v-if="item.imgSrc"
@@ -37,11 +42,19 @@
       @touchstart="onTouchStart('pageAnnouncer')"
       @touchend="onTouchEnd"
       v-on:dblclick.native="onDoubleClick()"
-      :style="{background: touchedIndex === 'pageAnnouncer' ? 'rgba(255,0,0,.25)' : 'transparent', transition: touchedIndex === 'pageAnnouncer' ? 'background 50ms' : 'background 500ms'}"
+      :style="{
+        background:
+          touchedIndex === 'pageAnnouncer'
+            ? 'rgba(255,0,0,.25)'
+            : 'transparent',
+        transition:
+          touchedIndex === 'pageAnnouncer'
+            ? 'background 50ms'
+            : 'background 500ms',
+      }"
     >
-
-      <div class="text-hex-ff0000 text-38px mt-1">
-        {{ (Math.abs(selectedPageIndex) % pages.length) + 1 }}
+      <div class="text-hex-ff0000 text-38px mt-7px ml--1px">
+        {{ (stepperIndex % pages.length) + 1 }}
       </div>
     </div>
     <QrScanner
@@ -53,7 +66,7 @@
 </template>
 
 <script setup>
-import { Howler } from 'howler';
+import { Howler } from "howler";
 
 const props = defineProps({
   xrRunning: {
@@ -239,8 +252,8 @@ const onDoubleClick = () => {
         : res.endsWith("page five")
         ? 5
         : null;
-      if (pageNumber >= 1 && pageNumber <= pages.value.length) {
-        selectedPageIndex.value = pageNumber - 1;
+      if (pageNumber >= 1 && pageNumber <= pages.length) {
+        stepperIndex = pageNumber - 1;
       }
     }
   } else {
@@ -383,11 +396,11 @@ const vibrateByIndex = (index) => {
   if (index === 3) vibrateQuadrice();
 };
 
-const touchCounter = useState('touchCounter', () => 0);
+const touchCounter = useState("touchCounter", () => 0);
 const touchedIndex = ref(null);
 const onTouchStart = (index, explanationSrc) => {
   touchedIndex.value = index;
-  console.log('touchCounter', touchCounter);
+  console.log("touchCounter", touchCounter);
   touchCounter.value++;
   // if (explanationSrc && explanationSrc.endsWith("hapticGrid.mp3")) {
   //   isTouching.value = true;
@@ -402,11 +415,7 @@ const onTouchEnd = () => {
   // isTouching.value = false;
 };
 
-const selectedPageIndex = ref(0);
-const absoluteSelectedPageIndex = computed(() =>
-  Math.abs(selectedPageIndex.value)
-);
-const pages = ref([
+const pages = [
   [
     {
       clickFunction: scanCamera,
@@ -505,7 +514,7 @@ const pages = ref([
     {
       clickFunction: tapAndHold,
       // imgSrc: "/icons/calibrator2.svg",
-      html: "Tap and hold",
+      html: "Click to toggle haptic feedback",
       explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
     },
     {
@@ -519,7 +528,18 @@ const pages = ref([
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
     },
   ],
-]);
+];
+const {
+  goToNext,
+  goToPrevious,
+  goTo,
+  stepNames,
+  steps,
+  isLast,
+  isFirst,
+  index: stepperIndex,
+  current: currentPage,
+} = useStepper(pages);
 
 const pageOneAnnouncer = useSoundComposable(
   "/sounds/elevenlabs/announce_page1.mp3"
@@ -529,14 +549,14 @@ const pageTwoAnnouncer = useSoundComposable(
 );
 const announcePage = () => {
   console.log("announcePage");
-  if (absoluteSelectedPageIndex.value % pages.value.length === 0) {
+  if (stepperIndex % pages.length === 0) {
     pageOneAnnouncer.play();
   } else {
     pageTwoAnnouncer.play();
   }
 };
 
-const explanations = pages.value
+const explanations = pages
   .flat()
   .map((item) => useSoundComposable(item.explanationSrc));
 
@@ -564,7 +584,7 @@ const longPressCallback = (e) => {
     lastIndex = explanationIndex;
   }
 
-  touchCounter.value++
+  touchCounter.value++;
 };
 
 let afterLongPress = false;
@@ -584,10 +604,6 @@ onLongPress(refs, longPressCallback, {
   },
 });
 
-const selectedPage = computed(
-  () => pages.value[absoluteSelectedPageIndex.value % pages.value.length]
-);
-
 const swiper = useTemplateRef("swiper");
 onLongPress(swiper, longPressCallback, {
   modifiers: {
@@ -598,19 +614,28 @@ onLongPress(swiper, longPressCallback, {
 const { isSwiping, direction } = useSwipe(swiper);
 watch(isSwiping, (val) => {
   if (val) {
-    if (direction.value === "right") selectedPageIndex.value--;
-    if (direction.value === "left") selectedPageIndex.value++;
+    console.log("swiping", direction.value);
+    if (direction.value === "right") {
+      if (isLast.value) {
+        const firstStep = stepNames.value[0];
+        goTo(firstStep);
+      } else {
+        goToNext();
+      }
+    }
+    if (direction.value === "left") {
+      console.log(stepperIndex.value === 0);
+      if (isFirst.value) {
+        const lastStep = stepNames.value[stepNames.value.length - 1];
+        goTo(lastStep);
+      } else {
+        goToPrevious();
+      }
+    }
 
-    if (selectedPageIndex.value % pages.value.length === 0) vibratePageOne();
-    else vibratePageTwo();
+    if (stepperIndex.value === 0) vibratePageOne();
+    else if(stepperIndex.value === 1) vibratePageTwo();
   }
-});
-
-onMounted(() => {
-  for (let i = 0; i < pages.value.length; i++) {
-      selectedPageIndex.value = i;
-  }
-  selectedPageIndex.value = 0;
 });
 </script>
 
