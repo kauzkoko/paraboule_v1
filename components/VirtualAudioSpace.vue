@@ -136,7 +136,11 @@ watch(
           if (mesh.iClass === "light") {
             lightCounter++;
           }
-          screenPositions.value.push({ ...screenPos, class: mesh.iClass, classNumber: mesh.iClass === "dark" ? darkCounter : lightCounter });
+          screenPositions.value.push({
+            ...screenPos,
+            class: mesh.iClass,
+            classNumber: mesh.iClass === "dark" ? darkCounter : lightCounter,
+          });
         });
         bus.emit("screenPositions", screenPositions.value);
       }, 1000);
@@ -476,23 +480,35 @@ function flyToRealisticStart() {
   });
 }
 
-let intervalIdPlayer, intervalIdFront;
+let intervalId0deg, intervalId90deg, intervalId180deg, intervalId270deg;
 function clearIntervals() {
-  if (intervalIdFront) {
-    clearInterval(intervalIdFront);
-    intervalIdFront = null; // Reset the intervalIdFront to null
+  if (intervalId0deg) {
+    clearInterval(intervalId0deg);
+    intervalId0deg = null; // Reset the intervalIdFront to null
     circleAroundCochonet.value = false;
   }
-  if (intervalIdPlayer) {
-    clearInterval(intervalIdPlayer);
-    intervalIdPlayer = null; // Reset the intervalIdPlayer to null
+  if (intervalId90deg) {
+    clearInterval(intervalId90deg);
+    intervalId90deg = null; // Reset the intervalIdBack to null
+    circleAroundCochonet.value = false;
+  }
+  if (intervalId180deg) {
+    clearInterval(intervalId180deg);
+    intervalId180deg = null; // Reset the intervalIdPlayer to null
+    circleAroundCochonet.value = false;
+  }
+  if (intervalId270deg) {
+    clearInterval(intervalId270deg);
+    intervalId270deg = null; // Reset the intervalIdPlayer to null
     circleAroundCochonet.value = false;
   }
 }
 
 const circleAroundCochonet = ref(false);
-const frontAudio = new Audio("/sounds/strudel/hh.mp3");
-const startAudio = new Audio("/sounds/strudel/hh2.mp3");
+const hihat1 = new Audio("/sounds/strudel/hiihat1.mp3");
+const hihat2 = new Audio("/sounds/strudel/hiihat2.mp3");
+const hihat3 = new Audio("/sounds/strudel/hiihat3.mp3");
+const hihat4 = new Audio("/sounds/strudel/hiihat4.mp3");
 function startCircularRotation() {
   circleAroundCochonet.value = true;
   let counter = 0;
@@ -509,36 +525,49 @@ function startCircularRotation() {
     duration: 1,
     ease: "power2.out",
   });
+  let duration = 8;
   gsap.to(alpha, {
     value: alpha.value + 360, // Full rotation
-    duration: 3,
+    duration: duration,
     delay: 1,
     repeat: -1, // Infinite repetition
     ease: "none",
     onStart: () => {
       console.log("startCircularRotation");
-      intervalIdFront = setInterval(() => {
-        console.log("looking to front");
-        frontAudio.play();
-      }, 10000);
+      hihat1.play();
+      intervalId0deg = setInterval(() => {
+        console.log("0deg");
+        hihat1.play();
+      }, duration * 1000);
       setTimeout(() => {
-        startAudio.play();
-        intervalIdPlayer = setInterval(() => {
-          console.log("looking at player");
-          startAudio.play();
-        }, 10000);
-      }, 5000);
+        hihat3.play();
+        intervalId90deg = setInterval(() => {
+          console.log("90deg");
+          hihat2.play();
+        }, duration * 1000);
+      }, (duration * 1000) / 4);
+      setTimeout(() => {
+        hihat3.play();
+        intervalId180deg = setInterval(() => {
+          console.log("180deg");
+          hihat3.play();
+        }, duration * 1000);
+      }, (duration * 1000) / 2);
+      setTimeout(() => {
+        hihat4.play();
+        intervalId270deg = setInterval(() => {
+          console.log("270deg");
+          hihat4.play();
+        }, duration * 1000);
+      }, (duration * 1000) / 4 * 3);
     },
     onRepeat: () => {
       if (counter > 0) {
+        hihat1.play();
         flyToStart();
         clearIntervals();
       }
       counter++;
-    },
-    onComplete: () => {
-      clearIntervals();
-      console.log("animation complete");
     },
   });
 }
