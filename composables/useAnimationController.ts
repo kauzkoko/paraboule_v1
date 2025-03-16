@@ -6,6 +6,7 @@ export function useAnimationController() {
   const bus = useEventBus("tresjs");
 
   function flyToStart() {
+    bus.emit("flyToStart");
     channel.send({
       type: "broadcast",
       event: "flyToStart",
@@ -14,7 +15,7 @@ export function useAnimationController() {
   }
 
   function flyToCochonetteAndBack() {
-    // bus.emit("flyToCochonetteAndBack");
+    bus.emit("flyToCochonetteAndBack");
     channel.send({
       type: "broadcast",
       event: "flyToCochonetteAndBack",
@@ -23,6 +24,7 @@ export function useAnimationController() {
   }
 
   function startCircularRotation() {
+    bus.emit("startCircularRotation");
     channel.send({
       type: "broadcast",
       event: "startCircularRotation",
@@ -30,5 +32,14 @@ export function useAnimationController() {
     });
   }
 
-  return { flyToStart, flyToCochonetteAndBack, startCircularRotation };
+  function stalefish180() {
+    bus.emit("stalefish180");
+    channel.send({
+      type: "broadcast",
+      event: "stalefish180",
+      payload: {},
+    });
+  }
+
+  return { flyToStart, flyToCochonetteAndBack, startCircularRotation, stalefish180 };
 }

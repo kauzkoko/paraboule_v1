@@ -57,8 +57,10 @@
             : 'background 500ms',
       }"
     >
-      <div class="text-hex-ff0000 text-38px mt-7px ml--1px">
-        {{ (stepperIndex % pages.length) + 1 }}
+      <div>
+        <div class="text-hex-ff0000 text-38px">
+          {{ (stepperIndex % pages.length) + 1 }}
+        </div>
       </div>
     </div>
     <QrScanner
@@ -126,6 +128,12 @@ const startCocho = () => {
 const flyCochoBack = () => {
   if (!afterLongPress) {
     flyToCochonetteAndBack();
+  }
+};
+
+const click_stalefish180 = () => {
+  if (!afterLongPress) {
+    stalefish180();
   }
 };
 
@@ -391,17 +399,13 @@ const pingPhone = () => {
   }
 };
 
-const click_stalefish180 = () => {
-  console.log("click_stalefish180");
-};
-
 const click_hapticGrid = () => {
   console.log("click_hapticGrid");
   isTouching.value = !isTouching.value;
 };
 
 const { sendPlayCocho, sendPlayShoes, sendPlayPhone } = useSoundController();
-const { startCircularRotation, flyToCochonetteAndBack } =
+const { startCircularRotation, flyToCochonetteAndBack, stalefish180 } =
   useAnimationController();
 
 const vibrateByIndex = (index) => {
@@ -654,6 +658,7 @@ onLongPress(swiper, longPressCallback, {
   },
 });
 
+const bus = useEventBus("tresjs");
 const { isSwiping, direction } = useSwipe(swiper);
 watch(isSwiping, (val) => {
   if (val) {
@@ -675,9 +680,39 @@ watch(isSwiping, (val) => {
         goToPrevious();
       }
     }
+    if (direction.value === "down") {
+      bus.emit("flyToStart");
+    }
 
     if (stepperIndex.value === 0) vibratePageOne();
     else if (stepperIndex.value === 1) vibratePageTwo();
+  }
+});
+
+onKeyStroke(["ArrowLeft"], (e) => {
+  e.preventDefault();
+  if (isFirst.value) {
+    const lastStep = stepNames.value[stepNames.value.length - 1];
+    goTo(lastStep);
+  } else {
+    goToPrevious();
+  }
+});
+
+onKeyStroke(["ArrowRight"], (e) => {
+  e.preventDefault();
+  if (isLast.value) {
+    const firstStep = stepNames.value[0];
+    goTo(firstStep);
+  } else {
+    goToNext();
+  }
+});
+
+onKeyStroke(["1", "2", "3", "4", "5", "6"], (e) => {
+  const pageIndex = parseInt(e.key) - 1;
+  if (pageIndex >= 0 && pageIndex < pages.length) {
+    goTo(stepNames.value[pageIndex]);
   }
 });
 </script>
@@ -745,16 +780,25 @@ watch(isSwiping, (val) => {
 }
 
 .center-circle {
-  width: 110px;
+  width: 150px;
   aspect-ratio: 1;
   border-radius: 50%;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border: 3px solid red;
+  border: 1px dashed transparent;
   display: flex;
   justify-content: center;
   align-items: center;
+  > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    width: 80%;
+    border: 3px solid red;
+  }
 }
 </style>

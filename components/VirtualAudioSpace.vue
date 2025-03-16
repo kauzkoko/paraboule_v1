@@ -40,7 +40,7 @@
         />
       </Suspense>
     </TresMesh>
-    <DegreesOrientation />
+    <DegreesOrientation :startPoint="startPoint" />
     <TresAmbientLight :intensity="230" />
     <TresDirectionalLight
       ref="directionalLightRef"
@@ -154,8 +154,16 @@ watch(
 const bus = useEventBus("tresjs");
 bus.on((message) => {
   if (message === "flyToCochonetteAndBack") {
-    console.log("flyToCochonetteAndBack");
     flyToCochonetteAndBack();
+  }
+  if (message === "flyToStart") {
+    flyToStart();
+  }
+  if (message === "stalefish180") {
+    stalefish180();
+  }
+  if (message === "startCircularRotation") {
+    startCircularRotation();
   }
 });
 
@@ -292,9 +300,10 @@ const grid = ref(true);
 const controller = ref(true);
 
 // camera controls / animations
+let startPoint = 30;
 const alpha = ref(0);
 const rotationX = ref(0);
-const cameraZ = ref(20);
+const cameraZ = ref(startPoint);
 const cameraX = ref(0);
 const cameraY = ref(1);
 
@@ -310,7 +319,6 @@ function topCamera() {
     ease: "power2.out",
   });
   gsap.to(cameraY, {
-    // value: 20,
     value: 30,
     duration: 1,
     ease: "power2.out",
@@ -352,7 +360,7 @@ function frontCamera() {
     ease: "power2.out",
   });
   gsap.to(cameraZ, {
-    value: 20,
+    value: startPoint,
     duration: 1,
     ease: "power2.out",
   });
@@ -373,6 +381,10 @@ function frontCamera() {
   });
 }
 
+onKeyStroke(["ArrowDown"], (e) => {
+  e.preventDefault();
+  flyToStart();
+});
 function flyToStart() {
   killTweens();
   gsap.to(cameraX, {
@@ -381,7 +393,7 @@ function flyToStart() {
     ease: "power2.out",
   });
   gsap.to(cameraZ, {
-    value: 20,
+    value: startPoint,
     duration: 1,
     ease: "power2.out",
   });
@@ -400,35 +412,49 @@ function killTweens() {
 
 function flyToCochonetteAndBack() {
   killTweens();
-  const angleInRadians = (alpha.value * Math.PI) / 180;
-  const targetX = cameraX.value - 20 * Math.sin(angleInRadians);
-  const targetZ = cameraZ.value - 20 * Math.cos(angleInRadians);
-
-  gsap.to(cameraX, {
-    value: targetX,
-    duration: 3,
-    ease: "power2.out",
-  });
   gsap.to(cameraZ, {
-    value: targetZ,
-    duration: 3,
-    ease: "power2.out",
-  });
-
-  // Return to original position
-  gsap.to(cameraX, {
     value: 0,
     duration: 3,
-    delay: 4,
     ease: "power2.out",
   });
   gsap.to(cameraZ, {
-    value: 20,
+    value: startPoint,
     duration: 3,
     delay: 4,
     ease: "power2.out",
     onComplete: () => {
-      console.log("animation complete");
+      console.log("flyToCochonetteAndBack complete");
+    },
+  });
+}
+
+function stalefish180() {
+  killTweens();
+
+  gsap.to(cameraZ, {
+    value: -startPoint,
+    duration: 3,
+    ease: "linear",
+    onComplete: () => {
+      gsap.to(alpha, {
+        value: alpha.value + 180,
+        duration: 0,
+        ease: "linear",
+      });
+    },
+  });
+
+  gsap.to(cameraZ, {
+    value: startPoint,
+    duration: 3,
+    delay: 4,
+    ease: "linear",
+    onComplete: () => {
+      gsap.to(alpha, {
+        value: alpha.value + 180,
+        duration: 0,
+        ease: "linear",
+      });
     },
   });
 }
@@ -559,7 +585,7 @@ function startCircularRotation() {
           console.log("270deg");
           hihat4.play();
         }, duration * 1000);
-      }, (duration * 1000) / 4 * 3);
+      }, ((duration * 1000) / 4) * 3);
     },
     onRepeat: () => {
       if (counter > 0) {
