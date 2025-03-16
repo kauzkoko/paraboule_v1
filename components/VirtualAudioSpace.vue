@@ -12,7 +12,7 @@
       ref="boulesRefs"
       :position="[boule.x, 0, boule.y]"
     >
-      <TresSphereGeometry :args="[boule.size, 16, 16]" />
+      <TresSphereGeometry :args="[boule.size, 24, 24]" />
       <Outline :thickness="3" color="#ff0000" />
       <TresMeshPhysicalMaterial
         :roughness="0.4"

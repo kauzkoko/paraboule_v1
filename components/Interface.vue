@@ -6,7 +6,7 @@
     <VirtualAudioSpace
       :isTouching="isTouching"
       :trigger="audioTrigger"
-      :selected-boule="store.boulesStepper.index+1"
+      :selected-boule="store.boulesStepper.index + 1"
     />
   </div>
   <VibrationGrid :isTouching="isTouching" @click="isTouching = !isTouching" />
@@ -391,6 +391,10 @@ const pingPhone = () => {
   }
 };
 
+const click_stalefish180 = () => {
+  console.log("click_stalefish180");
+};
+
 const click_hapticGrid = () => {
   console.log("click_hapticGrid");
   isTouching.value = !isTouching.value;
@@ -459,13 +463,39 @@ const pages = [
     },
     {
       clickFunction: flyCochoBack,
-      imgSrc: "/icons/boomerang.svg",
+      imgSrc: "/icons/boomerang1.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_boomerang.mp3",
     },
     {
       clickFunction: bouleFocuser,
-      imgSrc: "/icons/bouleFocuser.svg",
+      imgSrc: "/icons/bouleFocuser11.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_bouleFocuser.mp3",
+    },
+    {
+      clickFunction: click_stalefish180,
+      imgSrc: "/icons/stalefish180.svg",
+      html: "Tap to toggle haptic feedback",
+      explanationSrc: "/sounds/elevenlabs/explanation_stalefish180.mp3",
+    },
+  ],
+  [
+    {
+      clickFunction: click_hapticGrid,
+      // imgSrc: "/icons/calibrator2.svg",
+      html: "Tap to toggle haptic feedback",
+      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+    },
+    {
+      clickFunction: click_hapticGrid,
+      // imgSrc: "/icons/calibrator2.svg",
+      html: "Tap to toggle haptic feedback",
+      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+    },
+    {
+      clickFunction: click_hapticGrid,
+      // imgSrc: "/icons/calibrator2.svg",
+      html: "Tap to toggle haptic feedback",
+      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
     },
     {
       clickFunction: click_hapticGrid,
@@ -483,7 +513,7 @@ const pages = [
     },
     {
       clickFunction: pingPhone,
-      imgSrc: "/icons/pingPhone3.svg",
+      imgSrc: "/icons/pingPhone6.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pingPhone3.mp3",
     },
     {
@@ -522,7 +552,7 @@ const pages = [
   [
     {
       clickFunction: orientation,
-      imgSrc: "/icons/calibrator2.svg",
+      imgSrc: "/icons/orientexpress.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
     },
     {
