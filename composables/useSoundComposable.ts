@@ -1,7 +1,7 @@
 import { Howler } from "howler";
 
-export function useSoundComposable(soundSrc) {
-  const touchCounter = useState('touchCounter')
+export function useSoundComposable(soundSrc: string) {
+  const touchCounter = useState<number>('touchCounter')
   let lastTouchCounter = 0;
 
   const sound = useSound(soundSrc, { interrupt: true });
@@ -16,8 +16,6 @@ export function useSoundComposable(soundSrc) {
     lastTouchCounter = touchCounter.value;
   };
   
-
-
   return {
     play,
   };
