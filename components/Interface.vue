@@ -90,6 +90,10 @@ const {
   vibrateQuadrice,
   vibratePageOne,
   vibratePageTwo,
+  vibratePageThree,
+  vibratePageFour,
+  vibratePageFive,
+  vibratePageSix,
 } = useVibrations();
 
 // layout flickering fix
@@ -686,6 +690,10 @@ watch(isSwiping, (val) => {
 
     if (stepperIndex.value === 0) vibratePageOne();
     else if (stepperIndex.value === 1) vibratePageTwo();
+    else if (stepperIndex.value === 2) vibratePageThree();
+    else if (stepperIndex.value === 3) vibratePageFour();
+    else if (stepperIndex.value === 4) vibratePageFive();
+    else if (stepperIndex.value === 5) vibratePageSix();
   }
 });
 

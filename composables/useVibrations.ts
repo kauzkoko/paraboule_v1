@@ -16,5 +16,32 @@ export function useVibrations() {
     pattern: [100, 20, 50, 20, 50, 20],
   });
 
-  return { vibrateOnce, vibrateTwice, vibrateThrice, vibrateQuadrice, vibratePageOne, vibratePageTwo };
+  const { vibrate: vibratePageThree } = useVibrate({
+    pattern: [100, 20, 50, 20, 50, 20, 50, 20],
+  });
+
+  const { vibrate: vibratePageFour } = useVibrate({
+    pattern: [100, 20, 50, 20, 50, 20, 50, 20, 50, 20],
+  });
+
+  const { vibrate: vibratePageFive } = useVibrate({
+    pattern: [100, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20],
+  });
+
+  const { vibrate: vibratePageSix } = useVibrate({
+    pattern: [100, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20],
+  });
+
+  return {
+    vibrateOnce,
+    vibrateTwice,
+    vibrateThrice,
+    vibrateQuadrice,
+    vibratePageOne,
+    vibratePageTwo,
+    vibratePageThree,
+    vibratePageFour,
+    vibratePageFive,
+    vibratePageSix,
+  };
 }
