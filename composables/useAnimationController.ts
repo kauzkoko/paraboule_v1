@@ -1,9 +1,10 @@
 export function useAnimationController() {
+  const bus = useEventBus("tresjs");
+
   const supabase = useSupabaseClient();
   let channel = supabase.channel("animation-controller");
   channel.subscribe();
 
-  const bus = useEventBus("tresjs");
 
   function flyToStart() {
     bus.emit("flyToStart");
@@ -14,11 +15,11 @@ export function useAnimationController() {
     });
   }
 
-  function flyToCochonetteAndBack() {
-    bus.emit("flyToCochonetteAndBack");
+  function flyToCochonetAndBack() {
+    bus.emit("flyToCochonetAndBack");
     channel.send({
       type: "broadcast",
-      event: "flyToCochonetteAndBack",
+      event: "flyToCochonetAndBack",
       payload: {},
     });
   }
@@ -41,5 +42,5 @@ export function useAnimationController() {
     });
   }
 
-  return { flyToStart, flyToCochonetteAndBack, startCircularRotation, stalefish180 };
+  return { flyToStart, flyToCochonetAndBack, startCircularRotation, stalefish180 };
 }

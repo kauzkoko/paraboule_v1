@@ -1,5 +1,5 @@
 <template>
-  <TresCanvas v-bind="gl">
+  <TresCanvas>
     <TresPerspectiveCamera
       :position="[cameraX, cameraY, cameraZ]"
       :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
@@ -29,9 +29,7 @@
           :autoplay="false"
           :key="trigger"
           :url="
-            boule.player === 0 && cochonetteSound
-              ? sounds.noise.low
-              : boule.player === 1
+            boule.player === 1
               ? sounds.noise.high
               : boule.player === 2
               ? sounds.noise.medium
@@ -43,56 +41,18 @@
     <DegreesOrientation :startPoint="startPoint" />
     <TresAmbientLight :intensity="230" />
     <TresDirectionalLight
-      ref="directionalLightRef"
       :position="[cameraX, cameraY, cameraZ]"
       :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
       :intensity="5"
     />
-    <Grid
-      :args="[10.5, 10.5]"
-      cell-color="#ff0000"
-      :cell-size="1"
-      :cell-thickness="0.5"
-      section-color="#ff0000"
-      :section-size="1"
-      :section-thickness="2"
-      :infinite-grid="true"
-      :fade-from="0"
-      :fade-distance="30"
-      :fade-strength="1"
-    />
+    <Grid />
   </TresCanvas>
 </template>
 
 <script setup>
 import { TresCanvas } from "@tresjs/core";
-import {
-  Html,
-  PositionalAudio,
-  Grid,
-  Outline,
-  Superformula,
-} from "@tresjs/cientos";
+import { PositionalAudio, Outline } from "@tresjs/cientos";
 import { gsap } from "gsap";
-
-const gl = {
-  alpha: true,
-  // windowSize: true,
-};
-
-const directionalLight = useTemplateRef("directionalLightRef");
-
-const camera = useTemplateRef("camera");
-const meshRefs = useTemplateRef("boulesRefs");
-function getScreenPosition(object, camera) {
-  const vector = object.position.clone().project(camera);
-
-  // Convert NDC (-1 to 1) to screen coordinates
-  const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
-  const y = (1 - (vector.y * 0.5 + 0.5)) * window.innerHeight;
-
-  return { x, y };
-}
 
 const props = defineProps({
   isTouching: {
@@ -109,75 +69,20 @@ const props = defineProps({
   },
 });
 
-watch(
-  () => props.trigger,
-  (newVal) => {
-    trigger.value++;
-  }
-);
-
-const screenPositions = ref([]);
-watch(
-  () => props.isTouching,
-  (newVal) => {
-    console.log("isTouching changed:", newVal);
-    if (newVal) {
-      // Perform actions when isTouching becomes true
-      topCamera();
-      setTimeout(() => {
-        if (meshRefs.value.length < 1) return;
-        let darkCounter = 0;
-        let lightCounter = 0;
-        meshRefs.value.forEach((mesh) => {
-          const screenPos = getScreenPosition(mesh, camera.value);
-          if (mesh.iClass === "dark") {
-            darkCounter++;
-          }
-          if (mesh.iClass === "light") {
-            lightCounter++;
-          }
-          screenPositions.value.push({
-            ...screenPos,
-            class: mesh.iClass,
-            classNumber: mesh.iClass === "dark" ? darkCounter : lightCounter,
-          });
-        });
-        bus.emit("screenPositions", screenPositions.value);
-      }, 1000);
-    } else {
-      frontCamera();
-      // Perform actions when isTouching becomes false
-    }
-  }
-);
-
-const bus = useEventBus("tresjs");
-bus.on((message) => {
-  if (message === "flyToCochonetteAndBack") {
-    flyToCochonetteAndBack();
-  }
-  if (message === "flyToStart") {
-    flyToStart();
-  }
-  if (message === "stalefish180") {
-    stalefish180();
-  }
-  if (message === "startCircularRotation") {
-    startCircularRotation();
-  }
-});
+const camera = useTemplateRef("camera");
+const meshRefs = useTemplateRef("boulesRefs");
 
 const supabase = useSupabaseClient();
 let channel = supabase.channel("xr-controller");
 
-const locked = ref(false);
+const bus = useEventBus("tresjs");
 
 const intersections = ref([
   {
     x: 0.15217870875827644,
     y: 0.11757755279540989,
     z: -2.14242094133827,
-    class: "cochonette",
+    class: "cochonet",
   },
   {
     x: 0.3014103032020119,
@@ -205,79 +110,32 @@ const intersections = ref([
   },
 ]);
 const { history } = useRefHistory(intersections, { deep: true });
-
 const store = useProtoStore();
 const { boules } = storeToRefs(store);
 
-const setFromIntersections = (intersections) => {
-  let cochonette = intersections.find((item) => item.class === "cochonette");
-  let offsetX = 0;
-  let offsetY = 0;
+//interface controls
+const trigger = ref(0);
 
-  if (cochonette) {
-    offsetX = cochonette.x * 30;
-    offsetY = cochonette.z * 30;
-  }
+// camera controls / animations
+let intervalId0deg, intervalId90deg, intervalId180deg, intervalId270deg;
 
-  if (!locked.value) {
-    boules.value = [];
-    intersections.forEach((item) => {
-      let boule = {
-        x: item.x * 30 - offsetX,
-        y: item.z * 30 - offsetY,
-        color: "yellow",
-        size: 1,
-        player: 3,
-        class: item.class,
-      };
+let startPoint = 30;
+const alpha = ref(0);
+const rotationX = ref(0);
+const cameraX = ref(0);
+const cameraY = ref(1);
+const cameraZ = ref(startPoint);
 
-      if (item.class === "cochonette") {
-        boule.color = "orange";
-        boule.size = 0.4;
-        boule.player = 0;
-      } else if (item.class === "dark") {
-        boule.color = "#111";
-        boule.player = 1;
-      } else if (item.class === "light") {
-        boule.color = "#333";
-        boule.player = 2;
-      }
+const circleAroundCochonet = ref(false);
+const hihat1 = new Audio("/sounds/strudel/hiihat1.mp3");
+const hihat2 = new Audio("/sounds/strudel/hiihat2.mp3");
+const hihat3 = new Audio("/sounds/strudel/hiihat3.mp3");
+const hihat4 = new Audio("/sounds/strudel/hiihat4.mp3");
 
-      boules.value.push(boule);
-    });
-  }
-};
-setFromIntersections(intersections.value);
-
-channel
-  .on("broadcast", { event: "intersections" }, (data) => {
-    console.log("payload received: ", data.payload.intersections);
-    intersections.value = data.payload.intersections;
-    console.log(history.value);
-
-    setFromIntersections(data.payload.intersections);
-  })
-  .subscribe();
-
-let animationController = supabase.channel("animation-controller");
-animationController
-  .on("broadcast", { event: "startCircularRotation" }, (event) => {
-    console.log("startCircularRotation payload received: ", event.payload);
-    startCircularRotation();
-  })
-  .on("broadcast", { event: "flyToCochonetteAndBack" }, (event) => {
-    console.log("flyToCochonetteAndBack payload received: ", event.payload);
-    flyToCochonetteAndBack();
-  })
-  .subscribe();
-
-// audio
 let sounds = {};
 sounds.noise = {
   low: "/sounds/noiselow.mp3",
-  // medium: "/noise.mp3",
   medium: "/sounds/noz.mp3",
-  // high: "/noisehigh.mp3",
   high: "/sounds/noz2.mp3",
 };
 
@@ -287,25 +145,55 @@ sounds.colors = {
   blue: "/sounds/blue.mp3",
 };
 
-//interface controls
-const trigger = ref(0);
-const cochonetteSound = ref(false);
-watch(cochonetteSound, () => {
-  console.log("cochonetteSound");
-  trigger.value++;
-});
+const screenPositions = ref([]);
+function getScreenPosition(object, camera) {
+  const vector = object.position.clone().project(camera);
+  const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
+  const y = (1 - (vector.y * 0.5 + 0.5)) * window.innerHeight;
+  return { x, y };
+}
 
-const helpers = ref(true);
-const grid = ref(true);
-const controller = ref(true);
+const setFromIntersections = (intersections) => {
+  let cochonet = intersections.find((item) => item.class === "cochonet");
+  let offsetX = 0;
+  let offsetY = 0;
 
-// camera controls / animations
-let startPoint = 30;
-const alpha = ref(0);
-const rotationX = ref(0);
-const cameraZ = ref(startPoint);
-const cameraX = ref(0);
-const cameraY = ref(1);
+  if (cochonet) {
+    offsetX = cochonet.x * 30;
+    offsetY = cochonet.z * 30;
+  }
+
+  boules.value = [];
+  intersections.forEach((item) => {
+    let boule = {
+      x: item.x * 30 - offsetX,
+      y: item.z * 30 - offsetY,
+      color: "yellow",
+      size: 1,
+      player: 3,
+      class: item.class,
+    };
+
+    if (item.class === "cochonet") {
+      boule.color = "orange";
+      boule.size = 0.4;
+      boule.player = 0;
+    } else if (item.class === "dark") {
+      boule.color = "#111";
+      boule.player = 1;
+    } else if (item.class === "light") {
+      boule.color = "#333";
+      boule.player = 2;
+    }
+
+    boules.value.push(boule);
+  });
+};
+
+function killTweens() {
+  clearIntervals();
+  gsap.killTweensOf([alpha, cameraX, cameraY, cameraZ]);
+}
 
 function topCamera() {
   gsap.to(cameraX, {
@@ -325,29 +213,6 @@ function topCamera() {
   });
   gsap.to(rotationX, {
     value: -Math.PI / 2,
-    duration: 1,
-    ease: "power2.out",
-  });
-}
-
-function halfCamera() {
-  gsap.to(cameraX, {
-    value: 0,
-    duration: 1,
-    ease: "power2.out",
-  });
-  gsap.to(cameraZ, {
-    value: 7,
-    duration: 1,
-    ease: "power2.out",
-  });
-  gsap.to(cameraY, {
-    value: 5,
-    duration: 1,
-    ease: "power2.out",
-  });
-  gsap.to(rotationX, {
-    value: -Math.PI / 5,
     duration: 1,
     ease: "power2.out",
   });
@@ -381,10 +246,6 @@ function frontCamera() {
   });
 }
 
-onKeyStroke(["ArrowDown"], (e) => {
-  e.preventDefault();
-  flyToStart();
-});
 function flyToStart() {
   killTweens();
   gsap.to(cameraX, {
@@ -404,13 +265,7 @@ function flyToStart() {
   });
 }
 
-function killTweens() {
-  // frontCamera();
-  clearIntervals();
-  gsap.killTweensOf([alpha, cameraX, cameraZ]);
-}
-
-function flyToCochonetteAndBack() {
+function flyToCochonetAndBack() {
   killTweens();
   gsap.to(cameraZ, {
     value: 0,
@@ -423,7 +278,7 @@ function flyToCochonetteAndBack() {
     delay: 4,
     ease: "power2.out",
     onComplete: () => {
-      console.log("flyToCochonetteAndBack complete");
+      console.log("flyToCochonetAndBack complete");
     },
   });
 }
@@ -459,82 +314,29 @@ function stalefish180() {
   });
 }
 
-function flyThroughCochonetteToTheEndless() {
-  flyToStart();
-  const angleInRadians = (alpha.value * Math.PI) / 180;
-  const targetX = cameraX.value - 100 * Math.sin(angleInRadians);
-  const targetZ = cameraZ.value - 100 * Math.cos(angleInRadians);
-
-  gsap.to(cameraX, {
-    value: targetX,
-    duration: 5,
-    ease: "none",
-  });
-  gsap.to(cameraZ, {
-    value: targetZ,
-    duration: 5,
-    ease: "none",
-  });
-}
-
-function flyToRealisticStart() {
-  killTweens();
-  gsap.to(cameraX, {
-    value: 0,
-    duration: 2,
-    ease: "power2.out",
-  });
-  gsap.to(cameraZ, {
-    value: 37,
-    duration: 2,
-    ease: "power2.out",
-  });
-  gsap.to(cameraY, {
-    value: 31,
-    duration: 1,
-    ease: "power2.out",
-  });
-  gsap.to(rotationX, {
-    value: -Math.PI / 8,
-    duration: 1,
-    ease: "power2.out",
-  });
-  gsap.to(alpha, {
-    value: 0,
-    duration: 2,
-    ease: "power2.out",
-  });
-}
-
-let intervalId0deg, intervalId90deg, intervalId180deg, intervalId270deg;
 function clearIntervals() {
   if (intervalId0deg) {
     clearInterval(intervalId0deg);
-    intervalId0deg = null; // Reset the intervalIdFront to null
+    intervalId0deg = null;
     circleAroundCochonet.value = false;
   }
   if (intervalId90deg) {
     clearInterval(intervalId90deg);
-    intervalId90deg = null; // Reset the intervalIdBack to null
+    intervalId90deg = null;
     circleAroundCochonet.value = false;
   }
   if (intervalId180deg) {
     clearInterval(intervalId180deg);
-    intervalId180deg = null; // Reset the intervalIdPlayer to null
+    intervalId180deg = null;
     circleAroundCochonet.value = false;
   }
   if (intervalId270deg) {
     clearInterval(intervalId270deg);
-    intervalId270deg = null; // Reset the intervalIdPlayer to null
+    intervalId270deg = null;
     circleAroundCochonet.value = false;
   }
 }
 
-const circleAroundCochonet = ref(false);
-const hihat1 = new Audio("/sounds/strudel/hiihat1.mp3");
-const hihat2 = new Audio("/sounds/strudel/hiihat2.mp3");
-const hihat3 = new Audio("/sounds/strudel/hiihat3.mp3");
-const hihat4 = new Audio("/sounds/strudel/hiihat4.mp3");
 function startCircularRotation() {
   circleAroundCochonet.value = true;
   let counter = 0;
@@ -597,6 +399,87 @@ function startCircularRotation() {
     },
   });
 }
+
+onKeyStroke(["ArrowDown"], (e) => {
+  e.preventDefault();
+  flyToStart();
+});
+
+bus.on((message) => {
+  if (message === "flyToCochonetAndBack") {
+    flyToCochonetAndBack();
+  }
+  if (message === "flyToStart") {
+    flyToStart();
+  }
+  if (message === "stalefish180") {
+    stalefish180();
+  }
+  if (message === "startCircularRotation") {
+    startCircularRotation();
+  }
+});
+
+channel
+  .on("broadcast", { event: "intersections" }, (data) => {
+    console.log("payload received: ", data.payload.intersections);
+    intersections.value = data.payload.intersections;
+    console.log(history.value);
+
+    setFromIntersections(data.payload.intersections);
+  })
+  .subscribe();
+
+let animationController = supabase.channel("animation-controller");
+animationController
+  .on("broadcast", { event: "startCircularRotation" }, (event) => {
+    console.log("startCircularRotation payload received: ", event.payload);
+    startCircularRotation();
+  })
+  .on("broadcast", { event: "flyToCochonetAndBack" }, (event) => {
+    console.log("flyToCochonetAndBack payload received: ", event.payload);
+    flyToCochonetAndBack();
+  })
+  .subscribe();
+
+watch(
+  () => props.trigger,
+  () => {
+    trigger.value++;
+  }
+);
+
+watch(
+  () => props.isTouching,
+  (newVal) => {
+    console.log("isTouching changed:", newVal);
+    if (newVal) {
+      topCamera();
+      setTimeout(() => {
+        if (meshRefs.value.length < 1) return;
+        let darkCounter = 0;
+        let lightCounter = 0;
+        meshRefs.value.forEach((mesh) => {
+          const screenPos = getScreenPosition(mesh, camera.value);
+          if (mesh.iClass === "dark") {
+            darkCounter++;
+          }
+          if (mesh.iClass === "light") {
+            lightCounter++;
+          }
+          screenPositions.value.push({
+            ...screenPos,
+            class: mesh.iClass,
+            classNumber: mesh.iClass === "dark" ? darkCounter : lightCounter,
+          });
+        });
+        bus.emit("screenPositions", screenPositions.value);
+      }, 1000);
+    } else {
+      frontCamera();
+    }
+  }
+);
 </script>
 
 <style>

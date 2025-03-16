@@ -16,7 +16,7 @@
           left: prediction.bbox.x / 2 + 'px',
           top: prediction.bbox.y / 2 + 'px',
           borderColor:
-            prediction.class === 'cochonette'
+            prediction.class === 'cochonet'
               ? 'red'
               : prediction.class === 'dark'
               ? '#999'

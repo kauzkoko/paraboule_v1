@@ -20,7 +20,7 @@
           :autoplay="false"
           :key="trigger"
           :url="
-            boule.player === 0 && cochonetteSound
+            boule.player === 0 && cochonetSound
               ? sounds.noise.low
               : boule.player === 1
               ? sounds.noise.high
@@ -61,7 +61,7 @@
   >
     <div class="flex flex-col children:text-20px children:mt-1">
       <button class="mt-0!" @click="flyToStart()">flyToStart</button>
-      <button @click="flyToCochonetteAndBack()">flyToCochonetteAndBack</button>
+      <button @click="flyToCochonetAndBack()">flyToCochonetAndBack</button>
       <button @click="startCircularRotation()">startCircularRotation</button>
       <button @click="topCamera()">topCamera</button>
       <button @click="frontCamera()">frontCamera</button>
@@ -71,9 +71,9 @@
           type="checkbox"
           name="test"
           id="test"
-          v-model="cochonetteSound"
+          v-model="cochonetSound"
         />
-        <label for="test" class="text-white">cochonetteSound</label>
+        <label for="test" class="text-white">cochonetSound</label>
       </div>
     </div>
   </div>
@@ -109,15 +109,15 @@ channel
     // }, []);
     // console.log("Payload with the most items: ", maxPayload);
 
-    // Find the cochonette's position
-    let cochonette = data.payload.intersections.find((item) => item.class === "cochonette");
-    console.log("cochonette: ", cochonette);
+    // Find the cochonet's position
+    let cochonet = data.payload.intersections.find((item) => item.class === "cochonet");
+    console.log("cochonet: ", cochonet);
     let offsetX = 0;
     let offsetY = 0;
 
-    if (cochonette) {
-      offsetX = cochonette.x * 30;
-      offsetY = cochonette.z * 30;
+    if (cochonet) {
+      offsetX = cochonet.x * 30;
+      offsetY = cochonet.z * 30;
     }
 
     if (!locked.value) {
@@ -131,7 +131,7 @@ channel
           player: 3,
         };
 
-        if (item.class === "cochonette") {
+        if (item.class === "cochonet") {
           boule.color = "orange";
           boule.size = 0.4;
           boule.player = 0;
@@ -155,9 +155,9 @@ animationController
     console.log("startCircularRotation payload received: ", event.payload);
     startCircularRotation();
   })
-  .on("broadcast", { event: "flyToCochonetteAndBack" }, (event) => {
-    console.log("flyToCochonetteAndBack payload received: ", event.payload);
-    flyToCochonetteAndBack();
+  .on("broadcast", { event: "flyToCochonetAndBack" }, (event) => {
+    console.log("flyToCochonetAndBack payload received: ", event.payload);
+    flyToCochonetAndBack();
   })
   .subscribe();
 
@@ -184,8 +184,8 @@ sounds.colors = {
 
 //interface controls
 const trigger = ref(0);
-const cochonetteSound = ref(false);
-watch(cochonetteSound, () => {
+const cochonetSound = ref(false);
+watch(cochonetSound, () => {
   console.log("chocho");
   trigger.value++;
 });
@@ -344,7 +344,7 @@ function killTweens() {
   gsap.killTweensOf([alpha, cameraX, cameraZ]);
 }
 
-function flyToCochonetteAndBack() {
+function flyToCochonetAndBack() {
   killTweens();
   const angleInRadians = (alpha.value * Math.PI) / 180;
   const targetX = cameraX.value - 20 * Math.sin(angleInRadians);
@@ -379,7 +379,7 @@ function flyToCochonetteAndBack() {
   });
 }
 
-function flyThroughCochonetteToTheEndless() {
+function flyThroughCochonetToTheEndless() {
   flyToStart();
   const angleInRadians = (alpha.value * Math.PI) / 180;
   const targetX = cameraX.value - 100 * Math.sin(angleInRadians);

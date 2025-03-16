@@ -127,7 +127,7 @@ const startCocho = () => {
 
 const flyCochoBack = () => {
   if (!afterLongPress) {
-    flyToCochonetteAndBack();
+    flyToCochonetAndBack();
   }
 };
 
@@ -405,7 +405,7 @@ const click_hapticGrid = () => {
 };
 
 const { sendPlayCocho, sendPlayShoes, sendPlayPhone } = useSoundController();
-const { startCircularRotation, flyToCochonetteAndBack, stalefish180 } =
+const { startCircularRotation, flyToCochonetAndBack, stalefish180 } =
   useAnimationController();
 
 const vibrateByIndex = (index) => {

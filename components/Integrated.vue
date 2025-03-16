@@ -219,8 +219,8 @@ const startXR = async () => {
           const predictions = await predictFromImage(bitmap);
           if (predictions.length > 0) {
             bus.emit("predictions", predictions);
-            const hasCochonette = predictions.some(item => item.class === "cochonette");
-            if (hasCochonette) {
+            const hasCochonet = predictions.some(item => item.class === "cochonet");
+            if (hasCochonet) {
               let intersections = [];
                 predictions.forEach((prediction) => {
                 let intersectPoint = intersectPrediction(prediction);

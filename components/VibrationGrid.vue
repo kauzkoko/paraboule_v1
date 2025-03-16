@@ -52,7 +52,7 @@ watch([x, y], ([x, y]) => {
 
     if (distance < 10) {
       console.log("Touching", boule.class);
-      if (boule.class === "cochonette" || boule.class === "cochonet") {
+      if (boule.class === "cochonet" || boule.class === "cochonet") {
         cochonet.play();
       } else if (boule.class === "dark") {
         darkBouleAudios[boule.classNumber - 1].play();

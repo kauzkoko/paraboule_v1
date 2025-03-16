@@ -13,13 +13,9 @@ export async function useInference() {
 
   async function predictFromImage(outputImage: any) {
     let predictions = modelWorkerId.value;
-    // console.log("outputImage", outputImage);
     const image = new CVImage(outputImage);
-    // console.log("CVImage", image);
     predictions = await inferEngine.infer(modelWorkerId.value, image);
-    // console.log("predictions", predictions);
     return predictions;
-    // return [0]
   }
 
   return { modelWorkerId, predictFromImage };

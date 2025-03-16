@@ -33,7 +33,7 @@ let fixedIntersections = [
       x: 0.15217870875827644,
       y: 0.11757755279540989,
       z: -2.14242094133827,
-      class: "cochonette",
+      class: "cochonet",
     },
     {
       x: 0.3014103032020119,
@@ -65,7 +65,7 @@ let fixedIntersections = [
       x: 0.266183173694223,
       y: 0.10841178894042958,
       z: -2.0445047020107423,
-      class: "cochonette",
+      class: "cochonet",
     },
     {
       x: 0.35239538925638664,
