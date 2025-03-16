@@ -1,14 +1,115 @@
 export const useProtoStore = defineStore("protoStore", () => {
+  const supabase = useSupabaseClient();
+  let channel = supabase.channel("xr-controller");
+
+  // will be set from setFromIntersections
   const boules = ref([
     { id: 1, name: "Boule 1", color: "red" },
     { id: 2, name: "Boule 2", color: "blue" },
     { id: 3, name: "Boule 3", color: "green" },
   ]);
-
   const boulesStepper = useStepper(boules.value);
+
+  const deviceId = Math.random().toString(36).substring(2, 15);
+
+  const rawIntersections = ref([]);
+  const intersections = ref([
+    {
+      x: 0.15217870875827644,
+      y: 0.11757755279540989,
+      z: -2.14242094133827,
+      class: "cochonet",
+    },
+    {
+      x: 0.3014103032020119,
+      y: 0.11757755279540989,
+      z: -2.1185530158534984,
+      class: "dark",
+    },
+    {
+      x: 0.29827494002689575,
+      y: 0.11757755279540984,
+      z: -1.873205403607142,
+      class: "light",
+    },
+    {
+      x: 0.35239538925638664,
+      y: 0.10841178894042934,
+      z: -2.040454871744344,
+      class: "dark",
+    },
+    {
+      x: 0.40640927469181287,
+      y: 0.10841178894042956,
+      z: -1.9825655394221926,
+      class: "light",
+    },
+  ]);
+  const predictions = ref([]);
+  const planeDetected = ref(false);
+
+  const setFromIntersections = () => {
+    let cochonet = rawIntersections.value.find(
+      (item) => item.class === "cochonet" || item.class === "cochonette"
+    );
+    let offsetX = 0;
+    let offsetY = 0;
+    let scaler = 25;
+
+    if (cochonet) {
+      offsetX = cochonet.x * scaler;
+      offsetY = cochonet.z * scaler;
+    }
+
+    let tempBoules = [];
+    rawIntersections.value.forEach((item) => {
+      let boule = {
+        x: item.x * scaler - offsetX,
+        y: item.z * scaler - offsetY,
+        color: "yellow",
+        size: 1,
+        player: 3,
+        class: item.class,
+      };
+
+      if (item.class === "cochonet") {
+        boule.color = "orange";
+        boule.size = 0.4;
+        boule.player = 0;
+      } else if (item.class === "dark") {
+        boule.color = "#111";
+        boule.player = 1;
+      } else if (item.class === "light") {
+        boule.color = "#333";
+        boule.player = 2;
+      }
+
+      tempBoules.push(boule);
+    });
+    boules.value = tempBoules;
+  };
+
+  watch(rawIntersections, (rawIntersections) => {
+    setFromIntersections();
+    console.log("rawIntersections", rawIntersections.value);
+  });
+
+  channel
+    .on("broadcast", { event: "rawIntersections" }, (data) => {
+      setFromIntersections(data.payload.rawIntersections);
+    })
+    .subscribe();
+
+  // mock boules
+  rawIntersections.value = intersections.value;
 
   return {
     boules,
-    boulesStepper
+    boulesStepper,
+    deviceId,
+    rawIntersections,
+    intersections,
+    predictions,
+    planeDetected,
   };
 });

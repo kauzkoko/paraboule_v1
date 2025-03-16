@@ -11,7 +11,7 @@ import * as THREE from "three";
 
 const { renderer, scene, camera } = useTresContext();
 
-const bus = useEventBus("saveImages");
+const bus = useEventBus("protoboules");
 bus.on((message) => {
   if (message === "saveImages") saveImages();
   if (message === "startXR") startXR();

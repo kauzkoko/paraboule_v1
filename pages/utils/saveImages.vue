@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import { TresCanvas } from "@tresjs/core";
-const bus = useEventBus('saveImages')
+const bus = useEventBus("protoboules");
 const startXR = () => bus.emit('startXR')
 const saveImages = () => bus.emit('saveImages')
 const blobsCount = ref(0)

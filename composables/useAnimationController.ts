@@ -1,5 +1,5 @@
 export function useAnimationController() {
-  const bus = useEventBus("tresjs");
+  const bus = useEventBus("protoboules");
 
   const supabase = useSupabaseClient();
   let channel = supabase.channel("animation-controller");

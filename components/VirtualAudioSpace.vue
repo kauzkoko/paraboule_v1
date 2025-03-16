@@ -13,7 +13,7 @@
       :position="[boule.x, 0, boule.y]"
     >
       <TresSphereGeometry :args="[boule.size, 24, 24]" />
-      <Outline :thickness="3" color="#ff0000" />
+      <!-- <Outline :thickness="3" color="#ffff00" /> -->
       <TresMeshPhysicalMaterial
         :roughness="0.4"
         :metalness="1"
@@ -24,7 +24,7 @@
           ref="positionalAudioRef"
           :ready="true"
           loop
-          v-if="props.selectedBoule === i"
+          v-if="props.selectedBoule === i || true"
           :helper="true"
           :autoplay="false"
           :key="trigger"
@@ -73,43 +73,10 @@ const camera = useTemplateRef("camera");
 const meshRefs = useTemplateRef("boulesRefs");
 
 const supabase = useSupabaseClient();
-let channel = supabase.channel("xr-controller");
+let animationController = supabase.channel("animation-controller");
 
-const bus = useEventBus("tresjs");
+const bus = useEventBus("protoboules");
 
-const intersections = ref([
-  {
-    x: 0.15217870875827644,
-    y: 0.11757755279540989,
-    z: -2.14242094133827,
-    class: "cochonet",
-  },
-  {
-    x: 0.3014103032020119,
-    y: 0.11757755279540989,
-    z: -2.1185530158534984,
-    class: "dark",
-  },
-  {
-    x: 0.29827494002689575,
-    y: 0.11757755279540984,
-    z: -1.873205403607142,
-    class: "light",
-  },
-  {
-    x: 0.35239538925638664,
-    y: 0.10841178894042934,
-    z: -2.040454871744344,
-    class: "dark",
-  },
-  {
-    x: 0.40640927469181287,
-    y: 0.10841178894042956,
-    z: -1.9825655394221926,
-    class: "light",
-  },
-]);
-const { history } = useRefHistory(intersections, { deep: true });
 const store = useProtoStore();
 const { boules } = storeToRefs(store);
 
@@ -125,6 +92,8 @@ const rotationX = ref(0);
 const cameraX = ref(0);
 const cameraY = ref(1);
 const cameraZ = ref(startPoint);
+
+const screenPositions = ref([]);
 
 const circleAroundCochonet = ref(false);
 const hihat1 = new Audio("/sounds/strudel/hiihat1.mp3");
@@ -143,51 +112,6 @@ sounds.colors = {
   color: "/sounds/color.mp3",
   white: "/sounds/white.mp3",
   blue: "/sounds/blue.mp3",
-};
-
-const screenPositions = ref([]);
-function getScreenPosition(object, camera) {
-  const vector = object.position.clone().project(camera);
-  const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
-  const y = (1 - (vector.y * 0.5 + 0.5)) * window.innerHeight;
-  return { x, y };
-}
-
-const setFromIntersections = (intersections) => {
-  let cochonet = intersections.find((item) => item.class === "cochonet");
-  let offsetX = 0;
-  let offsetY = 0;
-
-  if (cochonet) {
-    offsetX = cochonet.x * 30;
-    offsetY = cochonet.z * 30;
-  }
-
-  boules.value = [];
-  intersections.forEach((item) => {
-    let boule = {
-      x: item.x * 30 - offsetX,
-      y: item.z * 30 - offsetY,
-      color: "yellow",
-      size: 1,
-      player: 3,
-      class: item.class,
-    };
-
-    if (item.class === "cochonet") {
-      boule.color = "orange";
-      boule.size = 0.4;
-      boule.player = 0;
-    } else if (item.class === "dark") {
-      boule.color = "#111";
-      boule.player = 1;
-    } else if (item.class === "light") {
-      boule.color = "#333";
-      boule.player = 2;
-    }
-
-    boules.value.push(boule);
-  });
 };
 
 function killTweens() {
@@ -277,9 +201,6 @@ function flyToCochonetAndBack() {
     duration: 3,
     delay: 4,
     ease: "power2.out",
-    onComplete: () => {
-      console.log("flyToCochonetAndBack complete");
-    },
   });
 }
 
@@ -361,30 +282,25 @@ function startCircularRotation() {
     repeat: -1, // Infinite repetition
     ease: "none",
     onStart: () => {
-      console.log("startCircularRotation");
       hihat1.play();
       intervalId0deg = setInterval(() => {
-        console.log("0deg");
         hihat1.play();
       }, duration * 1000);
       setTimeout(() => {
         hihat3.play();
         intervalId90deg = setInterval(() => {
-          console.log("90deg");
           hihat2.play();
         }, duration * 1000);
       }, (duration * 1000) / 4);
       setTimeout(() => {
         hihat3.play();
         intervalId180deg = setInterval(() => {
-          console.log("180deg");
           hihat3.play();
         }, duration * 1000);
       }, (duration * 1000) / 2);
       setTimeout(() => {
         hihat4.play();
         intervalId270deg = setInterval(() => {
-          console.log("270deg");
           hihat4.play();
         }, duration * 1000);
       }, ((duration * 1000) / 4) * 3);
@@ -398,6 +314,13 @@ function startCircularRotation() {
       counter++;
     },
   });
+}
+
+function getScreenPosition(object, camera) {
+  const vector = object.position.clone().project(camera);
+  const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
+  const y = (1 - (vector.y * 0.5 + 0.5)) * window.innerHeight;
+  return { x, y };
 }
 
 onKeyStroke(["ArrowDown"], (e) => {
@@ -420,28 +343,16 @@ bus.on((message) => {
   }
 });
 
-channel
-  .on("broadcast", { event: "intersections" }, (data) => {
-    console.log("payload received: ", data.payload.intersections);
-    intersections.value = data.payload.intersections;
-    console.log(history.value);
-
-    setFromIntersections(data.payload.intersections);
-  })
-  .subscribe();
-
-let animationController = supabase.channel("animation-controller");
 animationController
   .on("broadcast", { event: "startCircularRotation" }, (event) => {
-    console.log("startCircularRotation payload received: ", event.payload);
     startCircularRotation();
   })
   .on("broadcast", { event: "flyToCochonetAndBack" }, (event) => {
-    console.log("flyToCochonetAndBack payload received: ", event.payload);
     flyToCochonetAndBack();
   })
   .subscribe();
 
+// trigger for spatial audio
 watch(
   () => props.trigger,
   () => {
@@ -449,10 +360,10 @@ watch(
   }
 );
 
+// screen position for haptic feedback
 watch(
   () => props.isTouching,
   (newVal) => {
-    console.log("isTouching changed:", newVal);
     if (newVal) {
       topCamera();
       setTimeout(() => {

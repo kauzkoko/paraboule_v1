@@ -427,9 +427,6 @@ const onTouchStart = (index, explanationSrc) => {
   console.log("audioTrigger", audioTrigger.value);
   console.log("touchCounter", touchCounter);
   touchCounter.value++;
-  // if (explanationSrc && explanationSrc.endsWith("hapticGrid.mp3")) {
-  //   isTouching.value = true;
-  // }
   vibrateByIndex(index);
 };
 
@@ -437,15 +434,14 @@ const onTouchEnd = () => {
   setTimeout(() => {
     touchedIndex.value = null;
   }, 300);
-  // isTouching.value = false;
 };
 
 const pages = [
   [
     {
-      clickFunction: scanCamera,
-      imgSrc: "/icons/scanCamera.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_scanField.mp3",
+      clickFunction: click_hapticGrid,
+      imgSrc: "/icons/hapticGrid.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
     },
     {
       clickFunction: ping,
@@ -458,9 +454,9 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_pingShoes.mp3",
     },
     {
-      clickFunction: scoreStandings,
-      imgSrc: "/icons/standing.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
+      clickFunction: scanCamera,
+      imgSrc: "/icons/scanCamera.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_scanField.mp3",
     },
   ],
   [
@@ -488,10 +484,9 @@ const pages = [
   ],
   [
     {
-      clickFunction: click_hapticGrid,
-      // imgSrc: "/icons/calibrator2.svg",
-      html: "Tap to toggle haptic feedback",
-      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      clickFunction: scoreStandings,
+      imgSrc: "/icons/standing.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
     },
     {
       clickFunction: click_hapticGrid,
@@ -590,7 +585,7 @@ const {
   index: stepperIndex,
   current: currentPage,
 } = useStepper(pages);
-goToNext();
+// goToNext();
 
 const pageOneAnnouncer = useSoundComposable(
   "/sounds/elevenlabs/announce_page1.mp3"
@@ -662,7 +657,7 @@ onLongPress(swiper, longPressCallback, {
   },
 });
 
-const bus = useEventBus("tresjs");
+const bus = useEventBus("protoboules");
 const { isSwiping, direction } = useSwipe(swiper);
 watch(isSwiping, (val) => {
   if (val) {

@@ -1,12 +1,11 @@
 <template>
   <div id="overlay">
     <TresCanvas>
-      <Integrated />
+      <XR />
     </TresCanvas>
     <Interface @scanCamera="toggleCamera()" :xrRunning="xrRunning" />
     <div
       class="fixed left-0 bottom-0 transition-opacity transition-duration-200"
-      :style="{ opacity: showIntersections ? '100' : '0' }"
       v-show="xrRunning"
     >
       <div
@@ -26,23 +25,21 @@
         <div>{{ index }}</div>
       </div>
     </div>
+    <!-- <div class="fixed right-0 bottom-0 text-white">{{ planeDetected }}</div> -->
   </div>
 </template>
 
 <script setup lang="ts">
-// 823 1920
 import { TresCanvas } from "@tresjs/core";
 
-const { sendIntersections } = useXrController();
+const store = useProtoStore();
+const { planeDetected, predictions } = storeToRefs(store);
 
-const bus = useEventBus("tresjs");
+const bus = useEventBus("protoboules");
 const startXR = () => {
-  console.log("startXR in parent");
   bus.emit("startXR");
 };
-
 const stopXR = () => {
-  console.log("stopXR");
   bus.emit("stopXR");
 };
 
@@ -50,7 +47,6 @@ const scanCounter = ref(0);
 const xrRunning = ref(false);
 const toggleCamera = () => {
   scanCounter.value++;
-  console.log("toggleCamera");
   if (xrRunning.value) {
     stopXR();
   } else {
@@ -58,30 +54,6 @@ const toggleCamera = () => {
   }
   xrRunning.value = !xrRunning.value;
 };
-
-const showIntersections = ref(false);
-const planeDetected = ref(false);
-const predictions = ref(null);
-const intersections = ref([{ x: 1, z: 4 }]);
-bus.on((event, payload) => {
-  if (event === "predictions") {
-    console.log("predictions", payload);
-    predictions.value = payload;
-  }
-  if (event === "intersections" && planeDetected.value) {
-    showIntersections.value = true;
-    intersections.value = payload;
-    setTimeout(() => {
-      showIntersections.value = false;
-      // intersections.value = [];
-    }, 2000);
-    sendIntersections(payload);
-  }
-
-  if (event === "plane") {
-    planeDetected.value = payload.detected;
-  }
-});
 </script>
 
 <style>
@@ -100,6 +72,5 @@ bus.on((event, payload) => {
   position: flex;
   justify-content: center;
   align-items: center;
-  /* color: #ff0000; */
 }
 </style>

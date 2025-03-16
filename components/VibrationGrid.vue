@@ -16,7 +16,7 @@ const { isTouching } = defineProps({
 });
 
 const boules = ref([]);
-const bus = useEventBus("tresjs");
+const bus = useEventBus("protoboules");
 bus.on((message, payload) => {
   if (message === "screenPositions") {
     console.log("screenPositions", payload);

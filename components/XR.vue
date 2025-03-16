@@ -9,32 +9,30 @@
 import { useTresContext } from "@tresjs/core";
 import * as THREE from "three";
 
+const store = useProtoStore();
+const { rawIntersections, predictions, planeDetected } = storeToRefs(store);
+
 const { predictFromImage } = await useInference();
 
 const { renderer, scene, camera } = useTresContext();
 
-const bus = useEventBus("tresjs");
+const bus = useEventBus("protoboules");
 bus.on((message) => {
   if (message === "startXR") {
-    console.log("Starting XR in component");
-    startXR()
+    startXR();
   }
 });
 
 const startXR = async () => {
   console.log("Starting XR");
+
   let controller;
-
   let reticle;
-
   let plane;
-  let intersectionBall;
-
   let hitTestSource = null;
   let hitTestSourceRequested = false;
 
   const supported = await navigator.xr?.isSessionSupported("immersive-ar");
-
   if (supported) {
     init();
     animate();
@@ -66,21 +64,14 @@ const startXR = async () => {
     reticle = new THREE.Mesh(
       new THREE.RingGeometry(0.03, 0.05, 16).rotateX(-Math.PI / 2),
       new THREE.MeshBasicMaterial({
-        color: 0xff0000,
+        color: 0x0000ff,
         transparent: true,
         opacity: 0,
       })
     );
-
-    intersectionBall = new THREE.Mesh(
-      new THREE.SphereGeometry(0.1, 32, 32),
-      new THREE.MeshBasicMaterial({
-        color: 0x00ff00,
-        transparent: true,
-        opacity: 1,
-      })
-    );
-    // scene.value.add(intersectionBall);
+    reticle.matrixAutoUpdate = false;
+    reticle.visible = false;
+    scene.value.add(reticle);
 
     const geometry = new THREE.PlaneGeometry(10, 10);
     const material = new THREE.MeshBasicMaterial({
@@ -92,14 +83,6 @@ const startXR = async () => {
     plane.rotation.x = -Math.PI / 2;
     plane.position.y = -0.05;
     scene.value.add(plane);
-
-    reticle.matrixAutoUpdate = false;
-    reticle.visible = false;
-
-    scene.value.add(reticle);
-
-    // window.addEventListener("touchstart", onClick);
-    // window.addEventListener("click", onClick);
   }
 
   async function stopXR() {
@@ -116,54 +99,6 @@ const startXR = async () => {
   });
 
   let bitmap;
-  let counter = 0;
-  let blobs = [];
-  let clicked = false;
-  // async function onClick(event) {
-  //   clicked = true;
-  //   counter++;
-  //   console.log("Clicked", counter);
-  //   const clientX = event.touches ? event.touches[0].clientX : event.clientX;
-  //   const clientY = event.touches ? event.touches[0].clientY : event.clientY;
-
-  //   const intersectionBall = new THREE.Mesh(
-  //     new THREE.SphereGeometry(0.05, 32, 32),
-  //     new THREE.MeshBasicMaterial({
-  //       color: 0x00ff00,
-  //       transparent: true,
-  //       opacity: 0.5,
-  //     })
-  //   );
-
-  //   let testPrediction;
-  //   const predictions = await predictFromImage(bitmap);
-  //   if (predictions.length > 0) {
-  //     bus.emit("predictions", predictions);
-  //     testPrediction = predictions[0];
-  //   }
-
-  //   const raycaster = new THREE.Raycaster();
-  //   const mouse = new THREE.Vector2();
-
-  //   // mouse.x = (clientX / window.innerWidth) * 2 - 1;
-  //   // mouse.y = -(clientY / window.innerHeight) * 2 + 1;
-
-  //   (mouse.x = (testPrediction.bbox.x / 2 / window.innerWidth) * 2 - 1),
-  //     (mouse.y = -(testPrediction.bbox.y / 2 / window.innerHeight) * 2 + 1);
-
-  //   raycaster.setFromCamera(mouse, camera.value);
-
-  //   const intersects = raycaster.intersectObject(plane);
-
-  //   if (intersects.length > 0) {
-  //     const intersectPoint = intersects[0].point;
-  //     intersectionBall.position.copy(intersectPoint);
-  //   }
-
-  //   scene.value.add(intersectionBall);
-  //   clicked = false;
-  // }
-
   function intersectPrediction(prediction) {
     const raycaster = new THREE.Raycaster();
     const input = new THREE.Vector2();
@@ -215,23 +150,28 @@ const startXR = async () => {
           framebuffer
         );
 
-        if (frameCount % 10 === 0 && !clicked) {
-          const predictions = await predictFromImage(bitmap);
-          if (predictions.length > 0) {
-            bus.emit("predictions", predictions);
-            const hasCochonet = predictions.some(item => item.class === "cochonet");
+        if (frameCount % 10 === 0) {
+          const newPredictions = await predictFromImage(bitmap);
+          if (newPredictions.length > 0) {
+            predictions.value = newPredictions;
+            const hasCochonet = newPredictions.some(
+              (item) => item.class === "cochonette"
+            );
             if (hasCochonet) {
               let intersections = [];
-                predictions.forEach((prediction) => {
-                let intersectPoint = intersectPrediction(prediction);
+              newPredictions.forEach((newPrediction) => {
+                let intersectPoint = intersectPrediction(newPrediction);
                 intersections.push({
-                  class: prediction.class,
-                  ...intersectPoint
+                  class:
+                    newPrediction.class === "cochonette"
+                      ? "cochonet"
+                      : newPrediction.class,
+                  ...intersectPoint,
                 });
               });
-              bus.emit("intersections", intersections);
+              rawIntersections.value = intersections;
             }
-            lastPredictions = predictions;
+            lastPredictions = newPredictions;
           }
         }
       }
@@ -268,20 +208,10 @@ const startXR = async () => {
             reticle.position.z
           );
 
-          // Emit planeDetected event with true
-          bus.emit("plane", {
-            detected: true,
-            // position: {
-            //   x: plane.position.x,
-            //   y: plane.position.y,
-            //   z: plane.position.z
-            // },
-          });
+          planeDetected.value = true;
         } else {
           reticle.visible = false;
-
-          // Emit planeDetected event with false
-          bus.emit("plane", { detected: false });
+          planeDetected.value = false;
         }
       }
 
