@@ -16,7 +16,16 @@ export function useSpeech() {
 		window.speechSynthesis.speak(utterance);
 	};
 
+	const stop = () => {
+		if (!window.speechSynthesis) {
+			console.error('Speech Synthesis API is not supported in this browser.');
+			return;
+		}
+		window.speechSynthesis.cancel();
+	};
+
 	return {
 		speak,
+		stop,
 	};
 }

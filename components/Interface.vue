@@ -5,8 +5,24 @@
   >
     <VirtualAudioSpace :isTouching="isTouching" :trigger="audioTrigger" />
   </div>
-  <VibrationGrid :isTouching="isTouching" @click="isTouching = !isTouching" />
-  <div class="outer" ref="el" v-show="!isTouching">
+  <VibrationGrid
+    :isTouching="isTouching"
+    @click="isTouching = !isTouching"
+    @touchstart="onTappingOnHaptic"
+    @touchend="onTappingOnHaptic"
+  />
+  <div class="outer" v-show="isTouching">
+    <div class="container">
+      <div class="big">
+        <div v-show="!isTappingOnHaptic">
+          <div>
+            Tap, hold and move across the screen to navigate. Tap once to exit.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="outer" ref="el" v-show="!isTouching" s>
     <div class="container">
       <div
         :ref="refs.set"
@@ -47,7 +63,12 @@
                 : '',
             }"
           />
-          <div v-else class="text-hex-ff0000 text-20px text-center flex">
+          <div
+            v-if="
+              pages.flat().find((page) => page.id === item.cycler.state).html
+            "
+            class="text-hex-ff0000 text-20px text-center flex"
+          >
             <div
               v-html="
                 pages.flat().find((page) => page.id === item.cycler.state).html
@@ -93,8 +114,13 @@
 import { Howler } from "howler";
 
 const store = useProtoStore();
-const emit = defineEmits(["scanCamera"]);
 const isTouching = ref(false);
+
+const isTappingOnHaptic = ref(false);
+const onTappingOnHaptic = () => {
+  console.log("onTappingOnHaptic");
+  isTappingOnHaptic.value = !isTappingOnHaptic.value;
+};
 
 const {
   vibrateOnce,
@@ -135,7 +161,11 @@ const onSwipe = (dir, e, index) => {
 // register click functions
 const scanCamera = () => {
   if (!afterLongPress) {
-    emit("scanCamera");
+    if (store.xrRunning) {
+      store.stopXR();
+    } else if (store.modelLoaded) {
+      store.startXR();
+    }
   }
 };
 
@@ -456,6 +486,11 @@ const pingPhone = () => {
   }
 };
 
+const refreshPage = () => {
+  console.log("refreshPage");
+  window.location.reload();
+};
+
 const click_hapticGrid = () => {
   console.log("click_hapticGrid");
   isTouching.value = !isTouching.value;
@@ -551,7 +586,6 @@ const pages = [
       id: 7,
       clickFunction: click_stalefish180,
       imgSrc: "/icons/stalefish180.svg",
-      html: "Tap to toggle haptic feedback",
       explanationSrc: "/sounds/elevenlabs/explanation_stalefish180.mp3",
       cycler: useCycleList([7, 4, 5, 6]),
     },
@@ -683,15 +717,14 @@ const pages = [
       id: 22,
       name: "Orientation",
       clickFunction: orientation,
-      // imgSrc: "/icons/calibrator2.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
       cycler: useCycleList([22]),
     },
     {
       id: 23,
-      name: "Orientation",
-      clickFunction: orientation,
-      // imgSrc: "/icons/calibrator2.svg",
+      name: "Refresh page",
+      clickFunction: refreshPage,
+      html: "Click to refresh page",
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
       cycler: useCycleList([23]),
     },
@@ -779,7 +812,7 @@ const bus = useEventBus("protoboules");
 const { isSwiping, direction } = useSwipe(swiper);
 watch(isSwiping, (val) => {
   if (val) {
-    if (direction.value === "right") {
+    if (direction.value === "left") {
       if (isLast.value) {
         const firstStep = stepNames.value[0];
         goTo(firstStep);
@@ -787,7 +820,7 @@ watch(isSwiping, (val) => {
         goToNext();
       }
     }
-    if (direction.value === "left") {
+    if (direction.value === "right") {
       if (isFirst.value) {
         const lastStep = stepNames.value[stepNames.value.length - 1];
         goTo(lastStep);
@@ -801,6 +834,7 @@ watch(isSwiping, (val) => {
     if (direction.value === "up") {
       Howler.stop();
       store.helpers = !store.helpers;
+      window.speechSynthesis.cancel();
     }
 
     if (stepperIndex.value === 0) vibratePageOne();
@@ -868,6 +902,31 @@ onKeyStroke(["1", "2", "3", "4", "5", "6"], (e) => {
     ". ."
     ". .";
   user-select: none;
+}
+
+.big {
+  width: 100%;
+  height: 100%;
+  border: 3px solid #ff0000;
+  grid-row: span 2;
+  grid-column: span 2;
+  border-radius: 5px;
+  > div {
+    width: 100%;
+    height: 100%;
+    background-color: #ff0000;
+    opacity: 0.7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    div {
+      text-align: center;
+      font-size: 30px;
+      font-weight: 400;
+      color: black;
+      width: 80%;
+    }
+  }
 }
 
 .grid-item {

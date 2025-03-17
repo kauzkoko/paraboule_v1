@@ -74,7 +74,7 @@ let animationController = supabase.channel("animation-controller");
 const bus = useEventBus("protoboules");
 
 const store = useProtoStore();
-const { sortedBoules: boules, helpers } = storeToRefs(store);
+const { boulesToDisplay: boules, helpers } = storeToRefs(store);
 
 //interface controls
 const trigger = ref(0);

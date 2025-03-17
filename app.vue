@@ -8,6 +8,9 @@
   </div>
 </template>
 
+<script setup>
+</script>
+
 <style>
 html, body {
   background-color: black;
@@ -15,5 +18,7 @@ html, body {
   padding: 0;
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, "Trebuchet MS", Verdana, sans-serif;
   font-weight: 300;
+  overflow: hidden;
+  overscroll-behavior-y: contain;
 }
 </style>

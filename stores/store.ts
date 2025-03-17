@@ -2,6 +2,8 @@ export const useProtoStore = defineStore("protoStore", () => {
   const supabase = useSupabaseClient();
   let channel = supabase.channel("xr-controller");
 
+  const modelLoaded = ref(false);
+
   const xrRunning = ref(false);
   const helpers = ref(true);
 
@@ -12,19 +14,23 @@ export const useProtoStore = defineStore("protoStore", () => {
     { id: 3, name: "Boule 3", color: "green", distance: 1 },
   ]);
   const sortedBoules = useSorted(boules, (a, b) => a.distance - b.distance);
+  const filteredBoules = computed(() =>
+    sortedBoules.value.filter((boule) => boule.distance < 6)
+  );
+  const boulesToDisplay = computed(() => filteredBoules.value);
 
   const {
     next: nextBoule,
     prev: prevBoule,
     go: goToBoule,
     index: currentlySelectedBouleIndex,
-  } = useCycleList(sortedBoules);
-  const bouleCount = computed(() => sortedBoules.value.length);
+  } = useCycleList(boulesToDisplay);
+  const bouleCount = computed(() => boulesToDisplay.value.length);
 
   const deviceId = Math.random().toString(36).substring(2, 15);
 
   const rawIntersections = ref([]);
-  const intersections = ref([
+  const mockIntersections = ref([
     {
       x: 0.15217870875827644,
       y: 0.11757755279540989,
@@ -105,8 +111,10 @@ export const useProtoStore = defineStore("protoStore", () => {
   };
 
   watch(rawIntersections, (rawIntersections) => {
-    setFromIntersections();
-    console.log("rawIntersections", rawIntersections.value);
+    if (rawIntersections) {
+      setFromIntersections();
+      console.log("rawIntersections", rawIntersections.value);
+    }
   });
 
   channel
@@ -116,21 +124,24 @@ export const useProtoStore = defineStore("protoStore", () => {
     .subscribe();
 
   // mock boules
-  rawIntersections.value = intersections.value;
+  rawIntersections.value = mockIntersections.value;
 
   return {
     boules,
     deviceId,
     rawIntersections,
-    intersections,
+    mockIntersections,
     predictions,
     planeDetected,
     xrRunning,
     helpers,
     sortedBoules,
+    filteredBoules,
+    boulesToDisplay,
     bouleCount,
     goToBoule,
     nextBoule,
     currentlySelectedBouleIndex,
+    modelLoaded,
   };
 });

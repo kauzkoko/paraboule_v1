@@ -155,21 +155,23 @@ const startXR = async () => {
           if (newPredictions.length > 0) {
             predictions.value = newPredictions;
             const hasCochonet = newPredictions.some(
-              (item) => item.class === "cochonette"
+              (item) => item.class === "cochonette" && item.confidence > 0.5
             );
             if (hasCochonet) {
-              let intersections = [];
+              let tempIntersections = [];
               newPredictions.forEach((newPrediction) => {
-                let intersectPoint = intersectPrediction(newPrediction);
-                intersections.push({
-                  class:
-                    newPrediction.class === "cochonette"
-                      ? "cochonet"
-                      : newPrediction.class,
-                  ...intersectPoint,
-                });
+                if (newPrediction.confidence > 0.7) {
+                  let intersectPoint = intersectPrediction(newPrediction);
+                  tempIntersections.push({
+                    class:
+                      newPrediction.class === "cochonette"
+                        ? "cochonet"
+                        : newPrediction.class,
+                    ...intersectPoint,
+                  });
+                }
               });
-              rawIntersections.value = intersections;
+              rawIntersections.value = tempIntersections;
             }
             lastPredictions = newPredictions;
           }
