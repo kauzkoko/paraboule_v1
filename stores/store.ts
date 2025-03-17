@@ -2,13 +2,23 @@ export const useProtoStore = defineStore("protoStore", () => {
   const supabase = useSupabaseClient();
   let channel = supabase.channel("xr-controller");
 
+  const xrRunning = ref(false);
+  const helpers = ref(true);
+
   // will be set from setFromIntersections
   const boules = ref([
-    { id: 1, name: "Boule 1", color: "red" },
-    { id: 2, name: "Boule 2", color: "blue" },
-    { id: 3, name: "Boule 3", color: "green" },
+    { id: 1, name: "Boule 1", color: "red", distance: 3 },
+    { id: 2, name: "Boule 2", color: "blue", distance: 2 },
+    { id: 3, name: "Boule 3", color: "green", distance: 1 },
   ]);
-  const boulesStepper = useStepper(boules.value);
+  const sortedBoules = useSorted(boules, (a, b) => a.distance - b.distance);
+
+  const {
+    next: nextBoule,
+    prev: prevBoule,
+    go: goToBoule,
+    index: currentlySelectedBouleIndex,
+  } = useCycleList(sortedBoules);
 
   const deviceId = Math.random().toString(36).substring(2, 15);
 
@@ -63,13 +73,17 @@ export const useProtoStore = defineStore("protoStore", () => {
 
     let tempBoules = [];
     rawIntersections.value.forEach((item) => {
+      let scaledX = item.x * scaler - offsetX;
+      let scaledY = item.z * scaler - offsetY;
+      let distance = Math.sqrt(scaledX * scaledX + scaledY * scaledY);
       let boule = {
-        x: item.x * scaler - offsetX,
-        y: item.z * scaler - offsetY,
+        x: scaledX,
+        y: scaledY,
         color: "yellow",
         size: 1,
         player: 3,
         class: item.class,
+        distance: distance,
       };
 
       if (item.class === "cochonet") {
@@ -105,11 +119,15 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   return {
     boules,
-    boulesStepper,
     deviceId,
     rawIntersections,
     intersections,
     predictions,
     planeDetected,
+    xrRunning,
+    helpers,
+    sortedBoules,
+    nextBoule,
+    currentlySelectedBouleIndex,
   };
 });

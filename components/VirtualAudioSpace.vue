@@ -6,8 +6,8 @@
       ref="camera"
     />
     <TresMesh
-      v-for="(boule, i) in boules"
-      :key="i"
+      v-for="(boule, index) in boules"
+      :key="index"
       :iClass="boule.class"
       ref="boulesRefs"
       :position="[boule.x, 0, boule.y]"
@@ -24,8 +24,8 @@
           ref="positionalAudioRef"
           :ready="true"
           loop
-          v-if="props.selectedBoule === i || true"
-          :helper="true"
+          v-if="store.currentlySelectedBouleIndex === index"
+          :helper="helpers"
           :autoplay="false"
           :key="trigger"
           :url="
@@ -63,10 +63,6 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-  selectedBoule: {
-    type: Number,
-    default: 0,
-  },
 });
 
 const camera = useTemplateRef("camera");
@@ -78,7 +74,7 @@ let animationController = supabase.channel("animation-controller");
 const bus = useEventBus("protoboules");
 
 const store = useProtoStore();
-const { boules } = storeToRefs(store);
+const { sortedBoules: boules, helpers } = storeToRefs(store);
 
 //interface controls
 const trigger = ref(0);

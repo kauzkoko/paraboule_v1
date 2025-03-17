@@ -3,11 +3,7 @@
     class="absolute left-0 w-100dvw h-100dvh"
     :style="{ top: isTouching ? '0' : '-40px' }"
   >
-    <VirtualAudioSpace
-      :isTouching="isTouching"
-      :trigger="audioTrigger"
-      :selected-boule="store.boulesStepper.index + 1"
-    />
+    <VirtualAudioSpace :isTouching="isTouching" :trigger="audioTrigger" />
   </div>
   <VibrationGrid :isTouching="isTouching" @click="isTouching = !isTouching" />
   <div class="outer" ref="el" v-show="!isTouching">
@@ -57,8 +53,8 @@
             : 'background 500ms',
       }"
     >
-      <div>
-        <div class="text-hex-ff0000 text-38px">
+      <div :index="100">
+        <div class="text-hex-ff0000 text-38px" :index="'pageAnnouncer'">
           {{ (stepperIndex % pages.length) + 1 }}
         </div>
       </div>
@@ -74,12 +70,7 @@
 <script setup>
 import { Howler } from "howler";
 
-const props = defineProps({
-  xrRunning: {
-    type: Boolean,
-    required: true,
-  },
-});
+const store = useProtoStore();
 const emit = defineEmits(["scanCamera"]);
 const isTouching = ref(false);
 
@@ -99,7 +90,7 @@ const {
 // layout flickering fix
 const el = ref(null);
 watch(
-  () => props.xrRunning,
+  () => store.xrRunning,
   (newVal) => {
     if (newVal) {
       el.value.style.opacity = "0";
@@ -145,14 +136,12 @@ const orientation = () => {
   console.log("orientation");
 };
 
-const store = useProtoStore();
 const bouleFocuser = () => {
-  if (store.boulesStepper.isLast) {
-    const firstStep = store.boulesStepper.stepNames[0];
-    store.boulesStepper.goTo(firstStep);
-  } else {
-    store.boulesStepper.goToNext();
+  store.nextBoule();
+  if (store.currentlySelectedBouleIndex === 0) {
+    store.nextBoule();
   }
+  console.log("bouleFocuser", store.currentlySelectedBouleIndex);
 };
 
 const focusBoulesBefore = () => {
@@ -424,8 +413,6 @@ const touchedIndex = ref(null);
 const onTouchStart = (index, explanationSrc) => {
   touchedIndex.value = index;
   audioTrigger.value++;
-  console.log("audioTrigger", audioTrigger.value);
-  console.log("touchCounter", touchCounter);
   touchCounter.value++;
   vibrateByIndex(index);
 };
@@ -609,6 +596,7 @@ const explanations = pages
 const pageAnnouncerExplanation = useSoundComposable(
   "/sounds/elevenlabs/explanation_pageAnnouncer.mp3"
 );
+
 let lastIndex = 0;
 const longPressCallback = (e) => {
   afterLongPress = true;
@@ -623,8 +611,7 @@ const longPressCallback = (e) => {
 
   if (!isNaN(index) && index !== null) {
     let explanationIndex =
-      (absoluteSelectedPageIndex.value * 4 + parseInt(index)) %
-      explanations.length;
+      (stepperIndex.value * 4 + parseInt(index)) % explanations.length;
 
     explanations[explanationIndex].play();
     lastIndex = explanationIndex;
@@ -661,7 +648,6 @@ const bus = useEventBus("protoboules");
 const { isSwiping, direction } = useSwipe(swiper);
 watch(isSwiping, (val) => {
   if (val) {
-    console.log("swiping", direction.value);
     if (direction.value === "right") {
       if (isLast.value) {
         const firstStep = stepNames.value[0];
@@ -671,7 +657,6 @@ watch(isSwiping, (val) => {
       }
     }
     if (direction.value === "left") {
-      console.log(stepperIndex.value === 0);
       if (isFirst.value) {
         const lastStep = stepNames.value[stepNames.value.length - 1];
         goTo(lastStep);
@@ -681,6 +666,10 @@ watch(isSwiping, (val) => {
     }
     if (direction.value === "down") {
       bus.emit("flyToStart");
+    }
+    if (direction.value === "up") {
+      Howler.stop();
+      store.helpers = !store.helpers;
     }
 
     if (stepperIndex.value === 0) vibratePageOne();
