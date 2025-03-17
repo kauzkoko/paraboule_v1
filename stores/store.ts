@@ -19,6 +19,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     go: goToBoule,
     index: currentlySelectedBouleIndex,
   } = useCycleList(sortedBoules);
+  const bouleCount = computed(() => sortedBoules.value.length);
 
   const deviceId = Math.random().toString(36).substring(2, 15);
 
@@ -127,6 +128,8 @@ export const useProtoStore = defineStore("protoStore", () => {
     xrRunning,
     helpers,
     sortedBoules,
+    bouleCount,
+    goToBoule,
     nextBoule,
     currentlySelectedBouleIndex,
   };

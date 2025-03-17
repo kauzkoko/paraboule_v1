@@ -11,12 +11,18 @@
       <div
         :ref="refs.set"
         v-for="(item, index) in currentPage"
-        :key="index"
-        class="grid-item"
-        :index="index"
-        @click="item.clickFunction()"
-        @touchstart="onTouchStart(index, item.explanationSrc)"
+        :key="'grid-item-' + index"
+        class="grid-item children:pointer-events-none"
+        :index="pages.flat().findIndex((page) => page.id === item.cycler.state)"
         @touchend="onTouchEnd"
+        v-touch:swipe="(dir, e) => onSwipe(dir, e, index)"
+        @click="
+          pages
+            .flat()
+            .find((page) => page.id === item.cycler.state)
+            .clickFunction()
+        "
+        @touchstart="onTouchStart(index)"
         :style="{
           background:
             touchedIndex === index ? 'rgba(255,0,0,.25)' : 'transparent',
@@ -24,13 +30,32 @@
             touchedIndex === index ? 'background 50ms' : 'background 500ms',
         }"
       >
-        <img
-          v-if="item.imgSrc"
-          :src="item.imgSrc"
-          :style="{ width: item.imgSrc.endsWith('uniqueQr.png') ? '70%' : '' }"
-        />
-        <div v-else class="text-hex-ff0000 text-20px text-center flex">
-          <div v-html="item.html"></div>
+        <div class="flex justify-center items-center">
+          <img
+            v-if="
+              pages.flat().find((page) => page.id === item.cycler.state).imgSrc
+            "
+            :src="
+              pages.flat().find((page) => page.id === item.cycler.state).imgSrc
+            "
+            :style="{
+              width: pages
+                .flat()
+                .find((page) => page.id === item.cycler.state)
+                .imgSrc.endsWith('uniqueQr.png')
+                ? '30dvw'
+                : '',
+            }"
+          />
+          <div v-else class="text-hex-ff0000 text-20px text-center flex">
+            <div
+              v-html="
+                pages.flat().find((page) => page.id === item.cycler.state).html
+                  .value ??
+                pages.flat().find((page) => page.id === item.cycler.state).html
+              "
+            ></div>
+          </div>
         </div>
       </div>
     </div>
@@ -41,7 +66,6 @@
       @click="onSingleClick"
       @touchstart="onTouchStart('pageAnnouncer')"
       @touchend="onTouchEnd"
-      v-on:dblclick.native="onDoubleClick()"
       :style="{
         background:
           touchedIndex === 'pageAnnouncer'
@@ -53,10 +77,8 @@
             : 'background 500ms',
       }"
     >
-      <div :index="100">
-        <div class="text-hex-ff0000 text-38px" :index="'pageAnnouncer'">
-          {{ (stepperIndex % pages.length) + 1 }}
-        </div>
+      <div class="text-hex-ff0000 text-38px" :index="'pageAnnouncer'">
+        {{ stepperIndex + 1 }}
       </div>
     </div>
     <QrScanner
@@ -101,6 +123,15 @@ watch(
   }
 );
 
+const onSwipe = (dir, e, index) => {
+  const indexElement = e.srcElement.getAttribute("index");
+  if (dir === "right") {
+    currentPage.value[index].cycler.next();
+  } else {
+    currentPage.value[index].cycler.prev();
+  }
+};
+
 // register click functions
 const scanCamera = () => {
   if (!afterLongPress) {
@@ -136,12 +167,19 @@ const orientation = () => {
   console.log("orientation");
 };
 
-const bouleFocuser = () => {
+const bouleFocuser = (bouleIndex) => {
+  if (bouleIndex < store.bouleCount) {
+    store.goToBoule(bouleIndex);
+    return;
+  } else if (bouleIndex >= store.bouleCount) {
+    const message = `There are only ${store.bouleCount - 1} balls.`;
+    speak(message);
+    return;
+  }
   store.nextBoule();
   if (store.currentlySelectedBouleIndex === 0) {
     store.nextBoule();
   }
-  console.log("bouleFocuser", store.currentlySelectedBouleIndex);
 };
 
 const focusBoulesBefore = () => {
@@ -164,12 +202,10 @@ let clickTimeout = null;
 const { isListening, isFinal, result, start, stop } = useSpeechRecognition();
 const onSingleClick = () => {
   if (clickTimeout) {
-    console.log("if");
     clearTimeout(clickTimeout);
     clickTimeout = null;
     onDoubleClick();
   } else {
-    console.log("else");
     clickTimeout = setTimeout(() => {
       announcePage();
       clickTimeout = null;
@@ -177,103 +213,131 @@ const onSingleClick = () => {
   }
 };
 
+const micDown = new Audio("/sounds/strudel/micdown.mp3");
+const micUp = new Audio("/sounds/strudel/micup.mp3");
+watch(isListening, () => {
+  if (!isListening.value) {
+    let compare = result.value.toLowerCase();
+    console.log("compare", compare);
+    switch (compare) {
+      case "page 1":
+      case "page one":
+      case "h1":
+        goTo(stepNames.value[0]);
+        break;
+      case "page 2":
+      case "page two":
+      case "h2":
+        goTo(stepNames.value[1]);
+        break;
+      case "page 3":
+      case "page three":
+      case "h3":
+        goTo(stepNames.value[2]);
+        break;
+      case "page 4":
+      case "page four":
+      case "h4":
+        goTo(stepNames.value[3]);
+        break;
+      case "page 5":
+      case "page five":
+      case "h5":
+        goTo(stepNames.value[4]);
+        break;
+      case "page 6":
+      case "page six":
+      case "h6":
+        goTo(stepNames.value[5]);
+        break;
+      case "scan camera":
+      case "scan field":
+      case "scan the field":
+        scanCamera();
+        break;
+      case "scan qr":
+      case "scan qr code":
+      case "scan the qr code":
+        scanqr();
+        break;
+      case "ping the field":
+        ping();
+        break;
+      case "ping the shoes":
+      case "ping the hoop":
+      case "ping the hoolahoop":
+        pingShoes();
+        break;
+      case "ping the phone":
+        pingPhone();
+        break;
+      case "score standings":
+      case "tell the score":
+        scoreStandings();
+        break;
+      case "boule focuser":
+        bouleFocuser();
+        break;
+      case "focus the ball 1":
+      case "focus ball 1":
+      case "focus ball one":
+      case "focus the ball one":
+      case "focus the first ball":
+        bouleFocuser(1);
+        break;
+      case "focus the ball 2":
+      case "focus ball 2":
+      case "focus ball two":
+      case "focus the second ball":
+        bouleFocuser(2);
+        break;
+      case "focus the ball 3":
+      case "focus ball 3":
+      case "focus ball three":
+      case "focus the third ball":
+        bouleFocuser(3);
+        break;
+      case "focus the ball 4":
+      case "focus ball 4":
+      case "focus ball four":
+      case "focus ball for":
+      case "focus the fourth ball":
+        bouleFocuser(4);
+        break;
+      case "focus the ball 5":
+      case "focus ball 5":
+      case "focus ball five":
+      case "focus the fifth ball":
+        bouleFocuser(5);
+        break;
+      case "focus the ball 6":
+      case "focus ball 6":
+      case "focus ball six":
+      case "focus the sixth ball":
+        bouleFocuser(6);
+        break;
+      default:
+        console.log("default", result.value);
+        setTimeout(() => {
+          micDown.play();
+        }, 500);
+        return;
+    }
+    // setTimeout(() => {
+    //   micUp.play();
+    // }, 500);
+  }
+});
+
 const onDoubleClick = () => {
   console.log("onDoubleClick");
   if (clickTimeout) {
     clearTimeout(clickTimeout);
     clickTimeout = null;
   }
-  if (isListening.value) {
-    useSound("/sounds/strudel/micup.mp3", {
-      interrupt: true,
-    }).play();
-    stop();
-    let res = result.value;
-    console.log("stop listening", res);
-    if (res) {
-      if (res.includes("ping jack")) {
-        sendPlayCocho();
-      }
-      if (res.includes("ping shoes")) {
-        sendPlayShoes();
-      }
-      if (res.includes("scan field")) {
-        scanCamera();
-      }
-      if (res.includes("pairing status")) {
-        qrStatus();
-      }
-      if (res.includes("current score")) {
-        scoreStandings();
-      }
-      if (
-        res.includes("player one incrementer") ||
-        res.includes("increment player one")
-      ) {
-        incrementPlayer1();
-      }
-      if (
-        res.includes(
-          "player two incrementer" || res.includes("increment player two")
-        )
-      ) {
-        incrementPlayer2();
-      }
-      if (res.includes("announce balls played")) {
-        announceBallsPlayed();
-      }
-      if (res.includes("rewind")) {
-        rewind();
-      }
-      if (res.includes("pirate radar")) {
-        startCocho();
-      }
-      if (res.includes("boomerang")) {
-        flyCochoBack();
-      }
-      if (res.includes("boule focuser")) {
-        bouleFocuser();
-      }
-      if (res.includes("boules before")) {
-        focusBoulesBefore();
-      }
-      if (res.includes("calibrator")) {
-        orientation();
-      }
-      if (res.includes("unique QR")) {
-        qr();
-      }
-      if (res.includes("QR code")) {
-        qr();
-      }
-      if (res.includes("QR scanner")) {
-        scanqr();
-      }
-      if (res.includes("page announcer")) {
-        console.log("announcePage");
-        announcePage();
-      }
-      const pageNumber = res.endsWith("page one")
-        ? 1
-        : res.endsWith("page two")
-        ? 2
-        : res.endsWith("page three")
-        ? 3
-        : res.endsWith("page four")
-        ? 4
-        : res.endsWith("page five")
-        ? 5
-        : null;
-      if (pageNumber >= 1 && pageNumber <= pages.length) {
-        stepperIndex = pageNumber - 1;
-      }
-    }
-  } else {
+  if (!isListening.value) {
     start();
     console.log("start listening");
-    useSound("/sounds/strudel/micdown.mp3", {
-      interrupt: true,
-    }).play();
   }
 };
 
@@ -410,7 +474,7 @@ const vibrateByIndex = (index) => {
 
 const touchCounter = useState("touchCounter", () => 0);
 const touchedIndex = ref(null);
-const onTouchStart = (index, explanationSrc) => {
+const onTouchStart = (index) => {
   touchedIndex.value = index;
   audioTrigger.value++;
   touchCounter.value++;
@@ -426,139 +490,210 @@ const onTouchEnd = () => {
 const pages = [
   [
     {
+      id: 0,
+      name: "Haptic Grid",
       clickFunction: click_hapticGrid,
       imgSrc: "/icons/hapticGrid.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      cycler: useCycleList([0]),
     },
     {
+      id: 1,
+      name: "Ping Cocho",
       clickFunction: ping,
       imgSrc: "/icons/cocho.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pingCocho.mp3",
+      cycler: useCycleList([1, 2]),
     },
     {
+      id: 2,
+      name: "Ping Shoes",
       clickFunction: pingShoes,
       imgSrc: "/icons/hoolahoop.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_pingShoes.mp3",
+      explanationSrc: "/sounds/elevenlabs/explanation_hoolaPinger.mp3",
+      cycler: useCycleList([2, 1]),
     },
     {
+      id: 3,
+      name: "Scan Camera",
       clickFunction: scanCamera,
       imgSrc: "/icons/scanCamera.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_scanField.mp3",
+      cycler: useCycleList([3]),
     },
   ],
   [
     {
+      id: 4,
+      name: "Pirate Radar",
       clickFunction: startCocho,
       imgSrc: "/icons/around.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pirateRadar.mp3",
+      cycler: useCycleList([4, 5, 6, 7]),
     },
     {
+      id: 5,
+      name: "Boomerang",
       clickFunction: flyCochoBack,
       imgSrc: "/icons/boomerang1.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_boomerang.mp3",
+      cycler: useCycleList([5, 6, 7, 4]),
     },
     {
+      id: 6,
+      name: "Boule Focuser",
       clickFunction: bouleFocuser,
-      imgSrc: "/icons/bouleFocuser11.svg",
+      imgSrc: "/icons/bouleFocuser.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_bouleFocuser.mp3",
+      cycler: useCycleList([6, 7, 4, 5]),
     },
     {
+      id: 7,
       clickFunction: click_stalefish180,
       imgSrc: "/icons/stalefish180.svg",
       html: "Tap to toggle haptic feedback",
       explanationSrc: "/sounds/elevenlabs/explanation_stalefish180.mp3",
+      cycler: useCycleList([7, 4, 5, 6]),
     },
   ],
   [
     {
+      id: 8,
+      name: "Score Standings",
       clickFunction: scoreStandings,
       imgSrc: "/icons/standing.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
+      cycler: useCycleList([8]),
     },
     {
+      id: 9,
+      name: "Haptic Grid",
       clickFunction: click_hapticGrid,
       // imgSrc: "/icons/calibrator2.svg",
       html: "Tap to toggle haptic feedback",
       explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      cycler: useCycleList([9]),
     },
     {
+      id: 10,
+      name: "Haptic Grid",
       clickFunction: click_hapticGrid,
       // imgSrc: "/icons/calibrator2.svg",
       html: "Tap to toggle haptic feedback",
       explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      cycler: useCycleList([10]),
     },
     {
+      id: 11,
+      name: "Haptic Grid",
       clickFunction: click_hapticGrid,
       // imgSrc: "/icons/calibrator2.svg",
       html: "Tap to toggle haptic feedback",
       explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      cycler: useCycleList([11]),
     },
   ],
   [
     {
+      id: 12,
+      name: "Pairing Status",
       clickFunction: qrStatus,
       explanationSrc:
         "/sounds/elevenlabs/explanation_pairingStatusAnnouncer.mp3",
       html: "Pairing-Status:<br />Connected to 3wasds3w2.",
+      cycler: useCycleList([12]),
     },
     {
+      id: 13,
+      name: "Ping Phone",
       clickFunction: pingPhone,
       imgSrc: "/icons/pingPhone6.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pingPhone3.mp3",
+      cycler: useCycleList([13]),
     },
     {
+      id: 14,
+      name: "Scan QR",
       clickFunction: scanqr,
       imgSrc: "/icons/scanQr1.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_qrScanner.mp3",
+      cycler: useCycleList([14]),
     },
     {
+      id: 15,
+      name: "Unique QR",
       clickFunction: qr,
       imgSrc: "/icons/uniqueQr.png",
       explanationSrc: "/sounds/elevenlabs/explanation_uniqueQr.mp3",
+      cycler: useCycleList([15]),
     },
   ],
   [
     {
+      id: 16,
+      name: "Player 1 Incrementer",
       clickFunction: incrementPlayer1,
       imgSrc: "/icons/plus.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
+      cycler: useCycleList([16]),
     },
     {
+      id: 17,
+      name: "Player 2 Incrementer",
       clickFunction: incrementPlayer2,
       imgSrc: "/icons/plus.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
+      cycler: useCycleList([17]),
     },
     {
+      id: 18,
+      name: "Announce Balls Played",
       clickFunction: announceBallsPlayed,
       explanationSrc: "/sounds/elevenlabs/explanation_announceBallsPlayed.mp3",
       html: computedAnnounceBallsPlayedHtml,
+      cycler: useCycleList([18]),
     },
     {
+      id: 19,
+      name: "Rewind",
       clickFunction: rewind,
       imgSrc: "/icons/rewind.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
+      cycler: useCycleList([19]),
     },
   ],
   [
     {
+      id: 20,
+      name: "Orientation",
       clickFunction: orientation,
       imgSrc: "/icons/orientexpress.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
+      cycler: useCycleList([20]),
     },
     {
+      id: 21,
+      name: "Boules Before",
       clickFunction: focusBoulesBefore,
       imgSrc: "/icons/boulesBefore.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_boulesBefore.mp3",
+      cycler: useCycleList([21]),
     },
     {
+      id: 22,
+      name: "Orientation",
       clickFunction: orientation,
       // imgSrc: "/icons/calibrator2.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
+      cycler: useCycleList([22]),
     },
     {
+      id: 23,
+      name: "Orientation",
       clickFunction: orientation,
       // imgSrc: "/icons/calibrator2.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
+      cycler: useCycleList([23]),
     },
   ],
 ];
@@ -572,7 +707,6 @@ const {
   index: stepperIndex,
   current: currentPage,
 } = useStepper(pages);
-// goToNext();
 
 const pageOneAnnouncer = useSoundComposable(
   "/sounds/elevenlabs/announce_page1.mp3"
@@ -610,11 +744,8 @@ const longPressCallback = (e) => {
   }
 
   if (!isNaN(index) && index !== null) {
-    let explanationIndex =
-      (stepperIndex.value * 4 + parseInt(index)) % explanations.length;
-
-    explanations[explanationIndex].play();
-    lastIndex = explanationIndex;
+    explanations[index].play();
+    lastIndex = index;
   }
 
   touchCounter.value++;
@@ -749,9 +880,10 @@ onKeyStroke(["1", "2", "3", "4", "5", "6"], (e) => {
   pointer-events: auto;
   overflow: hidden;
   transition: all 50ms;
-  img {
-    pointer-events: none;
-    /* width: 90px; */
+  > div {
+    > * {
+      pointer-events: none;
+    }
   }
 
   &:first-child {
@@ -791,6 +923,9 @@ onKeyStroke(["1", "2", "3", "4", "5", "6"], (e) => {
     border-radius: 50%;
     width: 80%;
     border: 3px solid red;
+  }
+  > * {
+    pointer-events: none;
   }
 }
 </style>
