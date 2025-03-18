@@ -59,8 +59,7 @@ watch([x, y], ([x, y]) => {
       } else if (boule.class === "light") {
         lightBouleAudios[boule.classNumber - 1].play();
       }
-    }
-    else if (distance < 50) {
+    } else if (distance < 50) {
       console.log("Near", boule.class);
       useVibrate({ pattern: [50, 0] }).vibrate();
     }

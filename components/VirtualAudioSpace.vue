@@ -74,13 +74,13 @@ let animationController = supabase.channel("animation-controller");
 const bus = useEventBus("protoboules");
 
 const store = useProtoStore();
-const { boulesToDisplay: boules, helpers } = storeToRefs(store);
+const { boulesToDisplay: boules, helpers, hihatTriggers } = storeToRefs(store);
 
 //interface controls
 const trigger = ref(0);
+let circleAroundCochonet = false;
 
 // camera controls / animations
-let intervalId0deg, intervalId90deg, intervalId180deg, intervalId270deg;
 
 let startPoint = 30;
 const alpha = ref(0);
@@ -90,12 +90,6 @@ const cameraY = ref(1);
 const cameraZ = ref(startPoint);
 
 const screenPositions = ref([]);
-
-const circleAroundCochonet = ref(false);
-const hihat1 = new Audio("/sounds/strudel/hiihat1.mp3");
-const hihat2 = new Audio("/sounds/strudel/hiihat2.mp3");
-const hihat3 = new Audio("/sounds/strudel/hiihat3.mp3");
-const hihat4 = new Audio("/sounds/strudel/hiihat4.mp3");
 
 let sounds = {};
 sounds.noise = {
@@ -111,7 +105,7 @@ sounds.colors = {
 };
 
 function killTweens() {
-  clearIntervals();
+  circleAroundCochonet = false;
   gsap.killTweensOf([alpha, cameraX, cameraY, cameraZ]);
 }
 
@@ -127,7 +121,7 @@ function topCamera() {
     ease: "power2.out",
   });
   gsap.to(cameraY, {
-    value: 30,
+    value: 80,
     duration: 1,
     ease: "power2.out",
   });
@@ -231,33 +225,10 @@ function stalefish180() {
   });
 }
 
-function clearIntervals() {
-  if (intervalId0deg) {
-    clearInterval(intervalId0deg);
-    intervalId0deg = null;
-    circleAroundCochonet.value = false;
-  }
-  if (intervalId90deg) {
-    clearInterval(intervalId90deg);
-    intervalId90deg = null;
-    circleAroundCochonet.value = false;
-  }
-  if (intervalId180deg) {
-    clearInterval(intervalId180deg);
-    intervalId180deg = null;
-    circleAroundCochonet.value = false;
-  }
-  if (intervalId270deg) {
-    clearInterval(intervalId270deg);
-    intervalId270deg = null;
-    circleAroundCochonet.value = false;
-  }
-}
-
 function startCircularRotation() {
-  circleAroundCochonet.value = true;
-  let counter = 0;
   killTweens();
+  let counter = 0;
+  circleAroundCochonet = true;
   const targetX = 0;
   const targetZ = 0;
   gsap.to(cameraX, {
@@ -278,35 +249,46 @@ function startCircularRotation() {
     repeat: -1, // Infinite repetition
     ease: "none",
     onStart: () => {
-      hihat1.play();
-      intervalId0deg = setInterval(() => {
-        hihat1.play();
-      }, duration * 1000);
-      setTimeout(() => {
-        hihat3.play();
-        intervalId90deg = setInterval(() => {
-          hihat2.play();
-        }, duration * 1000);
-      }, (duration * 1000) / 4);
-      setTimeout(() => {
-        hihat3.play();
-        intervalId180deg = setInterval(() => {
-          hihat3.play();
-        }, duration * 1000);
-      }, (duration * 1000) / 2);
-      setTimeout(() => {
-        hihat4.play();
-        intervalId270deg = setInterval(() => {
-          hihat4.play();
-        }, duration * 1000);
-      }, ((duration * 1000) / 4) * 3);
+      hihatTriggers.value[0]++;
+      gsap.delayedCall(duration / 4, () => {
+        if (circleAroundCochonet) {
+          hihatTriggers.value[1]++;
+        }
+      });
+      gsap.delayedCall(duration / 2, () => {
+        if (circleAroundCochonet) {
+          hihatTriggers.value[2]++;
+        }
+      });
+      gsap.delayedCall((duration / 4) * 3, () => {
+        if (circleAroundCochonet) {
+          hihatTriggers.value[3]++;
+        }
+      });
     },
     onRepeat: () => {
       if (counter > 0) {
-        hihat1.play();
+        hihatTriggers.value[0]++;
         flyToStart();
-        clearIntervals();
+        circleAroundCochonet = false;
+        return;
       }
+      hihatTriggers.value[0]++;
+      gsap.delayedCall(duration / 4, () => {
+        if (circleAroundCochonet) {
+          hihatTriggers.value[1]++;
+        }
+      });
+      gsap.delayedCall(duration / 2, () => {
+        if (circleAroundCochonet) {
+          hihatTriggers.value[2]++;
+        }
+      });
+      gsap.delayedCall((duration / 4) * 3, () => {
+        if (circleAroundCochonet) {
+          hihatTriggers.value[3]++;
+        }
+      });
       counter++;
     },
   });

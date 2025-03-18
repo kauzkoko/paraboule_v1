@@ -113,6 +113,8 @@
 <script setup>
 import { Howler } from "howler";
 
+const bus = useEventBus("protoboules");
+
 const store = useProtoStore();
 const isTouching = ref(false);
 
@@ -162,9 +164,9 @@ const onSwipe = (dir, e, index) => {
 const scanCamera = () => {
   if (!afterLongPress) {
     if (store.xrRunning) {
-      store.stopXR();
+      bus.emit("stopXR");
     } else if (store.modelLoaded) {
-      store.startXR();
+      bus.emit("startXR");
     }
   }
 };
@@ -808,7 +810,6 @@ onLongPress(swiper, longPressCallback, {
   },
 });
 
-const bus = useEventBus("protoboules");
 const { isSwiping, direction } = useSwipe(swiper);
 watch(isSwiping, (val) => {
   if (val) {

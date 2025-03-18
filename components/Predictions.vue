@@ -1,11 +1,11 @@
 <template>
   <div
-    class="fixed left-0 bottom-0 transition-opacity transition-duration-200"
+    class="fixed left-0 top-0"
     v-show="xrRunning"
   >
     <div
       v-for="(prediction, index) in predictions"
-      class="predictions transition-all transition-duration-200 opacity-50"
+      class="predictions"
       :style="{
         left: prediction.bbox.x / 2 + 'px',
         top: prediction.bbox.y / 2 + 'px',
@@ -43,5 +43,7 @@ const { predictions, xrRunning } = storeToRefs(store);
   position: flex;
   justify-content: center;
   align-items: center;
+  transform: translate(-50%, -50%);
+  transition: all 0.2s ease-in-out;
 }
 </style>

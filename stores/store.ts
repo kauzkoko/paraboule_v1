@@ -1,3 +1,5 @@
+import { acceptHMRUpdate } from "pinia";
+
 export const useProtoStore = defineStore("protoStore", () => {
   const supabase = useSupabaseClient();
   let channel = supabase.channel("xr-controller");
@@ -15,9 +17,12 @@ export const useProtoStore = defineStore("protoStore", () => {
   ]);
   const sortedBoules = useSorted(boules, (a, b) => a.distance - b.distance);
   const filteredBoules = computed(() =>
-    sortedBoules.value.filter((boule) => boule.distance < 6)
+    sortedBoules.value.filter((boule) => boule.distance < 30)
   );
-  const boulesToDisplay = computed(() => filteredBoules.value);
+  const boulesToDisplay = computed(() => {
+    console.log("filteredBoules", filteredBoules.value);
+    return filteredBoules.value;
+  });
 
   const {
     next: nextBoule,
@@ -28,6 +33,8 @@ export const useProtoStore = defineStore("protoStore", () => {
   const bouleCount = computed(() => boulesToDisplay.value.length);
 
   const deviceId = Math.random().toString(36).substring(2, 15);
+
+  const hihatTriggers = ref([0, 0, 0, 0]);
 
   const rawIntersections = ref([]);
   const mockIntersections = ref([
@@ -108,12 +115,13 @@ export const useProtoStore = defineStore("protoStore", () => {
       tempBoules.push(boule);
     });
     boules.value = tempBoules;
+    console.log("boules in setFromIntersections", boules.value);
   };
 
-  watch(rawIntersections, (rawIntersections) => {
-    if (rawIntersections) {
+  watch(rawIntersections, (newIntersections) => {
+    if (newIntersections) {
+      console.log("newIntersections", newIntersections);
       setFromIntersections();
-      console.log("rawIntersections", rawIntersections.value);
     }
   });
 
@@ -143,5 +151,10 @@ export const useProtoStore = defineStore("protoStore", () => {
     nextBoule,
     currentlySelectedBouleIndex,
     modelLoaded,
+    hihatTriggers,
   };
 });
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useProtoStore, import.meta.hot));
+}

@@ -10,7 +10,8 @@ import { useTresContext } from "@tresjs/core";
 import * as THREE from "three";
 
 const store = useProtoStore();
-const { rawIntersections, predictions, planeDetected } = storeToRefs(store);
+const { rawIntersections, predictions, planeDetected, xrRunning } =
+  storeToRefs(store);
 
 const { predictFromImage } = await useInference();
 
@@ -25,6 +26,7 @@ bus.on((message) => {
 
 const startXR = async () => {
   console.log("Starting XR");
+  xrRunning.value = true;
 
   let controller;
   let reticle;
@@ -62,7 +64,7 @@ const startXR = async () => {
     scene.value.add(controller);
 
     reticle = new THREE.Mesh(
-      new THREE.RingGeometry(0.03, 0.05, 16).rotateX(-Math.PI / 2),
+      new THREE.RingGeometry(0.15, 0.2, 16).rotateX(-Math.PI / 2),
       new THREE.MeshBasicMaterial({
         color: 0x0000ff,
         transparent: true,
@@ -91,6 +93,7 @@ const startXR = async () => {
       await session.end();
       renderer.value.xr.enabled = false;
       console.log("XR session ended");
+      xrRunning.value = false;
     }
   }
 
@@ -159,9 +162,12 @@ const startXR = async () => {
             );
             if (hasCochonet) {
               let tempIntersections = [];
-              newPredictions.forEach((newPrediction) => {
-                if (newPrediction.confidence > 0.7) {
+              // console.log("newPredictions", newPredictions);
+              newPredictions.forEach((newPrediction, index) => {
+                // console.log("confidence", newPrediction.confidence);
+                if (newPrediction.confidence > 0.5) {
                   let intersectPoint = intersectPrediction(newPrediction);
+                  // console.log("intersectPoint", intersectPoint);
                   tempIntersections.push({
                     class:
                       newPrediction.class === "cochonette"
@@ -169,9 +175,16 @@ const startXR = async () => {
                         : newPrediction.class,
                     ...intersectPoint,
                   });
+                  // console.log("tempIntersections", tempIntersections[index]);
+                  // console.log("hitTestSource", hitTestSource);
                 }
               });
-              rawIntersections.value = tempIntersections;
+              // console.log("tempIntersections.length", tempIntersections.length);
+              if (tempIntersections.length > 0) {
+                console.log("tempIntersections", tempIntersections);
+                rawIntersections.value = tempIntersections;
+                // console.log("rawIntersections.value", rawIntersections.value);
+              }
             }
             lastPredictions = newPredictions;
           }
