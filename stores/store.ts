@@ -4,6 +4,8 @@ export const useProtoStore = defineStore("protoStore", () => {
   const supabase = useSupabaseClient();
   let channel = supabase.channel("xr-controller");
 
+  const bus = useEventBus("protoboules");
+
   const modelLoaded = ref(false);
 
   const player1Score = ref(0);
@@ -19,11 +21,28 @@ export const useProtoStore = defineStore("protoStore", () => {
     { id: 3, name: "Boule 3", color: "green", distance: 1 },
   ]);
   const sortedBoules = useSorted(boules, (a, b) => a.distance - b.distance);
-  const filteredBoules = computed(() =>
-    sortedBoules.value.filter((boule) => boule.distance < 30)
-  );
+
+  const { history } = useRefHistory(sortedBoules);
+  const filteredBoules = computed(() => {
+    if (history.value.length > 1) {
+      const currentLength = sortedBoules.value.length;
+      const previousLength = history.value[1].snapshot.length;
+      if (currentLength === previousLength) {
+        console.log("Same length as previous snapshot", currentLength);
+        return sortedBoules.value.filter((boule) => boule.distance < 30);
+        bus.emit("stopXR");
+      }
+    }
+    return [
+      { id: 1, name: "Boule 1", color: "red", distance: 3 },
+    ];
+  });
+
   const boulesToDisplay = computed(() => {
     console.log("filteredBoules", filteredBoules.value);
+    if (sortedBoules.value.length > 0) {
+      bus.emit("stopXR");
+    }
     return filteredBoules.value;
   });
 
