@@ -64,7 +64,13 @@ export function flipImageVertically(data, width, height) {
 // }
 
 // working
-export function createImageFromTexture(gl, texture, width, height, framebuffer) {
+export function createImageFromTexture(
+  gl,
+  texture,
+  width,
+  height,
+  framebuffer
+) {
   // Create a framebuffer backed by the texture
   gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
   gl.framebufferTexture2D(
@@ -81,7 +87,6 @@ export function createImageFromTexture(gl, texture, width, height, framebuffer) 
 
   // gl.deleteFramebuffer(framebuffer);
   // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
 
   // Reverse the image vertically
   const flippedData = flipImageVertically(data, width, height);
@@ -137,3 +142,15 @@ export function createImageFromTextureToCanvas(gl, texture, width, height) {
   imageData.data.set(flippedData);
   context.putImageData(imageData, 0, 0);
 }
+
+export const map = (n, start1, stop1, start2, stop2, withinBounds) => {
+  const newval = ((n - start1) / (stop1 - start1)) * (stop2 - start2) + start2;
+  if (!withinBounds) {
+    return newval;
+  }
+  if (start2 < stop2) {
+    return Math.max(Math.min(newval, start2), stop2);
+  } else {
+    return Math.max(Math.min(newval, stop2), start2);
+  }
+};
