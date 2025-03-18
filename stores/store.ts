@@ -6,6 +6,9 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   const modelLoaded = ref(false);
 
+  const player1Score = ref(0);
+  const player2Score = ref(0);
+
   const xrRunning = ref(false);
   const helpers = ref(true);
 
@@ -152,6 +155,8 @@ export const useProtoStore = defineStore("protoStore", () => {
     currentlySelectedBouleIndex,
     modelLoaded,
     hihatTriggers,
+    player1Score,
+    player2Score,
   };
 });
 

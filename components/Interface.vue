@@ -116,6 +116,7 @@ import { Howler } from "howler";
 const bus = useEventBus("protoboules");
 
 const store = useProtoStore();
+const { player1Score, player2Score } = storeToRefs(store);
 const isTouching = ref(false);
 
 const isTappingOnHaptic = ref(false);
@@ -348,6 +349,20 @@ watch(isListening, () => {
       case "focus the sixth ball":
         bouleFocuser(6);
         break;
+      case "fly to center and back":
+      case "fly to center":
+        flyToCochonetAndBack();
+        break;
+      case "fly to other side and back":
+      case "fly to other side":
+        stalefish180();
+        break;
+      case "haptic grid":
+      case "toggle haptic":
+      case "toggle haptic feedback":
+      case "toggle haptics":
+        click_hapticGrid();
+        break;
       default:
         console.log("default", result.value);
         setTimeout(() => {
@@ -428,6 +443,14 @@ const computedAnnounceBallsPlayedHtml = computed(() => {
         </div>`;
 });
 
+const computedScoreStandingsHtml = computed(() => {
+  return `
+    <div class='text-48px'>
+      <div>${player1Score.value} / 13</div><br />
+      <div class='h-3px bg-hex-ff0000 w-100%'></div><br/>
+      <div>${player2Score.value} / 13</div>
+    </div>`;
+});
 const { speak } = useSpeech();
 const text = ref("");
 const announceBallsPlayed = () => {
@@ -465,13 +488,17 @@ const scanqr = () => {
   }, 10000);
 };
 
-const currentScoreSound = useSoundComposable(
-  "/sounds/elevenlabs/click_currentScore.mp3"
-);
+const scores = [];
+for (let i = 0; i <= 13; i++) {
+  for (let j = 0; j <= 13; j++) {
+    scores.push(useSoundComposable(`/sounds/elevenlabs/scores/${i}_${j}.mp3`));
+  }
+}
 
 const scoreStandings = () => {
   console.log("scoreStandings");
-  currentScoreSound.play();
+  const index = (player1Score.value * 14) + player2Score.value;
+  scores[index].play();
 };
 
 const pingShoes = () => {
@@ -482,7 +509,7 @@ const pingShoes = () => {
 };
 
 const pingPhone = () => {
-  console.log("pingPhone");
+  console.log("pingPhone, TODO maybe add calling sound");
   if (!afterLongPress) {
     sendPlayPhone();
   }
@@ -588,7 +615,7 @@ const pages = [
       id: 7,
       clickFunction: click_stalefish180,
       imgSrc: "/icons/stalefish180.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_stalefish180.mp3",
+      explanationSrc: "/sounds/elevenlabs/explanation_throughTurnAndBack.mp3",
       cycler: useCycleList([7, 4, 5, 6]),
     },
   ],
@@ -597,9 +624,10 @@ const pages = [
       id: 8,
       name: "Score Standings",
       clickFunction: scoreStandings,
-      imgSrc: "/icons/standing.svg",
+      // imgSrc: "/icons/standing.svg",
+      html: computedScoreStandingsHtml,
       explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
-      cycler: useCycleList([8]),
+      cycler: useCycleList([8,18]),
     },
     {
       id: 9,
@@ -644,7 +672,7 @@ const pages = [
       name: "Ping Phone",
       clickFunction: pingPhone,
       imgSrc: "/icons/pingPhone6.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_pingPhone3.mp3",
+      explanationSrc: "/sounds/elevenlabs/explanation_phonePinger.mp3",
       cycler: useCycleList([13]),
     },
     {
@@ -685,7 +713,7 @@ const pages = [
       id: 18,
       name: "Announce Balls Played",
       clickFunction: announceBallsPlayed,
-      explanationSrc: "/sounds/elevenlabs/explanation_announceBallsPlayed.mp3",
+      explanationSrc: "/sounds/elevenlabs/explanation_ballsShotAnnouncer.mp3",
       html: computedAnnounceBallsPlayedHtml,
       cycler: useCycleList([18]),
     },
@@ -727,7 +755,7 @@ const pages = [
       name: "Refresh page",
       clickFunction: refreshPage,
       html: "Click to refresh page",
-      explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
+      explanationSrc: "/sounds/elevenlabs/explanation_pageRefresher.mp3",
       cycler: useCycleList([23]),
     },
   ],
