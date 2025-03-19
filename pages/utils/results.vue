@@ -1,5 +1,5 @@
 <template>
-  <div class="fullScreenAll bg-white pl-5">
+  <div class="fullScreenAll bg-white pl-5 container">
 	<div>
 		<h2>Correct answers</h2>
 		<table class="border-collapse border border-slate-400 mb-5">
@@ -65,6 +65,10 @@ if (error) {
 </script>
 
 <style scoped>
+.container {
+	font-size: 30px;
+}
+
 td, th {
 	padding: 0 5px;
 	border-right: 1px solid #000;
