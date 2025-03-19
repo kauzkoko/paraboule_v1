@@ -30,7 +30,7 @@
     </div>
   </div>
   <div class="fixed bottom-0 left-0 p-3">
-    <div class="text-23px mb-2">https://protoboules.netlify.app/poll</div>
+    <div class="text-23px mb-2">{{ url }}</div>
     <img :src="qrcode" class="w-15vw" alt="QR Code" />
   </div>
   <div class="fixed bottom-0 right-0 p-3">
@@ -47,8 +47,9 @@ import { TresCanvas } from "@tresjs/core";
 import { Grid } from "@tresjs/cientos";
 import { useQRCode } from "@vueuse/integrations/useQRCode";
 
-const qrcode = useQRCode("https://protoboules.netlify.app/poll", {
-  margin: 0,
+const url = ref("https://protoboules.netlify.app/utils/poll");
+const qrcode = useQRCode(url.value, {
+  margin: 5,
 });
 
 const { send } = useOSC();

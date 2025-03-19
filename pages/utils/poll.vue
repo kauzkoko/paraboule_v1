@@ -47,7 +47,7 @@
       </div>
 
       <div class="flex flex-col gap-4 max-w-80vw justify-left items-left">
-        <div class="flex justify-between items-center mt-8 w-80vw">
+        <div class="flex justify-between items-center mt-2 w-80vw">
           <button
             v-if="index > 0"
             @click="prev()"
@@ -56,6 +56,13 @@
             Previous
           </button>
           <div v-else class="w-20"></div>
+		  <button
+            @click="submit()"
+            :disabled="selectedAnswers.some((answer) => !answer.answer)"
+            class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed w-80%"
+          >
+            Submit
+          </button>
           <button
             v-if="index < questions.length - 1"
             @click="next()"
@@ -65,19 +72,10 @@
           </button>
           <div v-else class="w-20"></div>
         </div>
-        <div>
-          <button
-            @click="submit()"
-            :disabled="selectedAnswers.some((answer) => !answer.answer)"
-            class="mt-8 px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed w-full"
-          >
-            Submit Answers
-          </button>
-        </div>
       </div>
     </div>
   </div>
-  <div v-else class="fullScreenAll bg-white flexCenter flex-col">
+  <div v-else class="fullScreenAll bg-white pl-5 flexCenter flex-col">
     <div>
       <h1 class="text-center">Thank you for your answers!</h1>
     </div>
@@ -242,3 +240,11 @@ const submit = async () => {
   }
 };
 </script>
+
+<style>
+html,
+body {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+</style>
