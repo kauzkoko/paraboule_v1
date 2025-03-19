@@ -29,15 +29,10 @@
         v-for="(item, index) in currentPage"
         :key="'grid-item-' + index"
         class="grid-item children:pointer-events-none"
-        :index="pages.flat().findIndex((page) => page.id === item.cycler.state)"
+        :index="getIndex(item)"
         @touchend="onTouchEnd"
-        v-touch:swipe="(dir, e) => onSwipe(dir, e, index)"
-        @click="
-          pages
-            .flat()
-            .find((page) => page.id === item.cycler.state)
-            .clickFunction()
-        "
+        v-touch:swipe="(dir, e) => onSwipe(dir, e, index, item)"
+        @click="onClick(item, index)"
         @touchstart="onTouchStart(index)"
         :style="{
           background:
@@ -48,34 +43,19 @@
       >
         <div class="flex justify-center items-center">
           <img
-            v-if="
-              pages.flat().find((page) => page.id === item.cycler.state).imgSrc
-            "
-            :src="
-              pages.flat().find((page) => page.id === item.cycler.state).imgSrc
-            "
+            v-if="getItem(item).imgSrc"
+            :src="getItem(item).imgSrc"
             :style="{
-              width: pages
-                .flat()
-                .find((page) => page.id === item.cycler.state)
-                .imgSrc.endsWith('uniqueQr.png')
+              width: getItem(item).imgSrc.endsWith('uniqueQr.png')
                 ? '30dvw'
                 : '',
             }"
           />
           <div
-            v-if="
-              pages.flat().find((page) => page.id === item.cycler.state).html
-            "
-            class="text-hex-ff0000 text-20px text-center flex"
+            v-if="getItem(item).html"
+            class="text-hex-ff0000 text-20px text-center flexCenter"
           >
-            <div
-              v-html="
-                pages.flat().find((page) => page.id === item.cycler.state).html
-                  .value ??
-                pages.flat().find((page) => page.id === item.cycler.state).html
-              "
-            ></div>
+            <div v-html="getItem(item).html.value ?? getItem(item).html"></div>
           </div>
         </div>
       </div>
@@ -119,6 +99,8 @@ const store = useProtoStore();
 const { player1Score, player2Score } = storeToRefs(store);
 const isTouching = ref(false);
 
+const { sendRawIntersections } = useXrController();
+
 const isTappingOnHaptic = ref(false);
 const onTappingOnHaptic = () => {
   console.log("onTappingOnHaptic");
@@ -152,8 +134,8 @@ watch(
   }
 );
 
-const onSwipe = (dir, e, index) => {
-  const indexElement = e.srcElement.getAttribute("index");
+const onSwipe = (dir, e, index, item) => {
+  // const indexElement = e.srcElement.getAttribute("index");
   if (dir === "right") {
     currentPage.value[index].cycler.next();
   } else {
@@ -201,6 +183,7 @@ const orientation = () => {
 };
 
 const bouleFocuser = (bouleIndex) => {
+  store.focusBoules = true;
   if (bouleIndex < store.bouleCount) {
     store.goToBoule(bouleIndex);
     return;
@@ -497,7 +480,7 @@ for (let i = 0; i <= 13; i++) {
 
 const scoreStandings = () => {
   console.log("scoreStandings");
-  const index = (player1Score.value * 14) + player2Score.value;
+  const index = player1Score.value * 14 + player2Score.value;
   scores[index].play();
 };
 
@@ -525,6 +508,11 @@ const click_hapticGrid = () => {
   isTouching.value = !isTouching.value;
 };
 
+const ambisonicsFlyToCocho = () => {
+  console.log("ambisonicsFlyToCocho");
+  // TODO: add ambisonics fly to cocho
+};
+
 const { sendPlayCocho, sendPlayShoes, sendPlayPhone } = useSoundController();
 const { startCircularRotation, flyToCochonetAndBack, stalefish180 } =
   useAnimationController();
@@ -549,6 +537,14 @@ const onTouchEnd = () => {
   setTimeout(() => {
     touchedIndex.value = null;
   }, 300);
+};
+
+const focusBoule1 = () => bouleFocuser(1);
+const focusBoule2 = () => bouleFocuser(2);
+const focusBoule3 = () => bouleFocuser(3);
+const focusBoule4 = () => bouleFocuser(4);
+const focusAllBoules = () => {
+  store.focusBoules = false;
 };
 
 const pages = [
@@ -583,7 +579,7 @@ const pages = [
       clickFunction: scanCamera,
       imgSrc: "/icons/scanCamera.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_scanField.mp3",
-      cycler: useCycleList([3]),
+      cycler: useCycleList([3, 22]),
     },
   ],
   [
@@ -609,10 +605,11 @@ const pages = [
       clickFunction: bouleFocuser,
       imgSrc: "/icons/bouleFocuser.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_bouleFocuser.mp3",
-      cycler: useCycleList([6, 7, 4, 5]),
+      cycler: useCycleList([6, 20, 21, 22, 23, 24]),
     },
     {
       id: 7,
+      name: "Stalefish 180",
       clickFunction: click_stalefish180,
       imgSrc: "/icons/stalefish180.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_throughTurnAndBack.mp3",
@@ -627,34 +624,48 @@ const pages = [
       // imgSrc: "/icons/standing.svg",
       html: computedScoreStandingsHtml,
       explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
-      cycler: useCycleList([8,18]),
+      cycler: useCycleList([8, 18]),
     },
     {
-      id: 9,
-      name: "Haptic Grid",
-      clickFunction: click_hapticGrid,
-      // imgSrc: "/icons/calibrator2.svg",
-      html: "Tap to toggle haptic feedback",
-      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
-      cycler: useCycleList([9]),
+      id: 28,
+      name: "Ambisonics Fly to Cocho",
+      clickFunction: ambisonicsFlyToCocho,
+      html: 'Ambisonics Fly to Cocho',
+      cycler: useCycleList([28]),
+    },
+  ],
+  [
+    {
+      id: 16,
+      name: "Player 1 Incrementer",
+      clickFunction: incrementPlayer1,
+      imgSrc: "/icons/plus.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
+      cycler: useCycleList([16, 17]),
     },
     {
-      id: 10,
-      name: "Haptic Grid",
-      clickFunction: click_hapticGrid,
-      // imgSrc: "/icons/calibrator2.svg",
-      html: "Tap to toggle haptic feedback",
-      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
-      cycler: useCycleList([10]),
+      id: 17,
+      name: "Player 2 Incrementer",
+      clickFunction: incrementPlayer2,
+      imgSrc: "/icons/plus.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
+      cycler: useCycleList([17, 16]),
     },
     {
-      id: 11,
-      name: "Haptic Grid",
-      clickFunction: click_hapticGrid,
-      // imgSrc: "/icons/calibrator2.svg",
-      html: "Tap to toggle haptic feedback",
-      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
-      cycler: useCycleList([11]),
+      id: 18,
+      name: "Announce Balls Played",
+      clickFunction: announceBallsPlayed,
+      explanationSrc: "/sounds/elevenlabs/explanation_ballsShotAnnouncer.mp3",
+      html: computedAnnounceBallsPlayedHtml,
+      cycler: useCycleList([18, 8]),
+    },
+    {
+      id: 19,
+      name: "Rewind",
+      clickFunction: rewind,
+      imgSrc: "/icons/rewind.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
+      cycler: useCycleList([19, 16, 17]),
     },
   ],
   [
@@ -665,7 +676,7 @@ const pages = [
       explanationSrc:
         "/sounds/elevenlabs/explanation_pairingStatusAnnouncer.mp3",
       html: "Pairing-Status:<br />Connected to 3wasds3w2.",
-      cycler: useCycleList([12]),
+      cycler: useCycleList([12, 13, 14, 15]),
     },
     {
       id: 13,
@@ -673,7 +684,7 @@ const pages = [
       clickFunction: pingPhone,
       imgSrc: "/icons/pingPhone6.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_phonePinger.mp3",
-      cycler: useCycleList([13]),
+      cycler: useCycleList([13, 12, 14, 15]),
     },
     {
       id: 14,
@@ -681,7 +692,7 @@ const pages = [
       clickFunction: scanqr,
       imgSrc: "/icons/scanQr1.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_qrScanner.mp3",
-      cycler: useCycleList([14]),
+      cycler: useCycleList([14, 15, 13, 12]),
     },
     {
       id: 15,
@@ -689,41 +700,7 @@ const pages = [
       clickFunction: qr,
       imgSrc: "/icons/uniqueQr.png",
       explanationSrc: "/sounds/elevenlabs/explanation_uniqueQr.mp3",
-      cycler: useCycleList([15]),
-    },
-  ],
-  [
-    {
-      id: 16,
-      name: "Player 1 Incrementer",
-      clickFunction: incrementPlayer1,
-      imgSrc: "/icons/plus.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
-      cycler: useCycleList([16]),
-    },
-    {
-      id: 17,
-      name: "Player 2 Incrementer",
-      clickFunction: incrementPlayer2,
-      imgSrc: "/icons/plus.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
-      cycler: useCycleList([17]),
-    },
-    {
-      id: 18,
-      name: "Announce Balls Played",
-      clickFunction: announceBallsPlayed,
-      explanationSrc: "/sounds/elevenlabs/explanation_ballsShotAnnouncer.mp3",
-      html: computedAnnounceBallsPlayedHtml,
-      cycler: useCycleList([18]),
-    },
-    {
-      id: 19,
-      name: "Rewind",
-      clickFunction: rewind,
-      imgSrc: "/icons/rewind.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
-      cycler: useCycleList([19]),
+      cycler: useCycleList([15, 13, 14, 12]),
     },
   ],
   [
@@ -731,7 +708,7 @@ const pages = [
       id: 20,
       name: "Orientation",
       clickFunction: orientation,
-      imgSrc: "/icons/orientexpress.svg",
+      html: "Focus on Boule 1",
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
       cycler: useCycleList([20]),
     },
@@ -745,8 +722,9 @@ const pages = [
     },
     {
       id: 22,
-      name: "Orientation",
-      clickFunction: orientation,
+      name: "Raw Intersections",
+      clickFunction: sendRawIntersections,
+      html: "Send scan results to other device",
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
       cycler: useCycleList([22]),
     },
@@ -759,6 +737,37 @@ const pages = [
       cycler: useCycleList([23]),
     },
   ],
+  [
+    {
+      id: 24,
+      name: "Focus Boule 1",
+      clickFunction: focusBoule1,
+      html: "Focus on Boule 1",
+      cycler: useCycleList([24, 25, 26, 27]),
+    },
+    {
+      id: 25,
+      name: "Focus Boule 2",
+      clickFunction: focusBoule2,
+      html: "Focus on Boule 2",
+      cycler: useCycleList([25, 24, 26, 27]),
+    },
+    {
+      id: 26,
+      name: "Focus Boule 3",
+      clickFunction: focusBoule3,
+      html: "Focus on Boule 3",
+      cycler: useCycleList([26, 24, 25, 27]),
+    },
+    {
+      id: 27,
+      name: "Focus All Boules",
+      clickFunction: focusAllBoules,
+      html: "Focus all Boules",
+      cycler: useCycleList([27, 24, 25, 26]),
+    },
+  ],
+  [],
 ];
 const {
   goToNext,
@@ -771,19 +780,39 @@ const {
   current: currentPage,
 } = useStepper(pages);
 
-const pageOneAnnouncer = useSoundComposable(
-  "/sounds/elevenlabs/announce_page1.mp3"
-);
-const pageTwoAnnouncer = useSoundComposable(
-  "/sounds/elevenlabs/announce_page2.mp3"
-);
+const flatPages = pages.flat();
 const announcePage = () => {
-  console.log("announcePage");
-  if (stepperIndex % pages.length === 0) {
-    pageOneAnnouncer.play();
-  } else {
-    pageTwoAnnouncer.play();
-  }
+  if (currentPage.value.length === 0) return;
+  let names = [
+    flatPages.find((entry) => entry.id === currentPage.value[0].cycler.state)
+      .name,
+    flatPages.find((entry) => entry.id === currentPage.value[1].cycler.state)
+      .name,
+    flatPages.find((entry) => entry.id === currentPage.value[2].cycler.state)
+      .name,
+    flatPages.find((entry) => entry.id === currentPage.value[3].cycler.state)
+      .name,
+  ];
+  const message = `Page ${stepperIndex.value + 1}. ${names.join(", ")}.`;
+  console.log(message);
+  speak(message);
+};
+
+const getIndex = (item) => {
+  return flatPages.findIndex((entry) => entry.id === item.cycler.state);
+};
+
+const getItem = (item) => {
+  return flatPages.find((entry) => entry.id === item.cycler.state);
+};
+
+const onClick = (item, index) => {
+  console.log("onClick", item.cycler.state, index);
+  store.focusBoules = false;
+  pages
+    .flat()
+    .find((page) => page.id === item.cycler.state)
+    .clickFunction();
 };
 
 const explanations = pages

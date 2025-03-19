@@ -24,7 +24,7 @@
           ref="positionalAudioRef"
           :ready="true"
           loop
-          v-if="store.currentlySelectedBouleIndex === index"
+          v-if="store.focusBoules ? store.currentlySelectedBouleIndex === index : true"
           :helper="helpers"
           :autoplay="false"
           :key="trigger"
@@ -121,7 +121,7 @@ function topCamera() {
     ease: "power2.out",
   });
   gsap.to(cameraY, {
-    value: 80,
+    value: 50,
     duration: 1,
     ease: "power2.out",
   });
@@ -250,17 +250,17 @@ function startCircularRotation() {
     ease: "none",
     onStart: () => {
       hihatTriggers.value[0]++;
-      gsap.delayedCall(duration / 4, () => {
+      gsap.delayedCall(duration / 4 - 0.3, () => {
         if (circleAroundCochonet) {
           hihatTriggers.value[1]++;
         }
       });
-      gsap.delayedCall(duration / 2, () => {
+      gsap.delayedCall(duration / 2 - 0.3, () => {
         if (circleAroundCochonet) {
           hihatTriggers.value[2]++;
         }
       });
-      gsap.delayedCall((duration / 4) * 3, () => {
+      gsap.delayedCall((duration / 4) * 3 - 0.3, () => {
         if (circleAroundCochonet) {
           hihatTriggers.value[3]++;
         }
@@ -274,17 +274,17 @@ function startCircularRotation() {
         return;
       }
       hihatTriggers.value[0]++;
-      gsap.delayedCall(duration / 4, () => {
+      gsap.delayedCall(duration / 4 - 0.3, () => {
         if (circleAroundCochonet) {
           hihatTriggers.value[1]++;
         }
       });
-      gsap.delayedCall(duration / 2, () => {
+      gsap.delayedCall(duration / 2 - 0.3, () => {
         if (circleAroundCochonet) {
           hihatTriggers.value[2]++;
         }
       });
-      gsap.delayedCall((duration / 4) * 3, () => {
+      gsap.delayedCall((duration / 4) * 3 - 0.3, () => {
         if (circleAroundCochonet) {
           hihatTriggers.value[3]++;
         }

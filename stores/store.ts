@@ -24,18 +24,17 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   const { history } = useRefHistory(sortedBoules);
   const filteredBoules = computed(() => {
-    if (history.value.length > 1) {
-      const currentLength = sortedBoules.value.length;
-      const previousLength = history.value[1].snapshot.length;
-      if (currentLength === previousLength) {
-        console.log("Same length as previous snapshot", currentLength);
-        return sortedBoules.value.filter((boule) => boule.distance < 30);
-        bus.emit("stopXR");
-      }
-    }
-    return [
-      { id: 1, name: "Boule 1", color: "red", distance: 3 },
-    ];
+    // TODO: filter results
+    // if (history.value.length > 1) {
+    //   const currentLength = sortedBoules.value.length;
+    //   const previousLength = history.value[1].snapshot.length;
+    //   if (currentLength === previousLength) {
+    //     console.log("Same length as previous snapshot", currentLength);
+    //     return sortedBoules.value.filter((boule) => boule.distance < 30);
+    //     bus.emit("stopXR");
+    //   }
+    // }
+    return sortedBoules.value.filter((boule) => boule.distance < 30);
   });
 
   const boulesToDisplay = computed(() => {
@@ -46,6 +45,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     return filteredBoules.value;
   });
 
+  const focusBoules = ref(false);
   const {
     next: nextBoule,
     prev: prevBoule,
@@ -69,23 +69,23 @@ export const useProtoStore = defineStore("protoStore", () => {
     {
       x: 0.3014103032020119,
       y: 0.11757755279540989,
-      z: -2.1185530158534984,
+      z: -2.3185530158534984,
       class: "dark",
     },
     {
-      x: 0.29827494002689575,
-      y: 0.11757755279540984,
+      x: 0.019827494002689575,
+      y: 0.13757755279540984,
       z: -1.873205403607142,
       class: "light",
     },
     {
       x: 0.35239538925638664,
-      y: 0.10841178894042934,
+      y: 0.050841178894042934,
       z: -2.040454871744344,
       class: "dark",
     },
     {
-      x: 0.40640927469181287,
+      x: 0.20640927469181287,
       y: 0.10841178894042956,
       z: -1.9825655394221926,
       class: "light",
@@ -100,7 +100,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     );
     let offsetX = 0;
     let offsetY = 0;
-    let scaler = 25;
+    let scaler = 23;
 
     if (cochonet) {
       offsetX = cochonet.x * scaler;
@@ -149,7 +149,8 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   channel
     .on("broadcast", { event: "rawIntersections" }, (data) => {
-      setFromIntersections(data.payload.rawIntersections);
+      console.log("rawIntersections", data);
+      rawIntersections.value = data.payload.rawIntersections;
     })
     .subscribe();
 
@@ -176,6 +177,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     hihatTriggers,
     player1Score,
     player2Score,
+    focusBoules,
   };
 });
 

@@ -13,6 +13,8 @@ const store = useProtoStore();
 const { rawIntersections, predictions, planeDetected, xrRunning } =
   storeToRefs(store);
 
+const { sendRawIntersections } = useXrController();
+
 const { predictFromImage } = await useInference();
 
 const { renderer, scene, camera } = useTresContext();
@@ -183,6 +185,7 @@ const startXR = async () => {
               if (tempIntersections.length > 0) {
                 console.log("tempIntersections", tempIntersections);
                 rawIntersections.value = tempIntersections;
+                sendRawIntersections();
                 // console.log("rawIntersections.value", rawIntersections.value);
               }
             }
