@@ -47,7 +47,7 @@ import { TresCanvas } from "@tresjs/core";
 import { Grid } from "@tresjs/cientos";
 import { useQRCode } from "@vueuse/integrations/useQRCode";
 
-const url = ref("https://protoboules.netlify.app/utils/poll");
+const url = ref("https://boulespoll.netlify.app");
 const qrcode = useQRCode(url.value, {
   margin: 5,
 });
