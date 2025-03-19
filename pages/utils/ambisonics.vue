@@ -30,6 +30,7 @@
     </div>
   </div>
   <div class="fixed bottom-0 left-0 p-3">
+    <div class="text-23px mb-2">https://protoboules.netlify.app/poll</div>
     <img :src="qrcode" class="w-15vw" alt="QR Code" />
   </div>
   <div class="fixed bottom-0 right-0 p-3">
