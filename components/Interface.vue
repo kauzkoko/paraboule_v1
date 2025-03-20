@@ -633,6 +633,20 @@ const pages = [
       html: 'Ambisonics Fly to Cocho',
       cycler: useCycleList([28]),
     },
+    {
+      id: 29,
+      name: "Set score from scan",
+      clickFunction: ambisonicsFlyToCocho,
+      html: 'Scan field to increment total score',
+      cycler: useCycleList([29]),
+    },
+    {
+      id: 30,
+      name: "Mute",
+      clickFunction: ambisonicsFlyToCocho,
+      html: 'Mute',
+      cycler: useCycleList([30]),
+    },
   ],
   [
     {

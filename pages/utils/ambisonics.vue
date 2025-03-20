@@ -31,7 +31,7 @@
   </div>
   <div class="fixed bottom-0 left-0 p-3">
     <div class="text-23px mb-2">{{ url }}</div>
-    <img :src="qrcode" class="w-15vw" alt="QR Code" />
+    <img :src="qrcode" :class="[qrClicked ? 'w-50vw' : 'w-15vw']" @click="qrClicked = !qrClicked" alt="QR Code" />
   </div>
   <div class="fixed bottom-0 right-0 p-3">
     <button @click="lastBoules()" class="mr-1">Last step</button>
@@ -47,10 +47,12 @@ import { TresCanvas } from "@tresjs/core";
 import { Grid } from "@tresjs/cientos";
 import { useQRCode } from "@vueuse/integrations/useQRCode";
 
+const qrClicked = ref(false);
 const url = ref("https://boulespoll.netlify.app");
 const qrcode = useQRCode(url.value, {
   margin: 5,
 });
+
 
 const { send } = useOSC();
 
@@ -370,6 +372,17 @@ onKeyStroke("c", (e) => {
   e.preventDefault();
   changeBoules();
 });
+
+onKeyStroke("q", (e) => {
+  e.preventDefault();
+  qrClicked.value = !qrClicked.value;
+});
+
+onKeyStroke("l", (e) => {
+  e.preventDefault();
+  lastBoules();
+});
+
 
 function topCamera() {
   gsap.to(cameraX, {
