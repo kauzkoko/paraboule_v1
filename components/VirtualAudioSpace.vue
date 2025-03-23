@@ -24,7 +24,11 @@
           ref="positionalAudioRef"
           :ready="true"
           loop
-          v-if="store.focusBoules ? store.currentlySelectedBouleIndex === index : true"
+          v-if="
+            store.focusBoules
+              ? store.currentlySelectedBouleIndex === index
+              : true
+          "
           :helper="helpers"
           :autoplay="false"
           :key="trigger"
@@ -107,6 +111,60 @@ sounds.colors = {
 function killTweens() {
   circleAroundCochonet = false;
   gsap.killTweensOf([alpha, cameraX, cameraY, cameraZ]);
+}
+
+function goToZero() {
+  gsap.to(cameraX, {
+    value: 0,
+    duration: 1,
+    ease: "power2.out",
+  });
+  gsap.to(cameraY, {
+    value: 1,
+    duration: 1,
+    ease: "power2.out",
+  });
+  gsap.to(cameraZ, {
+    value: 0,
+    duration: 1,
+    ease: "power2.out",
+  });
+}
+
+function lookAlongNegativeXAxis() {
+  goToZero();
+  gsap.to(alpha, {
+    value: 90,
+    duration: 1,
+    ease: "power2.out",
+  });
+}
+
+function lookAlongPositiveXAxis() {
+  goToZero();
+  gsap.to(alpha, {
+    value: -90,
+    duration: 1,
+    ease: "power2.out",
+  });
+}
+
+function lookAlongPositiveZAxis() {
+  goToZero();
+  gsap.to(alpha, {
+    value: 0,
+    duration: 1,
+    ease: "power2.out",
+  });
+}
+
+function lookAlongNegativeZAxis() {
+  goToZero();
+  gsap.to(alpha, {
+    value: 180,
+    duration: 1,
+    ease: "power2.out",
+  });
 }
 
 function topCamera() {
@@ -318,6 +376,18 @@ bus.on((message) => {
   }
   if (message === "startCircularRotation") {
     startCircularRotation();
+  }
+  if (message === "lookAlongNegativeXAxis") {
+    lookAlongNegativeXAxis();
+  }
+  if (message === "lookAlongPositiveXAxis") {
+    lookAlongPositiveXAxis();
+  }
+  if (message === "lookAlongPositiveZAxis") {
+    lookAlongPositiveZAxis();
+  }
+  if (message === "lookAlongNegativeZAxis") {
+    lookAlongNegativeZAxis();
   }
 });
 

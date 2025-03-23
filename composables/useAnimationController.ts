@@ -5,7 +5,6 @@ export function useAnimationController() {
   let channel = supabase.channel("animation-controller");
   channel.subscribe();
 
-
   function flyToStart() {
     bus.emit("flyToStart");
     channel.send({
@@ -42,5 +41,50 @@ export function useAnimationController() {
     });
   }
 
-  return { flyToStart, flyToCochonetAndBack, startCircularRotation, stalefish180 };
+  function lookAlongNegativeXAxis() {
+    bus.emit("lookAlongNegativeXAxis");
+    channel.send({
+      type: "broadcast",
+      event: "lookAlongNegativeXAxis",
+      payload: {},
+    });
+  }
+
+  function lookAlongPositiveXAxis() {
+    bus.emit("lookAlongPositiveXAxis");
+    channel.send({
+      type: "broadcast",
+      event: "lookAlongPositiveXAxis",
+      payload: {},
+    });
+  }
+
+  function lookAlongPositiveZAxis() {
+    bus.emit("lookAlongPositiveZAxis");
+    channel.send({
+      type: "broadcast",
+      event: "lookAlongPositiveZAxis",
+      payload: {},
+    });
+  }
+
+  function lookAlongNegativeZAxis() {
+    bus.emit("lookAlongNegativeZAxis");
+    channel.send({
+      type: "broadcast",
+      event: "lookAlongNegativeZAxis",
+      payload: {},
+    });
+  }
+
+  return {
+    flyToStart,
+    flyToCochonetAndBack,
+    startCircularRotation,
+    stalefish180,
+    lookAlongNegativeXAxis,
+    lookAlongPositiveXAxis,
+    lookAlongPositiveZAxis,
+    lookAlongNegativeZAxis,
+  };
 }

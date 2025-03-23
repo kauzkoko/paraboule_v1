@@ -514,8 +514,15 @@ const ambisonicsFlyToCocho = () => {
 };
 
 const { sendPlayCocho, sendPlayShoes, sendPlayPhone } = useSoundController();
-const { startCircularRotation, flyToCochonetAndBack, stalefish180 } =
-  useAnimationController();
+const {
+  startCircularRotation,
+  flyToCochonetAndBack,
+  stalefish180,
+  lookAlongNegativeXAxis,
+  lookAlongPositiveXAxis,
+  lookAlongPositiveZAxis,
+  lookAlongNegativeZAxis,
+} = useAnimationController();
 
 const vibrateByIndex = (index) => {
   if (index === 0) vibrateOnce();
@@ -630,22 +637,52 @@ const pages = [
       id: 28,
       name: "Ambisonics Fly to Cocho",
       clickFunction: ambisonicsFlyToCocho,
-      html: 'Ambisonics Fly to Cocho',
+      html: "Ambisonics Fly to Cocho",
       cycler: useCycleList([28]),
     },
     {
       id: 29,
       name: "Set score from scan",
       clickFunction: ambisonicsFlyToCocho,
-      html: 'Scan field to increment total score',
+      html: "Scan field to increment total score",
       cycler: useCycleList([29]),
     },
     {
       id: 30,
       name: "Mute",
       clickFunction: ambisonicsFlyToCocho,
-      html: 'Mute',
+      html: "Mute",
       cycler: useCycleList([30]),
+    },
+  ],
+  [
+    {
+      id: 31,
+      name: "Look along negative X axis",
+      clickFunction: lookAlongNegativeXAxis,
+      html: "Look along negative X axis",
+      cycler: useCycleList([31]),
+    },
+    {
+      id: 32,
+      name: "Look along positive X axis",
+      clickFunction: lookAlongPositiveXAxis,
+      html: "Look along positive X axis",
+      cycler: useCycleList([32]),
+    },
+    {
+      id: 33,
+      name: "Look along positive Z axis",
+      clickFunction: lookAlongPositiveZAxis,
+      html: "Look along positive Z axis",
+      cycler: useCycleList([33]),
+    },
+    {
+      id: 34,
+      name: "Look along negative Z axis",
+      clickFunction: lookAlongNegativeZAxis,
+      html: "Look along negative Z axis",
+      cycler: useCycleList([34]),
     },
   ],
   [
