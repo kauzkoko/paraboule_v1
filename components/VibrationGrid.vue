@@ -25,10 +25,6 @@ bus.on((message, payload) => {
 });
 
 const { x, y } = useMouse();
-const { width, height } = useWindowSize();
-
-const pattern = ref([0]);
-const { vibrate, intervalControls } = useVibrate({ pattern });
 
 const cochonet = new Audio("/sounds/elevenlabs/cochonet.mp3");
 const darkBouleAudios = [

@@ -154,6 +154,28 @@ const scanCamera = () => {
   }
 };
 
+const scanForPoints = () => {
+  console.log("scanForPoints");
+  console.log("store.isScanningForPoints", store.isScanningForPoints);
+  if (!afterLongPress) {
+    if (store.xrRunning) {
+      bus.emit("stopXR");
+      store.isScanningForPoints = false;
+      setTimeout(() => {
+        store.setScoreFromPoints();
+      }, 100);
+    } else if (store.modelLoaded) {
+      bus.emit("startXR");
+      store.isScanningForPoints = true;
+    }
+  }
+};
+
+const setPointsFromLatestScan = () => {
+  console.log("setPointsFromLatestScan");
+  store.setScoreFromPoints();
+};
+
 const ping = () => {
   if (!afterLongPress) {
     sendPlayCocho();
@@ -683,6 +705,36 @@ const pages = [
       clickFunction: lookAlongNegativeZAxis,
       html: "Look along negative Z axis",
       cycler: useCycleList([34]),
+    },
+  ],
+  [
+    {
+      id: 35,
+      name: "Scan and count points",
+      clickFunction: scanForPoints,
+      html: "Scan and count points",
+      cycler: useCycleList([35]),
+    },
+    {
+      id: 36,
+      name: "Set points from latest scan",
+      clickFunction: setPointsFromLatestScan,
+      html: "Set points from latest scan",
+      cycler: useCycleList([36]),
+    },
+    {
+      id: 35,
+      name: "Scan for points",
+      clickFunction: scanForPoints,
+      html: "Scan for points",
+      cycler: useCycleList([35]),
+    },
+    {
+      id: 35,
+      name: "Scan for points",
+      clickFunction: scanForPoints,
+      html: "Scan for points",
+      cycler: useCycleList([35]),
     },
   ],
   [

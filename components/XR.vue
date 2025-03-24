@@ -70,7 +70,7 @@ const startXR = async () => {
       new THREE.MeshBasicMaterial({
         color: 0x0000ff,
         transparent: true,
-        opacity: 0,
+        opacity: 1,
       })
     );
     reticle.matrixAutoUpdate = false;
@@ -81,7 +81,7 @@ const startXR = async () => {
     const material = new THREE.MeshBasicMaterial({
       color: 0xffa500,
       transparent: true,
-      opacity: 0,
+      opacity: 1,
     });
     plane = new THREE.Mesh(geometry, material);
     plane.rotation.x = -Math.PI / 2;
@@ -134,6 +134,7 @@ const startXR = async () => {
       const referenceSpace = renderer.value.xr.getReferenceSpace();
       const session = renderer.value.xr.getSession();
       const gl = renderer.value.getContext();
+      // const prev_framebuffer = gl.getParameter(gl.FRAMEBUFFER_BINDING);
       gl.bindFramebuffer(
         gl.FRAMEBUFFER,
         session.renderState.baseLayer.framebuffer
@@ -154,6 +155,10 @@ const startXR = async () => {
           view.camera.height,
           framebuffer
         );
+
+        // gl.deleteFramebuffer(framebuffer);
+        // gl.bindFramebuffer(gl.FRAMEBUFFER, prev_framebuffer); // bind back the screen framebuffer
+
 
         if (frameCount % 10 === 0) {
           const newPredictions = await predictFromImage(bitmap);

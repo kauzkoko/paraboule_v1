@@ -301,10 +301,10 @@ function startCircularRotation() {
   });
   let duration = 8;
   gsap.to(alpha, {
-    value: alpha.value + 360, // Full rotation
+    value: alpha.value - 360, // Full rotation
     duration: duration,
     delay: 1,
-    repeat: -1, // Infinite repetition
+    // repeat: -1, // Infinite repetition
     ease: "none",
     onStart: () => {
       hihatTriggers.value[0]++;
@@ -348,6 +348,17 @@ function startCircularRotation() {
         }
       });
       counter++;
+    },
+    onComplete: () => {
+      hihatTriggers.value[0]++;
+      // flyToStart();
+      gsap.to(cameraZ, {
+        value: startPoint,
+        duration: 1,
+        ease: "power2.out",
+      });
+      circleAroundCochonet = false;
+      return;
     },
   });
 }

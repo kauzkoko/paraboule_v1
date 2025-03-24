@@ -16,7 +16,7 @@
     "bridge": "node bridge.cjs"
   },
   "dependencies": {
-    "@tresjs/cientos": "^4.1.1",
+    "@tresjs/cientos": "^4.2.0",
     "@tresjs/core": "^4.3.3",
     "@vite-pwa/nuxt": "^0.10.6",
     "@vueuse/components": "^13.0.0",
@@ -26,13 +26,13 @@
     "cloudflared": "^0.7.0",
     "gsap": "^3.12.7",
     "howler": "^2.2.4",
-    "inferencejs": "^1.0.16",
+    "inferencejs": "^1.0.21",
     "mqtt": "^5.10.4",
-    "nuxt": "^3.16.0",
+    "nuxt": "^3.16.1",
     "osc-js": "^2.4.1",
     "qr-scanner": "^1.4.2",
-    "qrcode": "^1",
-    "sass": "^1.85.1",
+    "qrcode": "^1.5.4",
+    "sass": "^1.86.0",
     "three": "^0.174.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
@@ -41,7 +41,7 @@
   "devDependencies": {
     "@nuxtjs/supabase": "^1.5.0",
     "@pinia/nuxt": "^0.10.1",
-    "@unocss/nuxt": "^66.1.0-beta.3",
+    "@unocss/nuxt": "^66.1.0-beta.6",
     "@vite-pwa/assets-generator": "^0.2.6",
     "@vueuse/nuxt": "^13.0.0",
     "pinia-plugin-persistedstate": "^4.2.0"

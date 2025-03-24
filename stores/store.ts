@@ -8,18 +8,18 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   const modelLoaded = ref(false);
 
+  const player1Name = ref("Player 1");
+  const player2Name = ref("Player 2");
+  const player1Class = ref("dark");
+  const player2Class = ref("light");
   const player1Score = ref(0);
   const player2Score = ref(0);
 
   const xrRunning = ref(false);
   const helpers = ref(true);
+  const isScanningForPoints = ref(false);
 
-  // will be set from setFromIntersections
-  const boules = ref([
-    { id: 1, name: "Boule 1", color: "red", distance: 3 },
-    { id: 2, name: "Boule 2", color: "blue", distance: 2 },
-    { id: 3, name: "Boule 3", color: "green", distance: 1 },
-  ]);
+  const boules = ref([]);
   const sortedBoules = useSorted(boules, (a, b) => a.distance - b.distance);
 
   const { history } = useRefHistory(sortedBoules);
@@ -43,6 +43,42 @@ export const useProtoStore = defineStore("protoStore", () => {
       bus.emit("stopXR");
     }
     return filteredBoules.value;
+  });
+
+  const winnerPoints = ref(0);
+  const winnerClass = ref("");
+  watch(
+    () => sortedBoules.value,
+    (newSortedBoules) => {
+      winnerPoints.value = 0;
+      if (newSortedBoules.length < 2) return;
+      const closestBoule = newSortedBoules[1];
+      const closestClass = closestBoule.class;
+      winnerPoints.value++;
+      winnerClass.value = closestClass;
+      if (
+        newSortedBoules.length > 2 &&
+        newSortedBoules[2].class === closestClass
+      ) {
+        winnerPoints.value++;
+      }
+      if (
+        newSortedBoules.length > 3 &&
+        newSortedBoules[3].class === closestClass
+      ) {
+        winnerPoints.value++;
+      }
+    }
+  );
+  const setScoreFromPoints = () => {
+    if (player1Class.value === winnerClass.value) {
+      player1Score.value += winnerPoints.value;
+    } else {
+      player2Score.value += winnerPoints.value;
+    }
+  };
+  const score = computed(() => {
+    return `${player1Score.value} - ${player2Score.value}`;
   });
 
   const focusBoules = ref(false);
@@ -178,6 +214,15 @@ export const useProtoStore = defineStore("protoStore", () => {
     player1Score,
     player2Score,
     focusBoules,
+    isScanningForPoints,
+    score,
+    winnerPoints,
+    winnerClass,
+    player1Name,
+    player2Name,
+    player1Class,
+    player2Class,
+    setScoreFromPoints
   };
 });
 
