@@ -42,7 +42,7 @@
         />
       </Suspense>
     </TresMesh>
-    <DegreesOrientation :startPoint="startPoint" />
+    <StundenOrientation :startPoint="startPoint" />
     <TresAmbientLight :intensity="230" />
     <TresDirectionalLight
       :position="[cameraX, cameraY, cameraZ]"
@@ -167,7 +167,7 @@ function lookAlongNegativeZAxis() {
   });
 }
 
-function topCamera() {
+function topCamera(height = 50) {
   gsap.to(cameraX, {
     value: 0,
     duration: 1,
@@ -179,7 +179,7 @@ function topCamera() {
     ease: "power2.out",
   });
   gsap.to(cameraY, {
-    value: 50,
+    value: height,
     duration: 1,
     ease: "power2.out",
   });
@@ -424,7 +424,13 @@ watch(
   () => props.isTouching,
   (newVal) => {
     if (newVal) {
-      topCamera();
+      const height =
+        store.currentHapticGrid === "Near"
+          ? 30
+          : store.currentHapticGrid === "Medium"
+          ? 50
+          : 100;
+      topCamera(height);
       setTimeout(() => {
         if (meshRefs.value.length < 1) return;
         let darkCounter = 0;

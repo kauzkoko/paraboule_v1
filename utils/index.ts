@@ -20,50 +20,6 @@ export function flipImageVertically(data, width, height) {
   return data;
 }
 
-// export function createImageFromTexture(texture, width, height) {
-//   // Create a framebuffer backed by the texture
-//   const offscreenCanvas1 = new OffscreenCanvas(width, height);
-//   const gl = offscreenCanvas1.getContext("webgl2");
-//   const framebuffer = gl.createFramebuffer();
-//   gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-//   gl.framebufferTexture2D(
-//     gl.FRAMEBUFFER,
-//     gl.COLOR_ATTACHMENT0,
-//     gl.TEXTURE_2D,
-//     texture,
-//     0
-//   );
-
-//   // Read the contents of the framebuffer
-//   const data = new Uint8Array(width * height * 4);
-//   gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, data);
-
-//   gl.deleteFramebuffer(framebuffer);
-
-//   // Reverse the image vertically
-//   const flippedData = flipImageVertically(data, width, height);
-
-//   // Create a 2D canvas to store the result
-//   //   const canvas = document.getElementById("outputCanvas") as HTMLCanvasElement;
-//   //   canvas.width = width;
-//   //   canvas.height = height;
-//   //   const context = canvas.getContext("2d");
-
-//   const offscreenCanvas = new OffscreenCanvas(width, height);
-//   const context = offscreenCanvas.getContext("2d");
-
-//   // Copy the pixels to a 2D canvas
-//   const imageData = context.createImageData(width, height);
-//   imageData.data.set(flippedData);
-//   context.putImageData(imageData, 0, 0);
-
-//   const bitmap = offscreenCanvas.transferToImageBitmap();
-//   return bitmap;
-
-//   // return offscreenCanvas;
-// }
-
-// working
 export function createImageFromTexture(
   gl,
   texture,

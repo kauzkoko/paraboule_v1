@@ -81,6 +81,8 @@ export const useProtoStore = defineStore("protoStore", () => {
     return `${player1Score.value} - ${player2Score.value}`;
   });
 
+  const currentHapticGrid = ref("near");
+
   const focusBoules = ref(false);
   const {
     next: nextBoule,
@@ -222,7 +224,8 @@ export const useProtoStore = defineStore("protoStore", () => {
     player2Name,
     player1Class,
     player2Class,
-    setScoreFromPoints
+    setScoreFromPoints,
+    currentHapticGrid,
   };
 });
 

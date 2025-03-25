@@ -28,7 +28,7 @@
         :ref="refs.set"
         v-for="(item, index) in currentPage"
         :key="'grid-item-' + index"
-        class="grid-item children:pointer-events-none"
+        class="grid-item"
         :index="getIndex(item)"
         @touchend="onTouchEnd"
         v-touch:swipe="(dir, e) => onSwipe(dir, e, index, item)"
@@ -41,18 +41,31 @@
             touchedIndex === index ? 'background 50ms' : 'background 500ms',
         }"
       >
-        <div class="flex justify-center items-center">
+        <div
+          class="absolute text-hex-ff0000 text-12px px-2 py-2"
+          :class="{
+            'top-0 left-0': index === 0,
+            'top-0 right-0': index === 1,
+            'bottom-0 left-0': index === 2,
+            'bottom-0 right-0': index === 3,
+          }"
+        >
+          {{ getItem(item).name }}
+        </div>
+        <div class="flex justify-center items-center w-full h-full">
           <img
             v-if="getItem(item).imgSrc"
             :src="getItem(item).imgSrc"
             :style="{
               width: getItem(item).imgSrc.endsWith('uniqueQr.png')
                 ? '30dvw'
+                : getItem(item).imgSrc.includes('lookAlong')
+                ? '80%'
                 : '',
             }"
           />
           <div
-            v-if="getItem(item).html"
+            v-else-if="getItem(item).html"
             class="text-hex-ff0000 text-20px text-center flexCenter"
           >
             <div v-html="getItem(item).html.value ?? getItem(item).html"></div>
@@ -362,11 +375,11 @@ watch(isListening, () => {
       case "fly to other side":
         stalefish180();
         break;
-      case "haptic grid":
+      case "Haptic grid":
       case "toggle haptic":
       case "toggle haptic feedback":
       case "toggle haptics":
-        click_hapticGrid();
+        click_hapticGridNear();
         break;
       default:
         console.log("default", result.value);
@@ -525,14 +538,39 @@ const refreshPage = () => {
   window.location.reload();
 };
 
-const click_hapticGrid = () => {
-  console.log("click_hapticGrid");
+const click_hapticGridNear = () => {
+  console.log("click_hapticGridNear");
+  store.currentHapticGrid = "near";
+  isTouching.value = !isTouching.value;
+};
+
+const click_hapticGridMedium = () => {
+  console.log("click_hapticGridMedium");
+  store.currentHapticGrid = "medium";
+  isTouching.value = !isTouching.value;
+};
+
+const click_hapticGridFar = () => {
+  console.log("click_hapticGridFar");
+  store.currentHapticGrid = "far";
   isTouching.value = !isTouching.value;
 };
 
 const ambisonicsFlyToCocho = () => {
   console.log("ambisonicsFlyToCocho");
   // TODO: add ambisonics fly to cocho
+};
+
+const setScoreFromScan = () => {
+  console.log("setScoreFromScan");
+  // TODO: add set score from scan
+};
+
+const click_mute = () => {
+  console.log("click_mute");
+  Howler.stop();
+  store.helpers = !store.helpers;
+  window.speechSynthesis.cancel();
 };
 
 const { sendPlayCocho, sendPlayShoes, sendPlayPhone } = useSoundController();
@@ -579,295 +617,307 @@ const focusAllBoules = () => {
 const pages = [
   [
     {
-      id: 0,
-      name: "Haptic Grid",
-      clickFunction: click_hapticGrid,
-      imgSrc: "/icons/hapticGrid.svg",
+      name: "Haptic grid near",
+      clickFunction: click_hapticGridNear,
+      html: "Haptic grid near",
+      // imgSrc: "/icons/hapticGrid.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
-      cycler: useCycleList([0]),
+      cycler: useCycleList([
+        "Haptic grid near",
+        "Haptic grid medium",
+        "Haptic grid far",
+      ]),
     },
     {
-      id: 1,
-      name: "Ping Cocho",
+      name: "Ping Cochonet",
       clickFunction: ping,
       imgSrc: "/icons/cocho.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pingCocho.mp3",
-      cycler: useCycleList([1, 2]),
+      cycler: useCycleList(["Ping Cochonet", "Ping Startpoint"]),
     },
     {
-      id: 2,
-      name: "Ping Shoes",
+      name: "Ping Startpoint",
       clickFunction: pingShoes,
       imgSrc: "/icons/hoolahoop.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_hoolaPinger.mp3",
-      cycler: useCycleList([2, 1]),
+      cycler: useCycleList(["Ping Startpoint", "Ping Cochonet"]),
     },
     {
-      id: 3,
-      name: "Scan Camera",
+      name: "Scan Field",
       clickFunction: scanCamera,
       imgSrc: "/icons/scanCamera.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_scanField.mp3",
-      cycler: useCycleList([3, 22]),
+      cycler: useCycleList(["Scan Field"]),
     },
   ],
   [
     {
-      id: 4,
       name: "Pirate Radar",
       clickFunction: startCocho,
       imgSrc: "/icons/around.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pirateRadar.mp3",
-      cycler: useCycleList([4, 5, 6, 7]),
+      cycler: useCycleList(["Pirate Radar", "Boomerang"]),
     },
     {
-      id: 5,
       name: "Boomerang",
       clickFunction: flyCochoBack,
       imgSrc: "/icons/boomerang1.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_boomerang.mp3",
-      cycler: useCycleList([5, 6, 7, 4]),
+      cycler: useCycleList(["Boomerang", "Pirate Radar"]),
     },
     {
-      id: 6,
       name: "Boule Focuser",
       clickFunction: bouleFocuser,
       imgSrc: "/icons/bouleFocuser.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_bouleFocuser.mp3",
-      cycler: useCycleList([6, 20, 21, 22, 23, 24]),
+      cycler: useCycleList(["Boule Focuser", "Stalefish 180"]),
     },
     {
-      id: 7,
       name: "Stalefish 180",
       clickFunction: click_stalefish180,
       imgSrc: "/icons/stalefish180.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_throughTurnAndBack.mp3",
-      cycler: useCycleList([7, 4, 5, 6]),
+      cycler: useCycleList(["Stalefish 180", "Boule Focuser"]),
     },
   ],
   [
     {
-      id: 8,
       name: "Score Standings",
       clickFunction: scoreStandings,
-      // imgSrc: "/icons/standing.svg",
       html: computedScoreStandingsHtml,
       explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
-      cycler: useCycleList([8, 18]),
+      cycler: useCycleList(["Score Standings", "Ambisonics Fly to Cochonet"]),
     },
     {
-      id: 28,
-      name: "Ambisonics Fly to Cocho",
+      name: "Ambisonics Fly to Cochonet",
       clickFunction: ambisonicsFlyToCocho,
-      html: "Ambisonics Fly to Cocho",
-      cycler: useCycleList([28]),
+      html: "Ambisonics Fly to Cochonet",
+      cycler: useCycleList([
+        "Ambisonics Fly to Cochonet",
+        "Set score from scan",
+      ]),
     },
     {
-      id: 29,
       name: "Set score from scan",
-      clickFunction: ambisonicsFlyToCocho,
-      html: "Scan field to increment total score",
-      cycler: useCycleList([29]),
+      clickFunction: setScoreFromScan,
+      html: "Set score from scan",
+      cycler: useCycleList(["Set score from scan", "Mute all sounds"]),
     },
     {
-      id: 30,
-      name: "Mute",
-      clickFunction: ambisonicsFlyToCocho,
-      html: "Mute",
-      cycler: useCycleList([30]),
+      name: "Mute all sounds",
+      clickFunction: click_mute,
+      html: "Mute all sounds",
+      cycler: useCycleList(["Mute all sounds", "Set score from scan"]),
     },
   ],
   [
     {
-      id: 31,
-      name: "Look along negative X axis",
-      clickFunction: lookAlongNegativeXAxis,
-      html: "Look along negative X axis",
-      cycler: useCycleList([31]),
-    },
-    {
-      id: 32,
-      name: "Look along positive X axis",
-      clickFunction: lookAlongPositiveXAxis,
-      html: "Look along positive X axis",
-      cycler: useCycleList([32]),
-    },
-    {
-      id: 33,
-      name: "Look along positive Z axis",
+      name: "Look along 12 o'clock",
       clickFunction: lookAlongPositiveZAxis,
-      html: "Look along positive Z axis",
-      cycler: useCycleList([33]),
+      html: "Look along 12 o'clock",
+      imgSrc: "/icons/lookAlong12.svg",
+      cycler: useCycleList([
+        "Look along 12 o'clock",
+        "Look along 9 o'clock",
+        "Look along 3 o'clock",
+        "Look along 6 o'clock",
+      ]),
     },
     {
-      id: 34,
-      name: "Look along negative Z axis",
+      name: "Look along 3 o'clock",
+      clickFunction: lookAlongPositiveXAxis,
+      html: "Look along 3 o'clock",
+      imgSrc: "/icons/lookAlong3.svg",
+      cycler: useCycleList([
+        "Look along 3 o'clock",
+        "Look along 9 o'clock",
+        "Look along 12 o'clock",
+        "Look along 6 o'clock",
+      ]),
+    },
+    {
+      name: "Look along 6 o'clock",
       clickFunction: lookAlongNegativeZAxis,
-      html: "Look along negative Z axis",
-      cycler: useCycleList([34]),
+      html: "Look along 6 o'clock",
+      imgSrc: "/icons/lookAlong6.svg",
+      cycler: useCycleList([
+        "Look along 6 o'clock",
+        "Look along 12 o'clock",
+        "Look along 9 o'clock",
+        "Look along 3 o'clock",
+      ]),
+    },
+    {
+      name: "Look along 9 o'clock",
+      clickFunction: lookAlongNegativeXAxis,
+      html: "Look along 9 o'clock",
+      imgSrc: "/icons/lookAlong9.svg",
+      cycler: useCycleList([
+        "Look along 9 o'clock",
+        "Look along 3 o'clock",
+        "Look along 12 o'clock",
+        "Look along 6 o'clock",
+      ]),
     },
   ],
   [
     {
-      id: 35,
       name: "Scan and count points",
       clickFunction: scanForPoints,
       html: "Scan and count points",
-      cycler: useCycleList([35]),
+      cycler: useCycleList([
+        "Scan and count points",
+        "Set points from latest scan",
+      ]),
     },
     {
-      id: 36,
       name: "Set points from latest scan",
       clickFunction: setPointsFromLatestScan,
       html: "Set points from latest scan",
-      cycler: useCycleList([36]),
-    },
-    {
-      id: 35,
-      name: "Scan for points",
-      clickFunction: scanForPoints,
-      html: "Scan for points",
-      cycler: useCycleList([35]),
-    },
-    {
-      id: 35,
-      name: "Scan for points",
-      clickFunction: scanForPoints,
-      html: "Scan for points",
-      cycler: useCycleList([35]),
+      cycler: useCycleList([
+        "Set points from latest scan",
+        "Scan and count points",
+      ]),
     },
   ],
   [
     {
-      id: 16,
-      name: "Player 1 Incrementer",
+      name: "Player 1 Shot Incrementer",
       clickFunction: incrementPlayer1,
       imgSrc: "/icons/plus.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
-      cycler: useCycleList([16, 17]),
+      cycler: useCycleList([
+        "Player 1 Shot Incrementer",
+        "Player 2 Shot Incrementer",
+      ]),
     },
     {
-      id: 17,
-      name: "Player 2 Incrementer",
+      name: "Player 2 Shot Incrementer",
       clickFunction: incrementPlayer2,
       imgSrc: "/icons/plus.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
-      cycler: useCycleList([17, 16]),
+      cycler: useCycleList([
+        "Player 2 Shot Incrementer",
+        "Player 1 Shot Incrementer",
+      ]),
     },
     {
-      id: 18,
       name: "Announce Balls Played",
       clickFunction: announceBallsPlayed,
       explanationSrc: "/sounds/elevenlabs/explanation_ballsShotAnnouncer.mp3",
       html: computedAnnounceBallsPlayedHtml,
-      cycler: useCycleList([18, 8]),
+      cycler: useCycleList(["Announce Balls Played", "Rewind"]),
     },
     {
-      id: 19,
       name: "Rewind",
       clickFunction: rewind,
       imgSrc: "/icons/rewind.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
-      cycler: useCycleList([19, 16, 17]),
+      cycler: useCycleList(["Rewind", "Announce Balls Played"]),
     },
   ],
   [
     {
-      id: 12,
       name: "Pairing Status",
       clickFunction: qrStatus,
       explanationSrc:
         "/sounds/elevenlabs/explanation_pairingStatusAnnouncer.mp3",
       html: "Pairing-Status:<br />Connected to 3wasds3w2.",
-      cycler: useCycleList([12, 13, 14, 15]),
+      cycler: useCycleList(["Pairing Status", "Ping Phone"]),
     },
     {
-      id: 13,
       name: "Ping Phone",
       clickFunction: pingPhone,
       imgSrc: "/icons/pingPhone6.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_phonePinger.mp3",
-      cycler: useCycleList([13, 12, 14, 15]),
+      cycler: useCycleList(["Ping Phone", "Pairing Status"]),
     },
     {
-      id: 14,
       name: "Scan QR",
       clickFunction: scanqr,
       imgSrc: "/icons/scanQr1.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_qrScanner.mp3",
-      cycler: useCycleList([14, 15, 13, 12]),
+      cycler: useCycleList(["Scan QR", "Unique QR"]),
     },
     {
-      id: 15,
       name: "Unique QR",
       clickFunction: qr,
       imgSrc: "/icons/uniqueQr.png",
       explanationSrc: "/sounds/elevenlabs/explanation_uniqueQr.mp3",
-      cycler: useCycleList([15, 13, 14, 12]),
+      cycler: useCycleList(["Unique QR", "Scan QR"]),
     },
   ],
   [
     {
-      id: 20,
       name: "Orientation",
       clickFunction: orientation,
       html: "Focus on Boule 1",
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
-      cycler: useCycleList([20]),
+      cycler: useCycleList(["Orientation", "Boules Before"]),
     },
     {
-      id: 21,
       name: "Boules Before",
       clickFunction: focusBoulesBefore,
       imgSrc: "/icons/boulesBefore.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_boulesBefore.mp3",
-      cycler: useCycleList([21]),
+      cycler: useCycleList(["Boules Before", "Orientation"]),
     },
     {
-      id: 22,
       name: "Raw Intersections",
       clickFunction: sendRawIntersections,
       html: "Send scan results to other device",
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
-      cycler: useCycleList([22]),
+      cycler: useCycleList(["Raw Intersections", "Refresh page"]),
     },
     {
-      id: 23,
       name: "Refresh page",
       clickFunction: refreshPage,
       html: "Click to refresh page",
       explanationSrc: "/sounds/elevenlabs/explanation_pageRefresher.mp3",
-      cycler: useCycleList([23]),
+      cycler: useCycleList(["Refresh page", "Raw Intersections"]),
     },
   ],
   [
     {
-      id: 24,
       name: "Focus Boule 1",
       clickFunction: focusBoule1,
       html: "Focus on Boule 1",
-      cycler: useCycleList([24, 25, 26, 27]),
+      cycler: useCycleList(["Focus Boule 1", "Focus Boule 2"]),
     },
     {
-      id: 25,
       name: "Focus Boule 2",
       clickFunction: focusBoule2,
       html: "Focus on Boule 2",
-      cycler: useCycleList([25, 24, 26, 27]),
+      cycler: useCycleList(["Focus Boule 2", "Focus Boule 1"]),
     },
     {
-      id: 26,
       name: "Focus Boule 3",
       clickFunction: focusBoule3,
       html: "Focus on Boule 3",
-      cycler: useCycleList([26, 24, 25, 27]),
+      cycler: useCycleList(["Focus Boule 3", "Focus All Boules"]),
     },
     {
-      id: 27,
       name: "Focus All Boules",
       clickFunction: focusAllBoules,
       html: "Focus all Boules",
-      cycler: useCycleList([27, 24, 25, 26]),
+      cycler: useCycleList(["Focus All Boules", "Focus Boule 3"]),
+    },
+  ],
+  [
+    {
+      name: "Haptic grid near",
+      html: "Haptic grid near",
+      clickFunction: click_hapticGridNear,
+    },
+    {
+      name: "Haptic grid medium",
+      html: "Haptic grid medium",
+      clickFunction: click_hapticGridMedium,
+    },
+    {
+      name: "Haptic grid far",
+      html: "Haptic grid far",
+      clickFunction: click_hapticGridFar,
     },
   ],
   [],
@@ -887,13 +937,13 @@ const flatPages = pages.flat();
 const announcePage = () => {
   if (currentPage.value.length === 0) return;
   let names = [
-    flatPages.find((entry) => entry.id === currentPage.value[0].cycler.state)
+    flatPages.find((entry) => entry.name === currentPage.value[0].cycler.state)
       .name,
-    flatPages.find((entry) => entry.id === currentPage.value[1].cycler.state)
+    flatPages.find((entry) => entry.name === currentPage.value[1].cycler.state)
       .name,
-    flatPages.find((entry) => entry.id === currentPage.value[2].cycler.state)
+    flatPages.find((entry) => entry.name === currentPage.value[2].cycler.state)
       .name,
-    flatPages.find((entry) => entry.id === currentPage.value[3].cycler.state)
+    flatPages.find((entry) => entry.name === currentPage.value[3].cycler.state)
       .name,
   ];
   const message = `Page ${stepperIndex.value + 1}. ${names.join(", ")}.`;
@@ -902,20 +952,17 @@ const announcePage = () => {
 };
 
 const getIndex = (item) => {
-  return flatPages.findIndex((entry) => entry.id === item.cycler.state);
+  return flatPages.findIndex((entry) => entry.name === item.cycler.state);
 };
 
 const getItem = (item) => {
-  return flatPages.find((entry) => entry.id === item.cycler.state);
+  return flatPages.find((entry) => entry.name === item.cycler.state);
 };
 
 const onClick = (item, index) => {
   console.log("onClick", item.cycler.state, index);
   store.focusBoules = false;
-  pages
-    .flat()
-    .find((page) => page.id === item.cycler.state)
-    .clickFunction();
+  flatPages.find((entry) => entry.name === item.cycler.state).clickFunction();
 };
 
 const explanations = pages
@@ -993,9 +1040,7 @@ watch(isSwiping, (val) => {
       bus.emit("flyToStart");
     }
     if (direction.value === "up") {
-      Howler.stop();
-      store.helpers = !store.helpers;
-      window.speechSynthesis.cancel();
+      click_mute();
     }
 
     if (stepperIndex.value === 0) vibratePageOne();
@@ -1093,17 +1138,13 @@ onKeyStroke(["1", "2", "3", "4", "5", "6"], (e) => {
 .grid-item {
   border: 3px solid #ff0000;
   border-radius: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   user-select: none;
   pointer-events: auto;
   overflow: hidden;
   transition: all 50ms;
-  > div {
-    > * {
-      pointer-events: none;
-    }
+  position: relative;
+  div {
+    pointer-events: none;
   }
 
   &:first-child {
@@ -1118,13 +1159,13 @@ onKeyStroke(["1", "2", "3", "4", "5", "6"], (e) => {
     border-top-right-radius: 60px;
   }
 
-  &:last-child {
+  &:nth-child(4) {
     border-top-left-radius: 60px;
   }
 }
 
 .center-circle {
-  width: 150px;
+  width: 160px;
   aspect-ratio: 1;
   border-radius: 50%;
   position: absolute;
@@ -1141,7 +1182,7 @@ onKeyStroke(["1", "2", "3", "4", "5", "6"], (e) => {
     align-items: center;
     aspect-ratio: 1;
     border-radius: 50%;
-    width: 80%;
+    width: 100%;
     border: 3px solid red;
   }
   > * {
