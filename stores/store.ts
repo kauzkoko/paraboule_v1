@@ -84,6 +84,8 @@ export const useProtoStore = defineStore("protoStore", () => {
   const currentHapticGrid = ref("near");
   const touchCounter = ref(0);
 
+  const currentSoundSrc = ref("");
+
   const focusBoules = ref(false);
   const {
     next: nextBoule,
@@ -196,6 +198,8 @@ export const useProtoStore = defineStore("protoStore", () => {
   // mock boules
   rawIntersections.value = mockIntersections.value;
 
+  const alphaController = ref(false);
+
   return {
     boules,
     deviceId,
@@ -228,6 +232,8 @@ export const useProtoStore = defineStore("protoStore", () => {
     setScoreFromPoints,
     currentHapticGrid,
     touchCounter,
+    currentSoundSrc,
+    alphaController,
   };
 });
 

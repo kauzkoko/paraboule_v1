@@ -162,6 +162,11 @@ const onSwipe = (dir, e, index, item) => {
   }
 };
 
+const setAlphaController = () => {
+  store.alphaController = !store.alphaController;
+  console.log("set store.alphaController", store.alphaController);
+};
+
 // register click functions
 const scanCamera = () => {
   if (!afterLongPress) {
@@ -250,6 +255,7 @@ const qr = () => {
 const pairingStatusAnnouncer = useSoundComposable(
   "/sounds/elevenlabs/click_pairingStatusAnnouncer.mp3"
 );
+
 const qrStatus = () => {
   pairingStatusAnnouncer.play();
 };
@@ -561,11 +567,6 @@ const click_hapticGridFar = () => {
   isTouching.value = !isTouching.value;
 };
 
-const ambisonicsFlyToCocho = () => {
-  console.log("ambisonicsFlyToCocho");
-  // TODO: add ambisonics fly to cocho
-};
-
 const setScoreFromScan = () => {
   console.log("setScoreFromScan");
   // TODO: add set score from scan
@@ -697,16 +698,7 @@ const pages = [
       clickFunction: scoreStandings,
       html: computedScoreStandingsHtml,
       explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
-      cycler: useCycleList(["Score Standings", "Ambisonics Fly to Cochonet"]),
-    },
-    {
-      name: "Ambisonics Fly to Cochonet",
-      clickFunction: ambisonicsFlyToCocho,
-      html: "Ambisonics Fly to Cochonet",
-      cycler: useCycleList([
-        "Ambisonics Fly to Cochonet",
-        "Set score from scan",
-      ]),
+      cycler: useCycleList(["Score Standings"]),
     },
     {
       name: "Set score from scan",
@@ -726,7 +718,7 @@ const pages = [
       name: "Look along 12 o'clock",
       clickFunction: lookAlongPositiveZAxis,
       html: "Look along 12 o'clock",
-      imgSrc: "/icons/lookAlong12.svg",
+      imgSrc: "/icons/12oclock.svg",
       cycler: useCycleList([
         "Look along 12 o'clock",
         "Look along 9 o'clock",
@@ -750,7 +742,7 @@ const pages = [
       name: "Look along 6 o'clock",
       clickFunction: lookAlongNegativeZAxis,
       html: "Look along 6 o'clock",
-      imgSrc: "/icons/lookAlong6.svg",
+      imgSrc: "/icons/6oclock.svg",
       cycler: useCycleList([
         "Look along 6 o'clock",
         "Look along 12 o'clock",
@@ -944,11 +936,26 @@ const pages = [
     {
       name: "Add function",
       clickFunction: addFunction,
+      imgSrc: "/icons/referenz.svg",
       html: "+",
       cycler: useCycleList(["Add function"]),
     },
   ],
-  [],
+  [
+    {
+      name: "Default",
+      clickFunction: () => {},
+      html: "Placeholder",
+      imgSrc: "/icons/watch1.svg",
+      cycler: useCycleList(["Default"]),
+    },
+    {
+      name: "Alpha Controller",
+      clickFunction: setAlphaController,
+      html: "Toggle Alpha Controller",
+      cycler: useCycleList(["Alpha Controller"]),
+    },
+  ],
 ];
 const {
   goToNext,

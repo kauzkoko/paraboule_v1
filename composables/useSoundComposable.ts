@@ -1,9 +1,7 @@
 import { Howler } from "howler";
 
 export function useSoundComposable(soundSrc: string, duration = 0) {
-  const touchCounter = useState<number>("touchCounter");
-  let lastTouchCounter = 0;
-
+  const store = useProtoStore();
   const sound = useSound(soundSrc, { interrupt: true });
 
   const play = () => {
@@ -13,7 +11,7 @@ export function useSoundComposable(soundSrc: string, duration = 0) {
       console.log("Already speaking, stopping current speech");
       return;
     }
-    if (sound.isPlaying.value && touchCounter.value === lastTouchCounter + 1) {
+    if (sound.isPlaying.value && store.currentSoundSrc === soundSrc) {
       sound.stop();
     } else {
       sound.play();
@@ -25,8 +23,8 @@ export function useSoundComposable(soundSrc: string, duration = 0) {
           sound.stop();
         }, duration);
       }
+      store.currentSoundSrc = soundSrc;
     }
-    lastTouchCounter = touchCounter.value;
   };
 
   return {

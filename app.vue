@@ -21,4 +21,12 @@ html, body {
   overflow: hidden;
   overscroll-behavior-y: contain;
 }
+
+button {
+  background-color: white;
+  color: black;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+}
 </style>

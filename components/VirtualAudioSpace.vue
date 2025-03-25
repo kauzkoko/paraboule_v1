@@ -5,8 +5,9 @@
       :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
       ref="camera"
     />
+    <primitive :object="scene" :position="[0, 2, 0]" :scale="[8, 8, 8]" />
     <TresMesh
-      v-for="(boule, index) in boules"
+      v-for="(boule, index) in boules.filter((_, i) => i !== -1)"
       :key="index"
       :iClass="boule.class"
       ref="boulesRefs"
@@ -55,8 +56,16 @@
 
 <script setup>
 import { TresCanvas } from "@tresjs/core";
-import { PositionalAudio, Outline } from "@tresjs/cientos";
+import {
+  PositionalAudio,
+  Outline,
+  useGLTF,
+  ScreenSizer,
+} from "@tresjs/cientos";
 import { gsap } from "gsap";
+
+const path = "/models/tigi.glb";
+const { scene } = await useGLTF(path, { draco: true });
 
 const props = defineProps({
   isTouching: {
@@ -130,6 +139,31 @@ function goToZero() {
     ease: "power2.out",
   });
 }
+
+const { alpha: gyroAlpha } = useDeviceOrientation();
+const baseAlpha = ref(0);
+const mappedRelativeAlpha = computed(() => {
+  let diff = gyroAlpha.value - baseAlpha.value;
+  if (diff > 180) {
+    diff -= 360;
+  } else if (diff < -180) {
+    diff += 360;
+  }
+  const normalized = diff < 0 ? diff + 360 : diff;
+  return normalized;
+});
+
+let lastAlphaController = false;
+watch(mappedRelativeAlpha, (newVal) => {
+  console.log("store.alphaController", store.alphaController);
+  if (store.alphaController) {
+    alpha.value = newVal;
+    lastAlphaController = true;
+  } else if (lastAlphaController) {
+    alpha.value = 0;
+    lastAlphaController = false;
+  }
+});
 
 function lookAlongNegativeXAxis() {
   goToZero();

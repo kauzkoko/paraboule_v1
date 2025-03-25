@@ -1,9 +1,12 @@
 <template>
   <div>
+    <NuxtLink noPrefetch to="/">
+      <li>/</li>
+    </NuxtLink>
     <template v-for="route in routes" :key="route.path">
       <NuxtLink
-        v-if="!route.path.startsWith('/archive')"
         noPrefetch
+        v-if="route.path.startsWith('/archive') && route.path !== '/archive'"
         :to="route.path"
       >
         <li>
@@ -13,6 +16,9 @@
     </template>
     <NuxtLink noPrefetch to="/archive">
       <li>/archive</li>
+    </NuxtLink>
+	<NuxtLink noPrefetch to="/">
+      <li>/</li>
     </NuxtLink>
   </div>
 </template>
