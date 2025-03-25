@@ -425,9 +425,9 @@ watch(
   (newVal) => {
     if (newVal) {
       const height =
-        store.currentHapticGrid === "Near"
+        store.currentHapticGrid === "near"
           ? 30
-          : store.currentHapticGrid === "Medium"
+          : store.currentHapticGrid === "medium"
           ? 50
           : 100;
       topCamera(height);

@@ -1,31 +1,39 @@
 export function useSpeech() {
-	const speak = (text: string) => {
-		if (!window.speechSynthesis) {
-			console.error('Speech Synthesis API is not supported in this browser.');
-			return;
-		}
+  const speak = (text: string) => {
+    if (!window.speechSynthesis) {
+      console.error("Speech Synthesis API is not supported in this browser.");
+      return;
+    }
 
-		const utterance = new SpeechSynthesisUtterance(text);
+    // Check if speech synthesis is already speaking
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      console.log("Already speaking, stopping current speech");
+      return;
+    }
 
-		const voices = window.speechSynthesis.getVoices();
-		const enGBVoice = voices.find(voice => voice.lang === 'en-GB');
-		if (enGBVoice) {
-			utterance.voice = enGBVoice;
-		}
+	Howler.stop();
+    const utterance = new SpeechSynthesisUtterance(text);
 
-		window.speechSynthesis.speak(utterance);
-	};
+    const voices = window.speechSynthesis.getVoices();
+    const enGBVoice = voices.find((voice) => voice.lang === "en-GB");
+    if (enGBVoice) {
+      utterance.voice = enGBVoice;
+    }
 
-	const stop = () => {
-		if (!window.speechSynthesis) {
-			console.error('Speech Synthesis API is not supported in this browser.');
-			return;
-		}
-		window.speechSynthesis.cancel();
-	};
+    window.speechSynthesis.speak(utterance);
+  };
 
-	return {
-		speak,
-		stop,
-	};
+  const stop = () => {
+    if (!window.speechSynthesis) {
+      console.error("Speech Synthesis API is not supported in this browser.");
+      return;
+    }
+    window.speechSynthesis.cancel();
+  };
+
+  return {
+    speak,
+    stop,
+  };
 }

@@ -32,6 +32,44 @@ export function useVibrations() {
     pattern: [100, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20],
   });
 
+  const { vibrate: vibratePageSeven } = useVibrate({
+    pattern: [100, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20],
+  });
+
+  const { vibrate: vibratePageEight } = useVibrate({
+    pattern: [
+      100, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20,
+    ],
+  });
+
+  const { vibrate: vibratePageNine } = useVibrate({
+    pattern: [
+      100, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20,
+      50, 20,
+    ],
+  });
+
+  const { vibrate: vibratePageTen } = useVibrate({
+    pattern: [
+      100, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20,
+      50, 20,
+    ],
+  });
+
+  const { vibrate: vibratePageEleven } = useVibrate({
+    pattern: [
+      100, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20,
+      50, 20, 50, 20,
+    ],
+  });
+
+  const { vibrate: vibratePageTwelve } = useVibrate({
+    pattern: [
+      100, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20, 50, 20,
+      50, 20, 50, 20,
+    ],
+  });
+
   return {
     vibrateOnce,
     vibrateTwice,
@@ -43,5 +81,11 @@ export function useVibrations() {
     vibratePageFour,
     vibratePageFive,
     vibratePageSix,
+    vibratePageSeven,
+    vibratePageEight,
+    vibratePageNine,
+    vibratePageTen,
+    vibratePageEleven,
+    vibratePageTwelve,
   };
 }

@@ -66,7 +66,7 @@
           />
           <div
             v-else-if="getItem(item).html"
-            class="text-hex-ff0000 text-20px text-center flexCenter"
+            class="text-hex-ff0000 text-20px text-center flexCenter max-w-80%"
           >
             <div v-html="getItem(item).html.value ?? getItem(item).html"></div>
           </div>
@@ -131,6 +131,12 @@ const {
   vibratePageFour,
   vibratePageFive,
   vibratePageSix,
+  vibratePageSeven,
+  vibratePageEight,
+  vibratePageNine,
+  vibratePageTen,
+  vibratePageEleven,
+  vibratePageTwelve,
 } = useVibrations();
 
 // layout flickering fix
@@ -527,9 +533,8 @@ const pingShoes = () => {
 };
 
 const pingPhone = () => {
-  console.log("pingPhone, TODO maybe add calling sound");
   if (!afterLongPress) {
-    sendPlayPhone();
+    sendPlayPhone(7);
   }
 };
 
@@ -573,7 +578,14 @@ const click_mute = () => {
   window.speechSynthesis.cancel();
 };
 
-const { sendPlayCocho, sendPlayShoes, sendPlayPhone } = useSoundController();
+const addFunction = () => {
+  console.log("addFunction");
+  // TODO: add add function
+};
+
+const { sendPlayCocho, sendPlayShoes, sendPlayPhone } = useSoundController({
+  listen: true,
+});
 const {
   startCircularRotation,
   flyToCochonetAndBack,
@@ -591,12 +603,11 @@ const vibrateByIndex = (index) => {
   if (index === 3) vibrateQuadrice();
 };
 
-const touchCounter = useState("touchCounter", () => 0);
 const touchedIndex = ref(null);
 const onTouchStart = (index) => {
   touchedIndex.value = index;
   audioTrigger.value++;
-  touchCounter.value++;
+  store.touchCounter++;
   vibrateByIndex(index);
 };
 
@@ -828,7 +839,7 @@ const pages = [
     {
       name: "Ping Phone",
       clickFunction: pingPhone,
-      imgSrc: "/icons/pingPhone6.svg",
+      imgSrc: "/icons/pingPhone7s.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_phonePinger.mp3",
       cycler: useCycleList(["Ping Phone", "Pairing Status"]),
     },
@@ -906,18 +917,35 @@ const pages = [
   [
     {
       name: "Haptic grid near",
-      html: "Haptic grid near",
       clickFunction: click_hapticGridNear,
+      html: "Haptic grid near",
+      // imgSrc: "/icons/hapticGrid.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      cycler: useCycleList([
+        "Haptic grid near",
+        "Haptic grid medium",
+        "Haptic grid far",
+      ]),
     },
     {
       name: "Haptic grid medium",
-      html: "Haptic grid medium",
       clickFunction: click_hapticGridMedium,
+      html: "Haptic grid medium",
+      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      cycler: useCycleList(["Haptic grid medium", "Haptic grid near"]),
     },
     {
       name: "Haptic grid far",
-      html: "Haptic grid far",
       clickFunction: click_hapticGridFar,
+      html: "Haptic grid far",
+      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      cycler: useCycleList(["Haptic grid far", "Haptic grid medium"]),
+    },
+    {
+      name: "Add function",
+      clickFunction: addFunction,
+      html: "+",
+      cycler: useCycleList(["Add function"]),
     },
   ],
   [],
@@ -990,7 +1018,7 @@ const longPressCallback = (e) => {
     lastIndex = index;
   }
 
-  touchCounter.value++;
+  store.touchCounter++;
 };
 
 let afterLongPress = false;
@@ -1012,8 +1040,16 @@ onLongPress(refs, longPressCallback, {
 
 const swiper = useTemplateRef("swiper");
 onLongPress(swiper, longPressCallback, {
+  delay: 300,
   modifiers: {
     prevent: true,
+  },
+  onMouseUp: () => {
+    console.log("onMouseUp");
+    Howler.stop();
+    setTimeout(() => {
+      afterLongPress = false;
+    }, 100);
   },
 });
 
@@ -1049,6 +1085,12 @@ watch(isSwiping, (val) => {
     else if (stepperIndex.value === 3) vibratePageFour();
     else if (stepperIndex.value === 4) vibratePageFive();
     else if (stepperIndex.value === 5) vibratePageSix();
+    else if (stepperIndex.value === 6) vibratePageSeven();
+    else if (stepperIndex.value === 7) vibratePageEight();
+    else if (stepperIndex.value === 8) vibratePageNine();
+    else if (stepperIndex.value === 9) vibratePageTen();
+    else if (stepperIndex.value === 10) vibratePageEleven();
+    else if (stepperIndex.value === 11) vibratePageTwelve();
   }
 });
 

@@ -82,6 +82,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   });
 
   const currentHapticGrid = ref("near");
+  const touchCounter = ref(0);
 
   const focusBoules = ref(false);
   const {
@@ -226,6 +227,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     player2Class,
     setScoreFromPoints,
     currentHapticGrid,
+    touchCounter,
   };
 });
 

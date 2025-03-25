@@ -4,7 +4,7 @@
       <button
         @click="sendPlay"
         class="w-30vw aspect-1 rounded-full bg-hex-ff0000 border-none"
-        :style="{backgroundColor: isPlaying ? 'blue' : 'red'}"
+        :style="{ backgroundColor: isPlaying ? 'blue' : 'red' }"
       >
         sendPlayPhone
       </button>
@@ -18,12 +18,11 @@ const noz = new Audio("/sounds/noz.mp3");
 const supabase = useSupabaseClient();
 let channel = supabase.channel("sound-controller");
 
-const isPlaying = ref(false);
+const phoneAudio = useSoundComposable("/sounds/noz.mp3");
 channel
   .on("broadcast", { event: "playPhone" }, (event) => {
     console.log("received event on vue page: ", event);
-    noz.play();
-    isPlaying.value = true;
+    phoneAudio.play();
     setTimeout(() => {
       noz.pause();
       noz.currentTime = 0;
