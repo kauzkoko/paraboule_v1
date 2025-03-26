@@ -16,7 +16,6 @@ export const useProtoStore = defineStore("protoStore", () => {
   const player2Score = ref(0);
 
   const xrRunning = ref(false);
-  const helpers = ref(true);
   const isScanningForPoints = ref(false);
 
   const boules = ref([]);
@@ -198,7 +197,36 @@ export const useProtoStore = defineStore("protoStore", () => {
   // mock boules
   rawIntersections.value = mockIntersections.value;
 
+  const { alpha: gyroAlpha } = useDeviceOrientation();
   const alphaController = ref(false);
+  const baseAlpha = ref(0);
+  const isTouching = ref(false);
+
+  const helpers = ref(false);
+  // setTimeout(() => {
+  //   helpers.value = true;
+  //   setTimeout(() => {
+  //     helpers.value = false;
+  //   }, 1);
+  // }, 1);
+
+  const mutePositionalAudio = () => {
+    helpers.value = false;
+    console.log("mutePositionalAudio", helpers.value);
+  };
+
+  const unmutePositionalAudio = () => {
+    helpers.value = true;
+    console.log("unmutePositionalAudio", helpers.value);
+  };
+
+  const togglePositionalAudio = () => {
+    if (helpers.value) {
+      mutePositionalAudio();
+    } else {
+      unmutePositionalAudio();
+    }
+  };
 
   return {
     boules,
@@ -234,6 +262,12 @@ export const useProtoStore = defineStore("protoStore", () => {
     touchCounter,
     currentSoundSrc,
     alphaController,
+    baseAlpha,
+    gyroAlpha,
+    isTouching,
+    mutePositionalAudio,
+    unmutePositionalAudio,
+    togglePositionalAudio,
   };
 });
 

@@ -2,79 +2,135 @@ export function useAnimationController() {
   const bus = useEventBus("protoboules");
 
   const supabase = useSupabaseClient();
-  let channel = supabase.channel("animation-controller");
-  channel.subscribe();
+  let animationController = supabase.channel("animation-controller");
+  animationController.subscribe();
 
-  function flyToStart() {
+  animationController
+    .on("broadcast", { event: "flyToStart" }, (event) => {
+      flyToStart(false);
+    })
+    .on("broadcast", { event: "flyToCochonetAndBack" }, (event) => {
+      flyToCochonetAndBack(false);
+    })
+    .on("broadcast", { event: "startCircularRotation" }, (event) => {
+      startCircularRotation(false);
+    })
+    .on("broadcast", { event: "stalefish180" }, (event) => {
+      stalefish180(false);
+    })
+    .on("broadcast", { event: "lookAlongNegativeXAxis" }, (event) => {
+      lookAlongNegativeXAxis(false);
+    })
+    .on("broadcast", { event: "lookAlongPositiveXAxis" }, (event) => {
+      lookAlongPositiveXAxis(false);
+    })
+    .on("broadcast", { event: "lookAlongPositiveZAxis" }, (event) => {
+      lookAlongPositiveZAxis(false);
+    })
+    .on("broadcast", { event: "lookAlongNegativeZAxis" }, (event) => {
+      lookAlongNegativeZAxis(false);
+    })
+    .on("broadcast", { event: "flyToCochonet" }, (event) => {
+      flyToCochonet(false);
+    })
+
+  function flyToStart(broadcast = true) {
     bus.emit("flyToStart");
-    channel.send({
-      type: "broadcast",
-      event: "flyToStart",
-      payload: {},
-    });
+    if (broadcast) {
+      animationController.send({
+        type: "broadcast",
+        event: "flyToStart",
+        payload: {},
+      });
+    }
   }
 
-  function flyToCochonetAndBack() {
+  function flyToCochonetAndBack(broadcast = true) {
     bus.emit("flyToCochonetAndBack");
-    channel.send({
-      type: "broadcast",
-      event: "flyToCochonetAndBack",
-      payload: {},
-    });
+    if (broadcast) {
+      animationController.send({
+        type: "broadcast",
+        event: "flyToCochonetAndBack",
+        payload: {},
+      });
+    }
   }
 
-  function startCircularRotation() {
+  function startCircularRotation(broadcast = true) {
     bus.emit("startCircularRotation");
-    channel.send({
-      type: "broadcast",
-      event: "startCircularRotation",
-      payload: {},
-    });
+    if (broadcast) {
+      animationController.send({
+        type: "broadcast",
+        event: "startCircularRotation",
+        payload: {},
+      });
+    }
   }
 
-  function stalefish180() {
+  function stalefish180(broadcast = true) {
     bus.emit("stalefish180");
-    channel.send({
-      type: "broadcast",
-      event: "stalefish180",
-      payload: {},
-    });
+    if (broadcast) {
+      animationController.send({
+        type: "broadcast",
+        event: "stalefish180",
+        payload: {},
+      });
+    }
   }
 
-  function lookAlongNegativeXAxis() {
+  function lookAlongNegativeXAxis(broadcast = true) {
     bus.emit("lookAlongNegativeXAxis");
-    channel.send({
-      type: "broadcast",
-      event: "lookAlongNegativeXAxis",
-      payload: {},
-    });
+    if (broadcast) {
+      animationController.send({
+        type: "broadcast",
+        event: "lookAlongNegativeXAxis",
+        payload: {},
+      });
+    }
   }
 
-  function lookAlongPositiveXAxis() {
+  function lookAlongPositiveXAxis(broadcast = true) {
     bus.emit("lookAlongPositiveXAxis");
-    channel.send({
-      type: "broadcast",
-      event: "lookAlongPositiveXAxis",
-      payload: {},
-    });
+    if (broadcast) {
+      animationController.send({
+        type: "broadcast",
+        event: "lookAlongPositiveXAxis",
+        payload: {},
+      });
+    }
   }
 
-  function lookAlongPositiveZAxis() {
+  function lookAlongPositiveZAxis(broadcast = true) {
     bus.emit("lookAlongPositiveZAxis");
-    channel.send({
-      type: "broadcast",
-      event: "lookAlongPositiveZAxis",
-      payload: {},
-    });
+    if (broadcast) {
+      animationController.send({
+        type: "broadcast",
+        event: "lookAlongPositiveZAxis",
+        payload: {},
+      });
+    }
   }
 
-  function lookAlongNegativeZAxis() {
+  function lookAlongNegativeZAxis(broadcast = true) {
     bus.emit("lookAlongNegativeZAxis");
-    channel.send({
-      type: "broadcast",
-      event: "lookAlongNegativeZAxis",
-      payload: {},
-    });
+    if (broadcast) {
+      animationController.send({
+        type: "broadcast",
+        event: "lookAlongNegativeZAxis",
+        payload: {},
+      });
+    }
+  }
+
+  function flyToCochonet(broadcast = true) {
+    bus.emit("flyToCochonet");
+    if (broadcast) {
+      animationController.send({
+        type: "broadcast",
+        event: "flyToCochonet",
+        payload: {},
+      });
+    }
   }
 
   return {
@@ -86,5 +142,6 @@ export function useAnimationController() {
     lookAlongPositiveXAxis,
     lookAlongPositiveZAxis,
     lookAlongNegativeZAxis,
+    flyToCochonet,
   };
 }

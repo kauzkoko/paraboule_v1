@@ -2,6 +2,7 @@
   <div
     class="absolute left-0 w-100dvw h-100dvh"
     :style="{ top: isTouching ? '0' : '-40px' }"
+    @click="onFullscreenClick()"
   >
     <VirtualAudioSpace :isTouching="isTouching" :trigger="audioTrigger" />
   </div>
@@ -109,8 +110,7 @@ import { Howler } from "howler";
 const bus = useEventBus("protoboules");
 
 const store = useProtoStore();
-const { player1Score, player2Score } = storeToRefs(store);
-const isTouching = ref(false);
+const { player1Score, player2Score, isTouching } = storeToRefs(store);
 
 const { sendRawIntersections } = useXrController();
 
@@ -139,6 +139,20 @@ const {
   vibratePageTwelve,
 } = useVibrations();
 
+const { sendPlayCocho, sendPlayShoes, sendPlayPhone } = useSoundController({
+  listen: true,
+});
+const {
+  startCircularRotation,
+  flyToCochonetAndBack,
+  stalefish180,
+  lookAlongNegativeXAxis,
+  lookAlongPositiveXAxis,
+  lookAlongPositiveZAxis,
+  lookAlongNegativeZAxis,
+  flyToCochonet,
+} = useAnimationController();
+
 // layout flickering fix
 const el = ref(null);
 watch(
@@ -163,8 +177,17 @@ const onSwipe = (dir, e, index, item) => {
 };
 
 const setAlphaController = () => {
-  store.alphaController = !store.alphaController;
-  console.log("set store.alphaController", store.alphaController);
+  store.alphaController = true;
+  store.baseAlpha = store.gyroAlpha;
+  console.log("in setAlphaController", store.alphaController);
+};
+
+const onFullscreenClick = () => {
+  if (store.alphaController) {
+    store.alphaController = false;
+    bus.emit("flyToStart");
+  }
+  console.log("in onFullscreenClick", store.alphaController);
 };
 
 // register click functions
@@ -215,6 +238,12 @@ const startCocho = () => {
 const flyCochoBack = () => {
   if (!afterLongPress) {
     flyToCochonetAndBack();
+  }
+};
+
+const click_flyToCochonet = () => {
+  if (!afterLongPress) {
+    flyToCochonet();
   }
 };
 
@@ -575,7 +604,7 @@ const setScoreFromScan = () => {
 const click_mute = () => {
   console.log("click_mute");
   Howler.stop();
-  store.helpers = !store.helpers;
+  store.togglePositionalAudio()
   window.speechSynthesis.cancel();
 };
 
@@ -583,19 +612,6 @@ const addFunction = () => {
   console.log("addFunction");
   // TODO: add add function
 };
-
-const { sendPlayCocho, sendPlayShoes, sendPlayPhone } = useSoundController({
-  listen: true,
-});
-const {
-  startCircularRotation,
-  flyToCochonetAndBack,
-  stalefish180,
-  lookAlongNegativeXAxis,
-  lookAlongPositiveXAxis,
-  lookAlongPositiveZAxis,
-  lookAlongNegativeZAxis,
-} = useAnimationController();
 
 const vibrateByIndex = (index) => {
   if (index === 0) vibrateOnce();
@@ -954,6 +970,12 @@ const pages = [
       clickFunction: setAlphaController,
       html: "Toggle Alpha Controller",
       cycler: useCycleList(["Alpha Controller"]),
+    },
+    {
+      name: "Fly to Cochonet",
+      clickFunction: click_flyToCochonet,
+      html: "Fly to Cochonet",
+      cycler: useCycleList(["Fly to Cochonet"]),
     },
   ],
 ];
