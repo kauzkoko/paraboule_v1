@@ -1,17 +1,26 @@
 <template>
   <div
     class="absolute left-0 w-100dvw h-100dvh"
-    :style="{ top: isTouching ? '0' : '-40px' }"
     @click="onFullscreenClick()"
   >
     <VirtualAudioSpace :isTouching="isTouching" :trigger="audioTrigger" />
   </div>
   <VibrationGrid
-    :isTouching="isTouching"
     @click="isTouching = !isTouching"
     @touchstart="onTappingOnHaptic"
     @touchend="onTappingOnHaptic"
   />
+  <div class="outer" v-show="isTouchingSlider">
+    <div class="container">
+      <div class="big">
+        <div v-show="!isTappingOnSlider">
+          <div>
+            Press and hold while sliding your finger vertically on the screen to navigate through the scene. A single tap will exit.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="outer" v-show="isTouching">
     <div class="container">
       <div class="big">
@@ -23,7 +32,7 @@
       </div>
     </div>
   </div>
-  <div class="outer" ref="el" v-show="!isTouching" s>
+  <div class="outer" ref="el" v-show="!isTouching && !isTouchingSlider" s>
     <div class="container">
       <div
         :ref="refs.set"
@@ -56,14 +65,7 @@
         <div class="flex justify-center items-center w-full h-full">
           <img
             v-if="getItem(item).imgSrc"
-            :src="getItem(item).imgSrc"
-            :style="{
-              width: getItem(item).imgSrc.endsWith('uniqueQr.png')
-                ? '30dvw'
-                : getItem(item).imgSrc.includes('lookAlong')
-                ? '80%'
-                : '',
-            }"
+            :src="getItem(item).imgSrc.value ?? getItem(item).imgSrc"
           />
           <div
             v-else-if="getItem(item).html"
@@ -102,6 +104,11 @@
       @qrCodeFound="onQrCode"
     />
   </div>
+  <Slider
+    @click="isTouchingSlider = !isTouchingSlider"
+    @touchstart="onTappingOnSlider"
+    @touchend="onTappingOnSlider"
+  />
 </template>
 
 <script setup>
@@ -110,7 +117,8 @@ import { Howler } from "howler";
 const bus = useEventBus("protoboules");
 
 const store = useProtoStore();
-const { player1Score, player2Score, isTouching } = storeToRefs(store);
+const { player1Score, player2Score, isTouching, isTouchingSlider } =
+  storeToRefs(store);
 
 const { sendRawIntersections } = useXrController();
 
@@ -118,6 +126,15 @@ const isTappingOnHaptic = ref(false);
 const onTappingOnHaptic = () => {
   console.log("onTappingOnHaptic");
   isTappingOnHaptic.value = !isTappingOnHaptic.value;
+};
+
+const isTappingOnSlider = ref(false);
+const onTappingOnSlider = () => {
+  isTappingOnSlider.value = !isTappingOnSlider.value;
+  if (!isTappingOnSlider.value) {
+    console.log("fly to start");
+    // flyToStart();
+  }
 };
 
 const {
@@ -151,6 +168,7 @@ const {
   lookAlongPositiveZAxis,
   lookAlongNegativeZAxis,
   flyToCochonet,
+  flyToStart,
 } = useAnimationController();
 
 // layout flickering fix
@@ -578,6 +596,12 @@ const refreshPage = () => {
   window.location.reload();
 };
 
+const click_slider = () => {
+  console.log("click_slider");
+  store.isTouchingSlider = !store.isTouchingSlider;
+  // TODO: add slider
+};
+
 const click_hapticGridNear = () => {
   console.log("click_hapticGridNear");
   store.currentHapticGrid = "near";
@@ -612,6 +636,24 @@ const addFunction = () => {
   console.log("addFunction");
   // TODO: add add function
 };
+
+import { useQRCode } from "@vueuse/integrations/useQRCode";
+const url = ref("asdfdsadf");
+const qrcode = useQRCode(url.value, {
+  margin: 1,
+  width: 110,
+  color: {
+    dark: "#ff0000",
+    light: "#000000",
+  },
+});
+
+const computedUniqueQrHtml = computed(() => {
+  return `
+    <div class='text-48px'>
+      <div>${lastQrCode.value}</div>
+    </div>`;
+});
 
 const vibrateByIndex = (index) => {
   if (index === 0) vibrateOnce();
@@ -755,18 +797,6 @@ const pages = [
       ]),
     },
     {
-      name: "Look along 6 o'clock",
-      clickFunction: lookAlongNegativeZAxis,
-      html: "Look along 6 o'clock",
-      imgSrc: "/icons/6oclock.svg",
-      cycler: useCycleList([
-        "Look along 6 o'clock",
-        "Look along 12 o'clock",
-        "Look along 9 o'clock",
-        "Look along 3 o'clock",
-      ]),
-    },
-    {
       name: "Look along 9 o'clock",
       clickFunction: lookAlongNegativeXAxis,
       html: "Look along 9 o'clock",
@@ -776,6 +806,18 @@ const pages = [
         "Look along 3 o'clock",
         "Look along 12 o'clock",
         "Look along 6 o'clock",
+      ]),
+    },
+    {
+      name: "Look along 6 o'clock",
+      clickFunction: lookAlongNegativeZAxis,
+      html: "Look along 6 o'clock",
+      imgSrc: "/icons/6oclock.svg",
+      cycler: useCycleList([
+        "Look along 6 o'clock",
+        "Look along 12 o'clock",
+        "Look along 9 o'clock",
+        "Look along 3 o'clock",
       ]),
     },
   ],
@@ -847,7 +889,7 @@ const pages = [
     {
       name: "Ping Phone",
       clickFunction: pingPhone,
-      imgSrc: "/icons/pingPhone7s.svg",
+      imgSrc: "/icons/pingPhone.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_phonePinger.mp3",
       cycler: useCycleList(["Ping Phone", "Pairing Status"]),
     },
@@ -861,26 +903,13 @@ const pages = [
     {
       name: "Unique QR",
       clickFunction: qr,
-      imgSrc: "/icons/uniqueQr.png",
+      imgSrc: qrcode,
+      // html: computedUniqueQrHtml",
       explanationSrc: "/sounds/elevenlabs/explanation_uniqueQr.mp3",
       cycler: useCycleList(["Unique QR", "Scan QR"]),
     },
   ],
   [
-    {
-      name: "Orientation",
-      clickFunction: orientation,
-      html: "Focus on Boule 1",
-      explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
-      cycler: useCycleList(["Orientation", "Boules Before"]),
-    },
-    {
-      name: "Boules Before",
-      clickFunction: focusBoulesBefore,
-      imgSrc: "/icons/boulesBefore.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_boulesBefore.mp3",
-      cycler: useCycleList(["Boules Before", "Orientation"]),
-    },
     {
       name: "Raw Intersections",
       clickFunction: sendRawIntersections,
@@ -891,7 +920,7 @@ const pages = [
     {
       name: "Refresh page",
       clickFunction: refreshPage,
-      html: "Click to refresh page",
+      html: "F5",
       explanationSrc: "/sounds/elevenlabs/explanation_pageRefresher.mp3",
       cycler: useCycleList(["Refresh page", "Raw Intersections"]),
     },
@@ -900,24 +929,28 @@ const pages = [
     {
       name: "Focus Boule 1",
       clickFunction: focusBoule1,
+      imgSrc: "/icons/focus1.svg",
       html: "Focus on Boule 1",
       cycler: useCycleList(["Focus Boule 1", "Focus Boule 2"]),
     },
     {
       name: "Focus Boule 2",
       clickFunction: focusBoule2,
+      imgSrc: "/icons/focus2.svg",
       html: "Focus on Boule 2",
       cycler: useCycleList(["Focus Boule 2", "Focus Boule 1"]),
     },
     {
       name: "Focus Boule 3",
       clickFunction: focusBoule3,
+      imgSrc: "/icons/focus3.svg",
       html: "Focus on Boule 3",
       cycler: useCycleList(["Focus Boule 3", "Focus All Boules"]),
     },
     {
       name: "Focus All Boules",
       clickFunction: focusAllBoules,
+      imgSrc: "/icons/focusAll.svg",
       html: "Focus all Boules",
       cycler: useCycleList(["Focus All Boules", "Focus Boule 3"]),
     },
@@ -952,8 +985,8 @@ const pages = [
     {
       name: "Add function",
       clickFunction: addFunction,
-      imgSrc: "/icons/referenz.svg",
-      html: "+",
+      // imgSrc: "/icons/referenz.svg",
+      html: "<div>+ Add</div>",
       cycler: useCycleList(["Add function"]),
     },
   ],
@@ -962,20 +995,29 @@ const pages = [
       name: "Default",
       clickFunction: () => {},
       html: "Placeholder",
-      imgSrc: "/icons/watch1.svg",
+      imgSrc: "/icons/watch.svg",
       cycler: useCycleList(["Default"]),
     },
     {
       name: "Alpha Controller",
       clickFunction: setAlphaController,
+      imgSrc: "/icons/gyros.svg",
       html: "Toggle Alpha Controller",
       cycler: useCycleList(["Alpha Controller"]),
     },
     {
       name: "Fly to Cochonet",
       clickFunction: click_flyToCochonet,
+      imgSrc: "/icons/flyToCochonet.svg",
       html: "Fly to Cochonet",
       cycler: useCycleList(["Fly to Cochonet"]),
+    },
+    {
+      name: "Slider",
+      clickFunction: click_slider,
+      imgSrc: "/icons/slider.svg",
+      html: "Slider",
+      cycler: useCycleList(["Slider"]),
     },
   ],
 ];
@@ -1182,8 +1224,8 @@ onKeyStroke(["1", "2", "3", "4", "5", "6"], (e) => {
 }
 
 .big {
-  width: 100%;
-  height: 100%;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
   border: 3px solid #ff0000;
   grid-row: span 2;
   grid-column: span 2;
@@ -1191,16 +1233,15 @@ onKeyStroke(["1", "2", "3", "4", "5", "6"], (e) => {
   > div {
     width: 100%;
     height: 100%;
-    background-color: #ff0000;
-    opacity: 0.7;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: top;
     div {
+      margin-top: 10px;
       text-align: center;
       font-size: 30px;
       font-weight: 400;
-      color: black;
+      color: red;
       width: 80%;
     }
   }

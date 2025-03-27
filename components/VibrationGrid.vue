@@ -8,12 +8,8 @@
 </template>
 
 <script setup>
-const { isTouching } = defineProps({
-  isTouching: {
-    type: Boolean,
-    default: false,
-  },
-});
+const store = useProtoStore();
+const { isTouching } = storeToRefs(store);
 
 const boules = ref([]);
 const bus = useEventBus("protoboules");

@@ -201,7 +201,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const alphaController = ref(false);
   const baseAlpha = ref(0);
   const isTouching = ref(false);
-
+  const isTouchingSlider = ref(false);
   const helpers = ref(false);
   // setTimeout(() => {
   //   helpers.value = true;
@@ -227,6 +227,8 @@ export const useProtoStore = defineStore("protoStore", () => {
       unmutePositionalAudio();
     }
   };
+
+  const showStundenOrientation = ref(false);
 
   return {
     boules,
@@ -268,6 +270,8 @@ export const useProtoStore = defineStore("protoStore", () => {
     mutePositionalAudio,
     unmutePositionalAudio,
     togglePositionalAudio,
+    isTouchingSlider,
+    showStundenOrientation,
   };
 });
 

@@ -60,9 +60,6 @@ import {
 } from "@tresjs/cientos";
 import { gsap } from "gsap";
 
-const path = "/models/tigi.glb";
-const { scene } = await useGLTF(path, { draco: true });
-
 const props = defineProps({
   trigger: {
     type: Number,
@@ -70,11 +67,15 @@ const props = defineProps({
   },
 });
 
+const { y } = useMouse();
+const { height } = useWindowSize();
+const { onBeforeRender } = useLoop();
+
+const path = "/models/tigi.glb";
+// const { scene } = await useGLTF(path, { draco: true });
+
 const camera = useTemplateRef("camera");
 const meshRefs = useTemplateRef("boulesRefs");
-
-const supabase = useSupabaseClient();
-let animationController = supabase.channel("animation-controller");
 
 const bus = useEventBus("protoboules");
 
@@ -86,14 +87,14 @@ watch(helpers, () => {
   if (positionalAudioRefs.value.length > 0) {
     positionalAudioRefs.value.forEach((ref) => {
       if (!helpers.value) {
-        console.log("to 0")
+        console.log("to 0");
         gsap.to(ref.instance.gain.gain, {
           value: 0,
           duration: 0.5,
           ease: "power2.out",
         });
       } else {
-        console.log("to 1")
+        console.log("to 1");
         gsap.to(ref.instance.gain.gain, {
           value: 1,
           duration: 0.5,
@@ -158,10 +159,13 @@ function goToZero() {
   });
 }
 
-const { onBeforeRender } = useLoop();
 onBeforeRender(({ delta, elapsed }) => {
   if (store.alphaController) {
     alpha.value = mappedRelativeAlpha.value;
+  }
+  if (store.isTouchingSlider) {
+    console.log("isTouchingSlider", store.isTouchingSlider);
+    cameraZ.value = map(y.value, 0, height.value, -30, 30);
   }
 });
 

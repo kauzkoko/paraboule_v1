@@ -1,13 +1,11 @@
 <template>
-  <TresGroup>
-    <TresMesh :position="[0, 1, -startPoint]">
-      <TresBoxGeometry :args="[1, 1, 1]" />
-      <TresMeshStandardMaterial color="white" transparent :opacity="0" />
+  <TresGroup v-if="showStundenOrientation">
+    <TresMesh :position="[0, 1, -startPoint / 2]">
       <Html center transform>
-        <div class="mt--300px flex flex-col items-center">
+        <div class="mt--50px flex flex-col items-center w-2px">
           <div class="text-white text-30px">12</div>
           <div class="flex flex-row items-center">
-            <div class="w-2px h-300px bg-white"></div>
+            <div class="w-2px h-50px bg-white"></div>
           </div>
         </div>
       </Html>
@@ -22,15 +20,15 @@
         />
       </Suspense>
     </TresMesh>
-    <TresMesh :position="[startPoint, 1, 0]" :rotation="[0, Math.PI / 2, 0]">
-      <TresBoxGeometry :args="[1, 1, 1]" />
-      <TresMeshStandardMaterial color="white" transparent :opacity="0" />
+    <TresMesh
+      :position="[startPoint / 2, 1, 0]"
+      :rotation="[0, Math.PI / 2, 0]"
+    >
       <Html center transform>
-        <div class="mt--300px flex flex-col items-center">
+        <div class="mt--50px flex flex-col items-center">
           <div class="mirror text-white text-30px">3</div>
           <div class="flex flex-row items-center">
-            <div class="w-2px h-300px bg-white"></div>
-
+            <div class="w-2px h-50px bg-white"></div>
           </div>
         </div>
       </Html>
@@ -45,15 +43,12 @@
         />
       </Suspense>
     </TresMesh>
-    <TresMesh :position="[0, 1, startPoint]">
-      <TresBoxGeometry :args="[1, 1, 1]" />
-      <TresMeshStandardMaterial color="white" transparent :opacity="0" />
+    <TresMesh :position="[0, 1, startPoint / 2]">
       <Html center transform>
-        <div class="mt--300px flex flex-col items-center">
+        <div class="mt--50px flex flex-col items-center">
           <div class="mirror text-white text-30px">6</div>
           <div class="flex flex-row items-center">
-            <div class="w-2px h-300px bg-white"></div>
-
+              <div class="w-2px h-50px bg-white"></div>
           </div>
         </div>
       </Html>
@@ -68,15 +63,15 @@
         />
       </Suspense>
     </TresMesh>
-    <TresMesh :position="[-startPoint, 1, 0]" :rotation="[0, Math.PI / 2, 0]">
-      <TresBoxGeometry :args="[1, 1, 1]" />
-      <TresMeshStandardMaterial color="white" transparent :opacity="0" />
+    <TresMesh
+      :position="[-startPoint / 2, 1, 0]"
+      :rotation="[0, Math.PI / 2, 0]"
+    >
       <Html center transform>
-        <div class="mt--300px flex flex-col items-center">
+        <div class="mt--50px flex flex-col items-center">
           <div class="text-white text-30px">9</div>
           <div class="flex flex-row items-center">
-            <div class="w-2px h-300px bg-white"></div>
-
+            <div class="w-2px h-50px bg-white"></div>
           </div>
         </div>
       </Html>
@@ -107,7 +102,7 @@ defineProps({
 });
 
 const store = useProtoStore();
-const { hihatTriggers } = storeToRefs(store);
+const { hihatTriggers, showStundenOrientation } = storeToRefs(store);
 
 const hihat1Ref = ref(null);
 const hihat2Ref = ref(null);
