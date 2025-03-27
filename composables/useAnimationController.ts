@@ -33,6 +33,9 @@ export function useAnimationController() {
     .on("broadcast", { event: "flyToCochonet" }, (event) => {
       flyToCochonet(false);
     })
+    .on("broadcast", { event: "toggleTopCamera" }, (event) => {
+      toggleTopCamera(false);
+    });
 
   function flyToStart(broadcast = true) {
     bus.emit("flyToStart");
@@ -133,6 +136,17 @@ export function useAnimationController() {
     }
   }
 
+  function toggleTopCamera(broadcast = true) {
+    bus.emit("toggleTopCamera");
+    if (broadcast) {
+      animationController.send({
+        type: "broadcast",
+        event: "toggleTopCamera",
+        payload: {},
+      });
+    }
+  }
+
   return {
     flyToStart,
     flyToCochonetAndBack,
@@ -143,5 +157,6 @@ export function useAnimationController() {
     lookAlongPositiveZAxis,
     lookAlongNegativeZAxis,
     flyToCochonet,
+    toggleTopCamera,
   };
 }

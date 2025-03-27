@@ -19,26 +19,18 @@
       :metalness="1"
       :emissive="boule.color"
     />
-    <Suspense>
-      <PositionalAudio
-        ref="positionalAudioRefs"
-        :ready="true"
-        loop
-        v-if="
-          store.focusBoules ? store.currentlySelectedBouleIndex === index : true
-        "
-        :helper="helpers"
-        :autoplay="false"
-        :key="trigger"
-        :url="
-          boule.player === 1
-            ? sounds.noise.high
-            : boule.player === 2
-            ? sounds.noise.medium
-            : '/strudel/still.mp3'
-        "
-      />
-    </Suspense>
+    <Audio3D
+      v-if="
+        store.focusBoules ? store.currentlySelectedBouleIndex === index : true
+      "
+      :url="
+        boule.player === 1
+          ? sounds.noise.high
+          : boule.player === 2
+          ? sounds.noise.medium
+          : '/strudel/still.mp3'
+      "
+    />
   </TresMesh>
   <StundenOrientation :startPoint="startPoint" />
   <TresAmbientLight :intensity="230" />
@@ -60,7 +52,6 @@ import {
 } from "@tresjs/cientos";
 import { gsap } from "gsap";
 
-
 const { y } = useMouse();
 const { height } = useWindowSize();
 const { onBeforeRender } = useLoop();
@@ -74,30 +65,7 @@ const meshRefs = useTemplateRef("boulesRefs");
 const bus = useEventBus("protoboules");
 
 const store = useProtoStore();
-const { boulesToDisplay: boules, helpers, hihatTriggers, trigger } = storeToRefs(store);
-
-const positionalAudioRefs = useTemplateRef("positionalAudioRefs");
-// watch(helpers, () => {
-//   if (positionalAudioRefs.value.length > 0) {
-//     positionalAudioRefs.value.forEach((ref) => {
-//       if (!helpers.value) {
-//         console.log("to 0");
-//         gsap.to(ref.instance.gain.gain, {
-//           value: 0,
-//           duration: 0.5,
-//           ease: "power2.out",
-//         });
-//       } else {
-//         console.log("to 1");
-//         gsap.to(ref.instance.gain.gain, {
-//           value: 1,
-//           duration: 0.5,
-//           ease: "power2.out",
-//         });
-//       }
-//     });
-//   }
-// });
+const { boulesToDisplay: boules, hihatTriggers } = storeToRefs(store);
 
 //interface controls
 let circleAroundCochonet = false;
@@ -205,6 +173,16 @@ function lookAlongNegativeZAxis() {
     ease: "power2.out",
   });
 }
+
+const toggleTopCamera = () => {
+  console.log("toggleTopCamera");
+  if (store.isTopCamera) {
+    frontCamera();
+  } else {
+    topCamera(50);
+  }
+  store.isTopCamera = !store.isTopCamera;
+};
 
 function topCamera(height = 50) {
   console.log("topCamera");
@@ -450,6 +428,10 @@ bus.on((message) => {
   }
   if (message === "flyToCochonet") {
     flyToCochonet();
+  }
+  if (message === "toggleTopCamera") {
+    toggleTopCamera();
+    console.log("toggleTopCamera", store.isTopCamera);
   }
 });
 

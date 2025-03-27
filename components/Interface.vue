@@ -167,6 +167,7 @@ const {
   lookAlongNegativeZAxis,
   flyToCochonet,
   flyToStart,
+  toggleTopCamera,
 } = useAnimationController();
 
 // layout flickering fix
@@ -600,6 +601,11 @@ const click_slider = () => {
   // TODO: add slider
 };
 
+const click_toggleTopCamera = () => {
+  console.log("click_toggleTopCamera");
+  toggleTopCamera();
+};
+
 const click_hapticGridNear = () => {
   console.log("click_hapticGridNear");
   store.currentHapticGrid = "near";
@@ -618,15 +624,10 @@ const click_hapticGridFar = () => {
   isTouching.value = !isTouching.value;
 };
 
-const setScoreFromScan = () => {
-  console.log("setScoreFromScan");
-  // TODO: add set score from scan
-};
-
 const click_mute = () => {
   console.log("click_mute");
   Howler.stop();
-  store.togglePositionalAudioHelpers();
+  store.toggle3dAudio();
   window.speechSynthesis.cancel();
 };
 
@@ -702,18 +703,6 @@ const focusAllBoules = () => {
 const pages = [
   [
     {
-      name: "Haptic grid near",
-      clickFunction: click_hapticGridNear,
-      html: "Haptic grid near",
-      // imgSrc: "/icons/hapticGrid.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
-      cycler: useCycleList([
-        "Haptic grid near",
-        "Haptic grid medium",
-        "Haptic grid far",
-      ]),
-    },
-    {
       name: "Ping Cochonet",
       clickFunction: ping,
       imgSrc: "/icons/cocho.svg",
@@ -721,18 +710,38 @@ const pages = [
       cycler: useCycleList(["Ping Cochonet", "Ping Startpoint"]),
     },
     {
-      name: "Ping Startpoint",
-      clickFunction: pingShoes,
-      imgSrc: "/icons/hoolahoop.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_hoolaPinger.mp3",
-      cycler: useCycleList(["Ping Startpoint", "Ping Cochonet"]),
-    },
-    {
       name: "Scan Field",
       clickFunction: scanCamera,
       imgSrc: "/icons/scanCamera.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_scanField.mp3",
-      cycler: useCycleList(["Scan Field"]),
+      cycler: useCycleList([
+        "Scan Field",
+        "Scan and count points",
+        "Set points from latest scan",
+      ]),
+    },
+    {
+      name: "Alpha Controller",
+      clickFunction: setAlphaController,
+      imgSrc: "/icons/gyros.svg",
+      html: "Toggle Alpha Controller",
+      cycler: useCycleList([
+        "Alpha Controller",
+        "Slider",
+        "Show Stunden Orientation",
+      ]),
+    },
+    {
+      name: "Focus All Boules",
+      clickFunction: focusAllBoules,
+      imgSrc: "/icons/focusAll.svg",
+      html: "Focus all Boules",
+      cycler: useCycleList([
+        "Focus All Boules",
+        "Focus Boule 1",
+        "Focus Boule 2",
+        "Focus Boule 3",
+      ]),
     },
   ],
   [
@@ -741,7 +750,7 @@ const pages = [
       clickFunction: startCocho,
       imgSrc: "/icons/around.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pirateRadar.mp3",
-      cycler: useCycleList(["Pirate Radar", "Boomerang"]),
+      cycler: useCycleList(["Pirate Radar", "Boomerang", "Stalefish 180"]),
     },
     {
       name: "Boomerang",
@@ -751,39 +760,63 @@ const pages = [
       cycler: useCycleList(["Boomerang", "Pirate Radar"]),
     },
     {
-      name: "Boule Focuser",
-      clickFunction: bouleFocuser,
-      imgSrc: "/icons/bouleFocuser.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_bouleFocuser.mp3",
-      cycler: useCycleList(["Boule Focuser", "Stalefish 180"]),
+      name: "Look along 12 o'clock",
+      clickFunction: lookAlongPositiveZAxis,
+      html: "Look along 12 o'clock",
+      imgSrc: "/icons/12oclock.svg",
+      cycler: useCycleList([
+        "Look along 12 o'clock",
+        "Look along 9 o'clock",
+        "Look along 3 o'clock",
+        "Look along 6 o'clock",
+      ]),
     },
     {
-      name: "Stalefish 180",
-      clickFunction: click_stalefish180,
-      imgSrc: "/icons/stalefish180.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_throughTurnAndBack.mp3",
-      cycler: useCycleList(["Stalefish 180", "Boule Focuser"]),
+      name: "Haptic grid far",
+      clickFunction: click_hapticGridFar,
+      html: "Haptic grid far",
+      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      cycler: useCycleList([
+        "Haptic grid far",
+        "Haptic grid medium",
+        "Haptic grid near",
+      ]),
     },
   ],
   [
     {
-      name: "Score Standings",
-      clickFunction: scoreStandings,
-      html: computedScoreStandingsHtml,
-      explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
-      cycler: useCycleList(["Score Standings"]),
+      name: "Player 1 Shot Incrementer",
+      clickFunction: incrementPlayer1,
+      imgSrc: "/icons/plus.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
+      cycler: useCycleList([
+        "Player 1 Shot Incrementer",
+        "Player 2 Shot Incrementer",
+      ]),
     },
     {
-      name: "Set score from scan",
-      clickFunction: setScoreFromScan,
-      html: "Set score from scan",
-      cycler: useCycleList(["Set score from scan", "Mute all sounds"]),
+      name: "Player 2 Shot Incrementer",
+      clickFunction: incrementPlayer2,
+      imgSrc: "/icons/plus.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
+      cycler: useCycleList([
+        "Player 2 Shot Incrementer",
+        "Player 1 Shot Incrementer",
+      ]),
     },
     {
-      name: "Mute all sounds",
-      clickFunction: click_mute,
-      html: "Mute all sounds",
-      cycler: useCycleList(["Mute all sounds", "Set score from scan"]),
+      name: "Announce Balls Played",
+      clickFunction: announceBallsPlayed,
+      explanationSrc: "/sounds/elevenlabs/explanation_ballsShotAnnouncer.mp3",
+      html: computedAnnounceBallsPlayedHtml,
+      cycler: useCycleList(["Announce Balls Played", "Rewind"]),
+    },
+    {
+      name: "Rewind",
+      clickFunction: rewind,
+      imgSrc: "/icons/rewind.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
+      cycler: useCycleList(["Rewind", "Announce Balls Played"]),
     },
   ],
   [
@@ -838,12 +871,34 @@ const pages = [
   ],
   [
     {
+      name: "Toggle Top Camera",
+      clickFunction: click_toggleTopCamera,
+      html: "Toggle Top Camera",
+      cycler: useCycleList(["Toggle Top Camera"]),
+    },
+  ],
+  [
+    {
+      name: "Score Standings",
+      clickFunction: scoreStandings,
+      html: computedScoreStandingsHtml,
+      explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
+      cycler: useCycleList(["Score Standings"]),
+    },
+    {
+      name: "Mute all sounds",
+      clickFunction: click_mute,
+      html: "Mute all sounds",
+      cycler: useCycleList(["Mute all sounds"]),
+    },
+    {
       name: "Scan and count points",
       clickFunction: scanForPoints,
       html: "Scan and count points",
       cycler: useCycleList([
         "Scan and count points",
         "Set points from latest scan",
+        "Scan field",
       ]),
     },
     {
@@ -854,42 +909,6 @@ const pages = [
         "Set points from latest scan",
         "Scan and count points",
       ]),
-    },
-  ],
-  [
-    {
-      name: "Player 1 Shot Incrementer",
-      clickFunction: incrementPlayer1,
-      imgSrc: "/icons/plus.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
-      cycler: useCycleList([
-        "Player 1 Shot Incrementer",
-        "Player 2 Shot Incrementer",
-      ]),
-    },
-    {
-      name: "Player 2 Shot Incrementer",
-      clickFunction: incrementPlayer2,
-      imgSrc: "/icons/plus.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
-      cycler: useCycleList([
-        "Player 2 Shot Incrementer",
-        "Player 1 Shot Incrementer",
-      ]),
-    },
-    {
-      name: "Announce Balls Played",
-      clickFunction: announceBallsPlayed,
-      explanationSrc: "/sounds/elevenlabs/explanation_ballsShotAnnouncer.mp3",
-      html: computedAnnounceBallsPlayedHtml,
-      cycler: useCycleList(["Announce Balls Played", "Rewind"]),
-    },
-    {
-      name: "Rewind",
-      clickFunction: rewind,
-      imgSrc: "/icons/rewind.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
-      cycler: useCycleList(["Rewind", "Announce Balls Played"]),
     },
   ],
   [
@@ -995,7 +1014,6 @@ const pages = [
       name: "Haptic grid near",
       clickFunction: click_hapticGridNear,
       html: "Haptic grid near",
-      // imgSrc: "/icons/hapticGrid.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
       cycler: useCycleList([
         "Haptic grid near",
@@ -1008,14 +1026,22 @@ const pages = [
       clickFunction: click_hapticGridMedium,
       html: "Haptic grid medium",
       explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
-      cycler: useCycleList(["Haptic grid medium", "Haptic grid near"]),
+      cycler: useCycleList([
+        "Haptic grid medium",
+        "Haptic grid near",
+        "Haptic grid far",
+      ]),
     },
     {
       name: "Haptic grid far",
       clickFunction: click_hapticGridFar,
       html: "Haptic grid far",
       explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
-      cycler: useCycleList(["Haptic grid far", "Haptic grid medium"]),
+      cycler: useCycleList([
+        "Haptic grid far",
+        "Haptic grid medium",
+        "Haptic grid near",
+      ]),
     },
     {
       name: "Add function",
@@ -1023,6 +1049,29 @@ const pages = [
       // imgSrc: "/icons/referenz.svg",
       html: "<div>+ Add</div>",
       cycler: useCycleList(["Add function"]),
+    },
+  ],
+  [
+    {
+      name: "Ping Startpoint",
+      clickFunction: pingShoes,
+      imgSrc: "/icons/hoolahoop.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_hoolaPinger.mp3",
+      cycler: useCycleList(["Ping Startpoint", "Ping Cochonet"]),
+    },
+    {
+      name: "Boule Focuser",
+      clickFunction: bouleFocuser,
+      imgSrc: "/icons/bouleFocuser.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_bouleFocuser.mp3",
+      cycler: useCycleList(["Boule Focuser", "Stalefish 180"]),
+    },
+    {
+      name: "Stalefish 180",
+      clickFunction: click_stalefish180,
+      imgSrc: "/icons/stalefish180.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_throughTurnAndBack.mp3",
+      cycler: useCycleList(["Stalefish 180", "Boule Focuser"]),
     },
   ],
   [
@@ -1213,6 +1262,7 @@ onKeyStroke(["ArrowLeft"], (e) => {
 onKeyStroke(["ArrowRight"], (e) => {
   e.preventDefault();
   if (isLast.value) {
+    9;
     const firstStep = stepNames.value[0];
     goTo(firstStep);
   } else {
@@ -1220,7 +1270,7 @@ onKeyStroke(["ArrowRight"], (e) => {
   }
 });
 
-onKeyStroke(["1", "2", "3", "4", "5", "6"], (e) => {
+onKeyStroke(["1", "2", "3", "4", "5", "6", "7", "8", "9"], (e) => {
   const pageIndex = parseInt(e.key) - 1;
   if (pageIndex >= 0 && pageIndex < pages.length) {
     goTo(stepNames.value[pageIndex]);

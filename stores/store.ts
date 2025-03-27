@@ -18,6 +18,8 @@ export const useProtoStore = defineStore("protoStore", () => {
   const xrRunning = ref(false);
   const isScanningForPoints = ref(false);
 
+  const isTopCamera = ref(false);
+
   const boules = ref([]);
   const sortedBoules = useSorted(boules, (a, b) => a.distance - b.distance);
 
@@ -204,17 +206,24 @@ export const useProtoStore = defineStore("protoStore", () => {
   const isTouching = ref(false);
   const isTouchingSlider = ref(false);
   const helpers = ref(false);
+  const showStundenOrientation = ref(false);
+  const volume = ref(0);
 
-  const togglePositionalAudioHelpers = () => {
-    if (helpers.value) {
-      helpers.value = false;
-    } else {
-      helpers.value = true;
-    }
-    trigger.value++;
+  const mute3dAudio = () => {
+    volume.value = 0;
   };
 
-  const showStundenOrientation = ref(false);
+  const unmute3dAudio = () => {
+    volume.value = 1;
+  };
+
+  const toggle3dAudio = () => {
+    if (volume.value === 0) {
+      unmute3dAudio();
+    } else {
+      mute3dAudio();
+    }
+  };
 
   return {
     boules,
@@ -253,10 +262,14 @@ export const useProtoStore = defineStore("protoStore", () => {
     baseAlpha,
     gyroAlpha,
     isTouching,
-    togglePositionalAudioHelpers,
     isTouchingSlider,
     showStundenOrientation,
     trigger,
+    volume,
+    mute3dAudio,
+    unmute3dAudio,
+    toggle3dAudio,
+    isTopCamera,
   };
 });
 
