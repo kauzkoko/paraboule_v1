@@ -270,28 +270,13 @@ const click_stalefish180 = () => {
   }
 };
 
-const orientation = () => {
-  console.log("orientation");
-};
-
-const bouleFocuser = (bouleIndex) => {
-  store.focusBoules = true;
-  if (bouleIndex < store.bouleCount) {
-    store.goToBoule(bouleIndex);
-    return;
-  } else if (bouleIndex >= store.bouleCount) {
-    const message = `There are only ${store.bouleCount - 1} balls.`;
-    speak(message);
-    return;
-  }
-  store.nextBoule();
-  if (store.currentlySelectedBouleIndex === 0) {
-    store.nextBoule();
-  }
-};
-
-const focusBoulesBefore = () => {
-  console.log("focusBoulesBefore");
+const click_bouleFocuser = (bouleIndex) => {
+  store.volume = 1;
+  if (bouleIndex === "all")
+    store.selectedBoules = store.boulesToDisplay
+      .map((_, index) => index)
+      .slice(1);
+  else store.selectedBoules = [bouleIndex];
 };
 
 const qr = () => {
@@ -385,45 +370,46 @@ watch(isListening, () => {
         scoreStandings();
         break;
       case "boule focuser":
-        bouleFocuser();
+      case "focus all":
+        click_bouleFocuser("all");
         break;
       case "focus the ball 1":
       case "focus ball 1":
       case "focus ball one":
       case "focus the ball one":
       case "focus the first ball":
-        bouleFocuser(1);
+        click_bouleFocuser(1);
         break;
       case "focus the ball 2":
       case "focus ball 2":
       case "focus ball two":
       case "focus the second ball":
-        bouleFocuser(2);
+        click_bouleFocuser(2);
         break;
       case "focus the ball 3":
       case "focus ball 3":
       case "focus ball three":
       case "focus the third ball":
-        bouleFocuser(3);
+        click_bouleFocuser(3);
         break;
       case "focus the ball 4":
       case "focus ball 4":
       case "focus ball four":
       case "focus ball for":
       case "focus the fourth ball":
-        bouleFocuser(4);
+        click_bouleFocuser(4);
         break;
       case "focus the ball 5":
       case "focus ball 5":
       case "focus ball five":
       case "focus the fifth ball":
-        bouleFocuser(5);
+        click_bouleFocuser(5);
         break;
       case "focus the ball 6":
       case "focus ball 6":
       case "focus ball six":
       case "focus the sixth ball":
-        bouleFocuser(6);
+        click_bouleFocuser(6);
         break;
       case "fly to center and back":
       case "fly to center":
@@ -692,14 +678,6 @@ const onTouchEnd = () => {
   }, 300);
 };
 
-const focusBoule1 = () => bouleFocuser(1);
-const focusBoule2 = () => bouleFocuser(2);
-const focusBoule3 = () => bouleFocuser(3);
-const focusBoule4 = () => bouleFocuser(4);
-const focusAllBoules = () => {
-  store.focusBoules = false;
-};
-
 const pages = [
   [
     {
@@ -733,7 +711,7 @@ const pages = [
     },
     {
       name: "Focus All Boules",
-      clickFunction: focusAllBoules,
+      clickFunction: () => click_bouleFocuser("all"),
       imgSrc: "/icons/focusAll.svg",
       html: "Focus all Boules",
       cycler: useCycleList([
@@ -982,28 +960,28 @@ const pages = [
   [
     {
       name: "Focus Boule 1",
-      clickFunction: focusBoule1,
+      clickFunction: () => click_bouleFocuser(1),
       imgSrc: "/icons/focus1.svg",
       html: "Focus on Boule 1",
       cycler: useCycleList(["Focus Boule 1", "Focus Boule 2"]),
     },
     {
       name: "Focus Boule 2",
-      clickFunction: focusBoule2,
+      clickFunction: () => click_bouleFocuser(2),
       imgSrc: "/icons/focus2.svg",
       html: "Focus on Boule 2",
       cycler: useCycleList(["Focus Boule 2", "Focus Boule 1"]),
     },
     {
       name: "Focus Boule 3",
-      clickFunction: focusBoule3,
+      clickFunction: () => click_bouleFocuser(3),
       imgSrc: "/icons/focus3.svg",
       html: "Focus on Boule 3",
       cycler: useCycleList(["Focus Boule 3", "Focus All Boules"]),
     },
     {
       name: "Focus All Boules",
-      clickFunction: focusAllBoules,
+      clickFunction: () => click_bouleFocuser(0),
       imgSrc: "/icons/focusAll.svg",
       html: "Focus all Boules",
       cycler: useCycleList(["Focus All Boules", "Focus Boule 3"]),
@@ -1060,18 +1038,11 @@ const pages = [
       cycler: useCycleList(["Ping Startpoint", "Ping Cochonet"]),
     },
     {
-      name: "Boule Focuser",
-      clickFunction: bouleFocuser,
-      imgSrc: "/icons/bouleFocuser.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_bouleFocuser.mp3",
-      cycler: useCycleList(["Boule Focuser", "Stalefish 180"]),
-    },
-    {
       name: "Stalefish 180",
       clickFunction: click_stalefish180,
       imgSrc: "/icons/stalefish180.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_throughTurnAndBack.mp3",
-      cycler: useCycleList(["Stalefish 180", "Boule Focuser"]),
+      cycler: useCycleList(["Stalefish 180"]),
     },
   ],
   [
@@ -1105,6 +1076,7 @@ const pages = [
     },
   ],
 ];
+
 const {
   goToNext,
   goToPrevious,
@@ -1143,14 +1115,12 @@ const getItem = (item) => {
 };
 
 const onClick = (item, index) => {
-  console.log("onClick", item.cycler.state, index);
-  store.focusBoules = false;
   flatPages.find((entry) => entry.name === item.cycler.state).clickFunction();
 };
 
-const explanations = pages
-  .flat()
-  .map((item) => useSoundComposable(item.explanationSrc));
+const explanations = flatPages.map((item) =>
+  useSoundComposable(item.explanationSrc)
+);
 
 const pageAnnouncerExplanation = useSoundComposable(
   "/sounds/elevenlabs/explanation_pageAnnouncer.mp3"

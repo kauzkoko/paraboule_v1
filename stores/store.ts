@@ -87,13 +87,14 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   const currentSoundSrc = ref("");
 
-  const focusBoules = ref(false);
+  const selectedBoules = ref([]);
   const {
     next: nextBoule,
     prev: prevBoule,
     go: goToBoule,
     index: currentlySelectedBouleIndex,
   } = useCycleList(boulesToDisplay);
+
   const bouleCount = computed(() => boulesToDisplay.value.length);
 
   const deviceId = Math.random().toString(36).substring(2, 15);
@@ -213,8 +214,15 @@ export const useProtoStore = defineStore("protoStore", () => {
     volume.value = 0;
   };
 
+  let unmuteCounter = 0;
   const unmute3dAudio = () => {
     volume.value = 1;
+    if (unmuteCounter === 0) {
+      selectedBoules.value = boulesToDisplay.value
+        .map((_, index) => index)
+        .slice(1);
+    }
+    unmuteCounter++;
   };
 
   const toggle3dAudio = () => {
@@ -245,7 +253,6 @@ export const useProtoStore = defineStore("protoStore", () => {
     hihatTriggers,
     player1Score,
     player2Score,
-    focusBoules,
     isScanningForPoints,
     score,
     winnerPoints,
@@ -270,6 +277,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     unmute3dAudio,
     toggle3dAudio,
     isTopCamera,
+    selectedBoules,
   };
 });
 

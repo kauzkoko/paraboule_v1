@@ -4,25 +4,20 @@
     :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
     ref="camera"
   />
-  <!-- <primitive :object="scene" :position="[0, 2, 0]" :scale="[8, 8, 8]" /> -->
   <TresMesh
-    v-for="(boule, index) in boules.filter((_, i) => i !== -1)"
+    v-for="(boule, index) in boules"
     :key="index"
     :iClass="boule.class"
     ref="boulesRefs"
     :position="[boule.x, 0, boule.y]"
   >
     <TresSphereGeometry :args="[boule.size, 24, 24]" />
-    <!-- <Outline :thickness="3" color="#ffff00" /> -->
-    <TresMeshPhysicalMaterial
-      :roughness="0.4"
-      :metalness="1"
-      :emissive="boule.color"
+    <CustomShaderMaterial
+      v-bind="materialProps"
+      v-if="checkSelectedBoules(index)"
     />
     <Audio3D
-      v-if="
-        store.focusBoules ? store.currentlySelectedBouleIndex === index : true
-      "
+      v-if="checkSelectedBoules(index)"
       :url="
         boule.player === 1
           ? sounds.noise.high
@@ -30,6 +25,11 @@
           ? sounds.noise.medium
           : '/strudel/still.mp3'
       "
+    />
+    <TresMeshPhysicalMaterial
+      :roughness="0.4"
+      :metalness="1"
+      :emissive="boule.color"
     />
   </TresMesh>
   <StundenOrientation :startPoint="startPoint" />
@@ -43,21 +43,59 @@
 </template>
 
 <script setup>
-import { useLoop } from "@tresjs/core";
-import {
-  PositionalAudio,
-  Outline,
-  useGLTF,
-  ScreenSizer,
-} from "@tresjs/cientos";
+import { useLoop, useRenderLoop } from "@tresjs/core";
+import { CustomShaderMaterial } from "@tresjs/cientos";
 import { gsap } from "gsap";
+import { MeshBasicMaterial } from "three";
+
+const { onLoop } = useRenderLoop();
+const materialProps = {
+  baseMaterial: MeshBasicMaterial,
+  fragmentShader: `
+    varying float vWobble;
+
+    uniform float u_Time;
+
+    void main() {
+      float wobble = vWobble * 0.5 + 0.5;
+      csm_FragColor = mix(vec4(1.5, 0.0, 0.0, 1.0), vec4(1.2, 0.6, 0.8, 1.0), wobble);
+    }
+  `,
+  vertexShader: `
+    uniform float u_Time;
+    uniform float u_WobbleSpeed;
+    uniform float u_WobbleAmplitude;
+    uniform float u_WobbleFrequency;
+
+    varying float vWobble;
+
+    void main() {
+      float wobble = sin(csm_Position.z * u_WobbleFrequency + u_Time * u_WobbleSpeed);
+      csm_Position += normal * wobble * u_WobbleAmplitude;
+
+      vWobble = wobble;
+    }
+  `,
+  uniforms: {
+    u_Time: { value: 0 },
+    u_WobbleSpeed: { value: 2 },
+    u_WobbleAmplitude: { value: 0.01 },
+    u_WobbleFrequency: { value: 1 },
+  },
+};
+
+onMounted(async () => {
+  await nextTick();
+
+  onLoop(() => {
+    materialProps.uniforms.u_Time.value +=
+      0.01 * materialProps.uniforms.u_WobbleSpeed.value;
+  });
+});
 
 const { y } = useMouse();
 const { height } = useWindowSize();
 const { onBeforeRender } = useLoop();
-
-const path = "/models/tigi.glb";
-// const { scene } = await useGLTF(path, { draco: true });
 
 const camera = useTemplateRef("camera");
 const meshRefs = useTemplateRef("boulesRefs");
@@ -66,6 +104,11 @@ const bus = useEventBus("protoboules");
 
 const store = useProtoStore();
 const { boulesToDisplay: boules, hihatTriggers } = storeToRefs(store);
+
+const checkSelectedBoules = (index) => {
+  if (store.volume === 0) return false;
+  return store.selectedBoules.includes(index);
+};
 
 //interface controls
 let circleAroundCochonet = false;
