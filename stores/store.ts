@@ -203,28 +203,12 @@ export const useProtoStore = defineStore("protoStore", () => {
   const isTouching = ref(false);
   const isTouchingSlider = ref(false);
   const helpers = ref(false);
-  // setTimeout(() => {
-  //   helpers.value = true;
-  //   setTimeout(() => {
-  //     helpers.value = false;
-  //   }, 1);
-  // }, 1);
 
-  const mutePositionalAudio = () => {
-    helpers.value = false;
-    console.log("mutePositionalAudio", helpers.value);
-  };
-
-  const unmutePositionalAudio = () => {
-    helpers.value = true;
-    console.log("unmutePositionalAudio", helpers.value);
-  };
-
-  const togglePositionalAudio = () => {
+  const togglePositionalAudioHelpers = () => {
     if (helpers.value) {
-      mutePositionalAudio();
+      helpers.value = false;
     } else {
-      unmutePositionalAudio();
+      helpers.value = true;
     }
   };
 
@@ -267,9 +251,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     baseAlpha,
     gyroAlpha,
     isTouching,
-    mutePositionalAudio,
-    unmutePositionalAudio,
-    togglePositionalAudio,
+    togglePositionalAudioHelpers,
     isTouchingSlider,
     showStundenOrientation,
   };

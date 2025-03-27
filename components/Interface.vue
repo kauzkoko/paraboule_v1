@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="absolute left-0 w-100dvw h-100dvh"
-    @click="onFullscreenClick()"
-  >
+  <div class="absolute left-0 w-100dvw h-100dvh" @click="onFullscreenClick()">
     <VirtualAudioSpace :isTouching="isTouching" :trigger="audioTrigger" />
   </div>
   <VibrationGrid
@@ -15,7 +12,8 @@
       <div class="big">
         <div v-show="!isTappingOnSlider">
           <div>
-            Press and hold while sliding your finger vertically on the screen to navigate through the scene. A single tap will exit.
+            Press and hold while sliding your finger vertically on the screen to
+            navigate through the scene. A single tap will exit.
           </div>
         </div>
       </div>
@@ -628,7 +626,7 @@ const setScoreFromScan = () => {
 const click_mute = () => {
   console.log("click_mute");
   Howler.stop();
-  store.togglePositionalAudio()
+  store.togglePositionalAudioHelpers();
   window.speechSynthesis.cancel();
 };
 
@@ -654,6 +652,23 @@ const computedUniqueQrHtml = computed(() => {
       <div>${lastQrCode.value}</div>
     </div>`;
 });
+
+const coinImgSrc = ref("/icons/gsicht.svg");
+const tossCoin = () => {
+  const totalTime = 2000;
+  const count = 5;
+  coinImgSrc.value = "/icons/fragezeichen.svg";
+  setTimeout(() => {
+    // for (let i = 1; i < count; i++) {
+    //   setTimeout(() => {
+    //     coinImgSrc.value = "/icons/fragezeichen" + (i + 1) + ".svg";
+    //     console.log("coinImgSrc", coinImgSrc.value);
+    //   }, (totalTime / count) * i);
+    // }
+    coinImgSrc.value =
+      Math.random() < 0.5 ? "/icons/gsicht.svg" : "/icons/zahl.svg";
+  }, totalTime);
+};
 
 const vibrateByIndex = (index) => {
   if (index === 0) vibrateOnce();
@@ -923,6 +938,14 @@ const pages = [
       html: "F5",
       explanationSrc: "/sounds/elevenlabs/explanation_pageRefresher.mp3",
       cycler: useCycleList(["Refresh page", "Raw Intersections"]),
+    },
+    {
+      name: "Toss Coin",
+      clickFunction: tossCoin,
+      imgSrc: coinImgSrc,
+      html: "Toss a coin and get heads or tails",
+      explanationSrc: "/sounds/elevenlabs/explanation_tossCoin.mp3",
+      cycler: useCycleList(["Toss Coin"]),
     },
   ],
   [

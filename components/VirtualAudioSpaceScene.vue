@@ -83,27 +83,27 @@ const store = useProtoStore();
 const { boulesToDisplay: boules, helpers, hihatTriggers } = storeToRefs(store);
 
 const positionalAudioRefs = useTemplateRef("positionalAudioRefs");
-watch(helpers, () => {
-  if (positionalAudioRefs.value.length > 0) {
-    positionalAudioRefs.value.forEach((ref) => {
-      if (!helpers.value) {
-        console.log("to 0");
-        gsap.to(ref.instance.gain.gain, {
-          value: 0,
-          duration: 0.5,
-          ease: "power2.out",
-        });
-      } else {
-        console.log("to 1");
-        gsap.to(ref.instance.gain.gain, {
-          value: 1,
-          duration: 0.5,
-          ease: "power2.out",
-        });
-      }
-    });
-  }
-});
+// watch(helpers, () => {
+//   if (positionalAudioRefs.value.length > 0) {
+//     positionalAudioRefs.value.forEach((ref) => {
+//       if (!helpers.value) {
+//         console.log("to 0");
+//         gsap.to(ref.instance.gain.gain, {
+//           value: 0,
+//           duration: 0.5,
+//           ease: "power2.out",
+//         });
+//       } else {
+//         console.log("to 1");
+//         gsap.to(ref.instance.gain.gain, {
+//           value: 1,
+//           duration: 0.5,
+//           ease: "power2.out",
+//         });
+//       }
+//     });
+//   }
+// });
 
 //interface controls
 const trigger = ref(0);
@@ -143,9 +143,6 @@ function goToZero() {
     value: 0,
     duration: 1,
     ease: "power2.out",
-    onComplete: () => {
-      store.mutePositionalAudio();
-    },
   });
   gsap.to(cameraY, {
     value: 1,
@@ -181,7 +178,6 @@ const mappedRelativeAlpha = computed(() => {
 });
 
 function lookAlongNegativeXAxis() {
-  store.unmutePositionalAudio();
   goToZero();
   gsap.to(alpha, {
     value: 90,
@@ -191,7 +187,6 @@ function lookAlongNegativeXAxis() {
 }
 
 function lookAlongPositiveXAxis() {
-  store.unmutePositionalAudio();
   goToZero();
   gsap.to(alpha, {
     value: -90,
@@ -201,7 +196,6 @@ function lookAlongPositiveXAxis() {
 }
 
 function lookAlongPositiveZAxis() {
-  store.unmutePositionalAudio();
   goToZero();
   gsap.to(alpha, {
     value: 0,
@@ -211,7 +205,6 @@ function lookAlongPositiveZAxis() {
 }
 
 function lookAlongNegativeZAxis() {
-  store.unmutePositionalAudio();
   goToZero();
   gsap.to(alpha, {
     value: 180,
@@ -278,9 +271,6 @@ function flyToStart() {
     value: 0,
     duration: 1,
     ease: "power2.out",
-    onComplete: () => {
-      store.mutePositionalAudio();
-    },
   });
   gsap.to(cameraZ, {
     value: startPoint,
@@ -295,7 +285,6 @@ function flyToStart() {
 }
 
 function flyToCochonetAndBack() {
-  store.unmutePositionalAudio();
   killTweens();
   gsap.to(cameraZ, {
     value: 0,
@@ -307,14 +296,10 @@ function flyToCochonetAndBack() {
     duration: 3,
     delay: 4,
     ease: "power2.out",
-    onComplete: () => {
-      store.mutePositionalAudio();
-    },
   });
 }
 
 function flyToCochonet() {
-  store.unmutePositionalAudio();
   killTweens();
   gsap.to(cameraZ, {
     value: 0,
@@ -325,7 +310,6 @@ function flyToCochonet() {
 
 function stalefish180() {
   killTweens();
-  store.unmutePositionalAudio();
   gsap.to(cameraZ, {
     value: -startPoint,
     duration: 3,
@@ -349,9 +333,6 @@ function stalefish180() {
         value: alpha.value + 180,
         duration: 0.2,
         ease: "linear",
-        onComplete: () => {
-          store.mutePositionalAudio();
-        },
       });
     },
   });
