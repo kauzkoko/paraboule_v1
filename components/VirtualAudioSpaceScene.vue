@@ -60,12 +60,6 @@ import {
 } from "@tresjs/cientos";
 import { gsap } from "gsap";
 
-const props = defineProps({
-  trigger: {
-    type: Number,
-    required: true,
-  },
-});
 
 const { y } = useMouse();
 const { height } = useWindowSize();
@@ -80,7 +74,7 @@ const meshRefs = useTemplateRef("boulesRefs");
 const bus = useEventBus("protoboules");
 
 const store = useProtoStore();
-const { boulesToDisplay: boules, helpers, hihatTriggers } = storeToRefs(store);
+const { boulesToDisplay: boules, helpers, hihatTriggers, trigger } = storeToRefs(store);
 
 const positionalAudioRefs = useTemplateRef("positionalAudioRefs");
 // watch(helpers, () => {
@@ -106,7 +100,6 @@ const positionalAudioRefs = useTemplateRef("positionalAudioRefs");
 // });
 
 //interface controls
-const trigger = ref(0);
 let circleAroundCochonet = false;
 
 // camera controls / animations
@@ -459,14 +452,6 @@ bus.on((message) => {
     flyToCochonet();
   }
 });
-
-// trigger for spatial audio
-watch(
-  () => props.trigger,
-  () => {
-    trigger.value++;
-  }
-);
 
 // screen position for haptic feedback
 const { isTouching } = storeToRefs(store);

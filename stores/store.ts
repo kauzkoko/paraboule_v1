@@ -96,6 +96,7 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   const deviceId = Math.random().toString(36).substring(2, 15);
 
+  const trigger = ref(0);
   const hihatTriggers = ref([0, 0, 0, 0]);
 
   const rawIntersections = ref([]);
@@ -210,6 +211,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     } else {
       helpers.value = true;
     }
+    trigger.value++;
   };
 
   const showStundenOrientation = ref(false);
@@ -254,6 +256,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     togglePositionalAudioHelpers,
     isTouchingSlider,
     showStundenOrientation,
+    trigger,
   };
 });
 

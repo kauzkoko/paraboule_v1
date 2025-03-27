@@ -193,7 +193,7 @@ const onSwipe = (dir, e, index, item) => {
 };
 
 const setAlphaController = () => {
-  store.alphaController = true;
+  store.alphaController = !store.alphaController;
   store.baseAlpha = store.gyroAlpha;
   console.log("in setAlphaController", store.alphaController);
 };
@@ -946,6 +946,18 @@ const pages = [
       html: "Toss a coin and get heads or tails",
       explanationSrc: "/sounds/elevenlabs/explanation_tossCoin.mp3",
       cycler: useCycleList(["Toss Coin"]),
+    },
+    {
+      name: "Show Stunden Orientation",
+      clickFunction: () => {
+        store.showStundenOrientation = !store.showStundenOrientation;
+        console.log(
+          "Stunden Orientation toggled:",
+          store.showStundenOrientation
+        );
+      },
+      html: "Toggle watch orientation",
+      cycler: useCycleList(["Show Stunden Orientation"]),
     },
   ],
   [
