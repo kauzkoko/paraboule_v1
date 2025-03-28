@@ -20,9 +20,9 @@
       v-if="checkSelectedBoules(index)"
       :url="
         boule.player === 1
-          ? sounds.noise.high
+          ? store.player1AudioSrc
           : boule.player === 2
-          ? sounds.noise.medium
+          ? store.player2AudioSrc
           : '/strudel/still.mp3'
       "
     />
@@ -103,7 +103,7 @@ const meshRefs = useTemplateRef("boulesRefs");
 const bus = useEventBus("protoboules");
 
 const store = useProtoStore();
-const { boulesToDisplay: boules, hihatTriggers } = storeToRefs(store);
+const { boulesToDisplay: boules, hihatTriggers, isTouching } = storeToRefs(store);
 
 const checkSelectedBoules = (index) => {
   if (store.volume === 0) return false;
@@ -479,7 +479,6 @@ bus.on((message) => {
 });
 
 // screen position for haptic feedback
-const { isTouching } = storeToRefs(store);
 watch(isTouching, (newVal) => {
   if (newVal) {
     const height =
@@ -488,7 +487,6 @@ watch(isTouching, (newVal) => {
         : store.currentHapticGrid === "medium"
         ? 50
         : 100;
-    console.log("topCamera", height);
     topCamera(height);
     setTimeout(() => {
       if (meshRefs.value.length < 1) return;

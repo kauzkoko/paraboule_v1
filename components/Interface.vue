@@ -1,12 +1,12 @@
 <template>
   <div class="absolute left-0 w-100dvw h-100dvh" @click="onFullscreenClick()">
-    <VirtualAudioSpace :isTouching="isTouching" :trigger="audioTrigger" />
+    <VirtualAudioSpace :trigger="audioTrigger"></VirtualAudioSpace>
   </div>
   <VibrationGrid
-    @click="isTouching = !isTouching"
+    @click="onClickHapticGrid"
     @touchstart="onTappingOnHaptic"
     @touchend="onTappingOnHaptic"
-  />
+  ></VibrationGrid>
   <div class="outer" v-show="isTouchingSlider">
     <div class="container">
       <div class="big">
@@ -100,7 +100,7 @@
       v-if="scanForQr"
       :scanForQr="scanForQr"
       @qrCodeFound="onQrCode"
-    />
+    ></QrScanner>
   </div>
   <Slider
     @click="isTouchingSlider = !isTouchingSlider"
@@ -115,8 +115,14 @@ import { Howler } from "howler";
 const bus = useEventBus("protoboules");
 
 const store = useProtoStore();
-const { player1Score, player2Score, isTouching, isTouchingSlider } =
-  storeToRefs(store);
+const {
+  player1Score,
+  player2Score,
+  isTouching,
+  isTouchingSlider,
+  player1AudioSrc,
+  player2AudioSrc,
+} = storeToRefs(store);
 
 const { sendRawIntersections } = useXrController();
 
@@ -184,12 +190,27 @@ watch(
   }
 );
 
-const onSwipe = (dir, e, index, item) => {
-  // const indexElement = e.srcElement.getAttribute("index");
-  if (dir === "right") {
+const onSwipe = (direction, e, index, item) => {
+  console.log("direction", direction);
+  console.log("currentPage.value[index]", currentPage.value[index]);
+  if (direction === "right") {
     currentPage.value[index].cycler.next();
-  } else {
+  } else if (direction === "left") {
     currentPage.value[index].cycler.prev();
+  } else if (direction === "top") {
+    currentPage.value[index].audioCycler?.next();
+    if (currentPage.value[index].name === "Change player 1 audio") {
+      player1AudioSrc.value = currentPage.value[index].audioCycler?.state;
+    } else if (currentPage.value[index].name === "Change player 2 audio") {
+      player2AudioSrc.value = currentPage.value[index].audioCycler?.state;
+    }
+  } else if (direction === "bottom") {
+    currentPage.value[index].audioCycler?.prev();
+    if (currentPage.value[index].name === "Change player 1 audio") {
+      player1AudioSrc.value = currentPage.value[index].audioCycler?.state;
+    } else if (currentPage.value[index].name === "Change player 2 audio") {
+      player2AudioSrc.value = currentPage.value[index].audioCycler?.state;
+    }
   }
 };
 
@@ -592,22 +613,27 @@ const click_toggleTopCamera = () => {
   toggleTopCamera();
 };
 
+const onClickHapticGrid = () => {
+  isTouching.value = !isTouching.value;
+  console.log("onClickHapticGrid, isTouching", isTouching.value);
+};
+
 const click_hapticGridNear = () => {
-  console.log("click_hapticGridNear");
   store.currentHapticGrid = "near";
   isTouching.value = !isTouching.value;
+  console.log("click_hapticGridNear, isTouching", isTouching.value);
 };
 
 const click_hapticGridMedium = () => {
-  console.log("click_hapticGridMedium");
   store.currentHapticGrid = "medium";
   isTouching.value = !isTouching.value;
+  console.log("click_hapticGridMedium, isTouching", isTouching.value);
 };
 
 const click_hapticGridFar = () => {
-  console.log("click_hapticGridFar");
   store.currentHapticGrid = "far";
   isTouching.value = !isTouching.value;
+  console.log("click_hapticGridFar, isTouching", isTouching.value);
 };
 
 const click_mute = () => {
@@ -1073,6 +1099,34 @@ const pages = [
       imgSrc: "/icons/slider.svg",
       html: "Slider",
       cycler: useCycleList(["Slider"]),
+    },
+  ],
+  [
+    {
+      name: "Change player 1 audio",
+      clickFunction: () => {
+        console.log("play the currently selected audio");
+      },
+      html: computed(
+        () =>
+          `<div class='text-14px opacity-50'>${store.lastPlayer1AudioSrc}</div><div class='text-16px'>${store.player1AudioSrc}</div><div class='text-14px opacity-50'>${store.nextPlayer1AudioSrc}</div>`
+      ),
+      explanationSrc: "/sounds/elevenlabs/explanation_player1AudioCycler.mp3",
+      cycler: useCycleList(["Change player 1 audio"]),
+      audioCycler: useCycleList(store.player1AudioSrcs),
+    },
+    {
+      name: "Change player 2 audio",
+      clickFunction: () => {
+        console.log("play the currently selected audio");
+      },
+      html: computed(
+        () =>
+          `<div class='text-14px opacity-50'>${store.lastPlayer2AudioSrc}</div><div class='text-16px'>${store.player2AudioSrc}</div><div class='text-14px opacity-50'>${store.nextPlayer2AudioSrc}</div>`
+      ),
+      explanationSrc: "/sounds/elevenlabs/explanation_player2AudioCycler.mp3",
+      cycler: useCycleList(["Change player 2 audio"]),
+      audioCycler: useCycleList(store.player2AudioSrcs),
     },
   ],
 ];

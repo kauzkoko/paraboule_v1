@@ -210,6 +210,86 @@ export const useProtoStore = defineStore("protoStore", () => {
   const showStundenOrientation = ref(false);
   const volume = ref(0);
 
+  const player1AudioSrcs = ref([
+    "/sounds/noise.mp3",
+    "/sounds/noisehigh.mp3",
+    "/sounds/noiselow.mp3",
+    "/sounds/shortdeep.mp3",
+  ]);
+  const player2AudioSrcs = ref([
+    "/sounds/noise.mp3",
+    "/sounds/noisehigh.mp3",
+    "/sounds/noiselow.mp3",
+    "/sounds/shortdeep.mp3",
+  ]);
+  const player1AudioSrc = ref("/sounds/noise.mp3");
+  const player2AudioSrc = ref("/sounds/shortdeep.mp3");
+
+  watch(player1AudioSrc, () => {
+    console.log("player1AudioSrc", player1AudioSrc.value);
+    if (player1AudioSrc.value === "/sounds/shortdeep.mp3") {
+      setTimeout(() => {
+        trigger.value++;
+      }, 2000);
+    } else {
+      trigger.value++;
+    }
+  });
+  watch(player2AudioSrc, () => {
+    console.log("player2AudioSrc", player2AudioSrc.value);
+    if (player2AudioSrc.value === "/sounds/shortdeep.mp3") {
+      setTimeout(() => {
+        trigger.value++;
+      }, 2000);
+    } else {
+      trigger.value++;
+    }
+  });
+
+  const lastPlayer1AudioSrc = computed(() => {
+    const currentPlayer1Index = player1AudioSrcs.value.findIndex(
+      (src) => src === player1AudioSrc.value
+    );
+    const previousPlayer1AudioSrc =
+      currentPlayer1Index > 0
+        ? player1AudioSrcs.value[currentPlayer1Index - 1]
+        : player1AudioSrcs.value[player1AudioSrcs.value.length - 1];
+    return previousPlayer1AudioSrc;
+  });
+
+  const nextPlayer1AudioSrc = computed(() => {
+    const currentPlayer1Index = player1AudioSrcs.value.findIndex(
+      (src) => src === player1AudioSrc.value
+    );
+    const nextPlayer1AudioSrc =
+      currentPlayer1Index < player1AudioSrcs.value.length - 1
+        ? player1AudioSrcs.value[currentPlayer1Index + 1]
+        : player1AudioSrcs.value[0];
+    return nextPlayer1AudioSrc;
+  });
+
+  const lastPlayer2AudioSrc = computed(() => {
+    const currentPlayer2Index = player2AudioSrcs.value.findIndex(
+      (src) => src === player2AudioSrc.value
+    );
+    const previousPlayer2AudioSrc =
+      currentPlayer2Index > 0
+        ? player2AudioSrcs.value[currentPlayer2Index - 1]
+        : player2AudioSrcs.value[player2AudioSrcs.value.length - 1];
+    return previousPlayer2AudioSrc;
+  });
+
+  const nextPlayer2AudioSrc = computed(() => {
+    const currentPlayer2Index = player2AudioSrcs.value.findIndex(
+      (src) => src === player2AudioSrc.value
+    );
+    const nextPlayer2AudioSrc =
+      currentPlayer2Index < player2AudioSrcs.value.length - 1
+        ? player2AudioSrcs.value[currentPlayer2Index + 1]
+        : player2AudioSrcs.value[0];
+    return nextPlayer2AudioSrc;
+  });
+
   const mute3dAudio = () => {
     volume.value = 0;
   };
@@ -278,6 +358,14 @@ export const useProtoStore = defineStore("protoStore", () => {
     toggle3dAudio,
     isTopCamera,
     selectedBoules,
+    player1AudioSrc,
+    player2AudioSrc,
+    player1AudioSrcs,
+    player2AudioSrcs,
+    lastPlayer1AudioSrc,
+    lastPlayer2AudioSrc,
+    nextPlayer1AudioSrc,
+    nextPlayer2AudioSrc,
   };
 });
 

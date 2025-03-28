@@ -45,9 +45,8 @@ const props = defineProps({
 });
 
 const positionalAudioRef = useTemplateRef("positionalAudioRef");
-const trigger = ref(0);
 const store = useProtoStore();
-const { volume } = storeToRefs(store);
+const { volume, trigger } = storeToRefs(store);
 
 watchEffect(() => {
   trigger.value = props.localTrigger;
