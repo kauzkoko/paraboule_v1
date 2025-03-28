@@ -14,6 +14,8 @@
     <TresSphereGeometry :args="[boule.size, 24, 24]" />
     <CustomShaderMaterial
       v-bind="materialProps"
+      transparent
+      :opacity="checkSelectedBoules(index) ? 1 : 0"
       v-if="checkSelectedBoules(index)"
     />
     <Audio3D
@@ -281,6 +283,7 @@ function frontCamera() {
 
 function flyToStart() {
   killTweens();
+  frontCamera();
   gsap.to(cameraX, {
     value: 0,
     duration: 1,

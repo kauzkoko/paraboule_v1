@@ -222,6 +222,10 @@ export const useProtoStore = defineStore("protoStore", () => {
     "/sounds/waterBigger.m4a",
     "/sounds/noz.mp3",
     "/sounds/noz2.mp3",
+    "/sounds/strudel/c3major.mp3",
+    "/sounds/strudel/e3major.mp3",
+    "/sounds/strudel/g3major.mp3",
+    "/sounds/strudel/startpoint.mp3",
   ]);
   const player2AudioSrcs = ref([
     "/sounds/noise.mp3",
@@ -233,15 +237,30 @@ export const useProtoStore = defineStore("protoStore", () => {
     "/sounds/waterBigger.m4a",
     "/sounds/noz.mp3",
     "/sounds/noz2.mp3",
+    "/sounds/strudel/c3major.mp3",
+    "/sounds/strudel/e3major.mp3",
+    "/sounds/strudel/g3major.mp3",
+    "/sounds/strudel/startpoint.mp3",
   ]);
-  const player1AudioSrc = ref("/sounds/noise.mp3");
-  const player2AudioSrc = ref("/sounds/waterBig.mp4");
+  const player1AudioSrc = ref("/sounds/startpoint.mp3");
+  const player2AudioSrc = ref("/sounds/noz.mp3");
 
   watch(player1AudioSrc, () => {
-    trigger.value++;
+    if (volume.value > 0) {
+      toggle3dAudio();
+      setTimeout(() => {
+        toggle3dAudio();
+      }, 200);
+    }
   });
   watch(player2AudioSrc, () => {
-    trigger.value++;
+    if (volume.value > 0) {
+      toggle3dAudio();
+      setTimeout(() => {
+        toggle3dAudio();
+      }, 200);
+    }
+
   });
 
   const lastPlayer1AudioSrc = computed(() => {
