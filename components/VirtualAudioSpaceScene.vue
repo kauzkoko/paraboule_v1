@@ -222,7 +222,7 @@ const toggleTopCamera = () => {
   if (store.isTopCamera) {
     frontCamera();
   } else {
-    topCamera(50);
+    topCamera(70);
   }
   store.isTopCamera = !store.isTopCamera;
 };

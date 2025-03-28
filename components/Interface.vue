@@ -297,7 +297,11 @@ const click_bouleFocuser = (bouleIndex) => {
     store.selectedBoules = store.boulesToDisplay
       .map((_, index) => index)
       .slice(1);
-  else store.selectedBoules = [bouleIndex];
+  else if (store.boulesToDisplay.length >= bouleIndex)
+    store.selectedBoules = [bouleIndex];
+  else {
+    console.log("bouleIndex out of range", bouleIndex);
+  }
 };
 
 const qr = () => {
@@ -720,6 +724,7 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_scanField.mp3",
       cycler: useCycleList([
         "Scan Field",
+        "Toggle Top Camera",
         "Scan and count points",
         "Set points from latest scan",
       ]),
@@ -745,6 +750,9 @@ const pages = [
         "Focus Boule 1",
         "Focus Boule 2",
         "Focus Boule 3",
+        "Focus Boule 4",
+        "Focus Boule 5",
+        "Focus Boule 6",
       ]),
     },
   ],
@@ -1007,10 +1015,60 @@ const pages = [
     },
     {
       name: "Focus All Boules",
-      clickFunction: () => click_bouleFocuser(0),
+      clickFunction: () => click_bouleFocuser("all"),
       imgSrc: "/icons/focusAll.svg",
       html: "Focus all Boules",
       cycler: useCycleList(["Focus All Boules", "Focus Boule 3"]),
+    },
+  ],
+  [
+    {
+      name: "Focus Boule 4",
+      clickFunction: () => click_bouleFocuser(4),
+      imgSrc: "/icons/focus4.svg",
+      html: "Focus on Boule 1",
+      cycler: useCycleList([
+        "Focus Boule 4",
+        "Focus Boule 5",
+        "Focus Boule 6",
+        "Focus All Boules",
+      ]),
+    },
+    {
+      name: "Focus Boule 5",
+      clickFunction: () => click_bouleFocuser(5),
+      imgSrc: "/icons/focus5.svg",
+      html: "Focus on Boule 2",
+      cycler: useCycleList([
+        "Focus Boule 5",
+        "Focus Boule 4",
+        "Focus Boule 6",
+        "Focus All Boules",
+      ]),
+    },
+    {
+      name: "Focus Boule 6",
+      clickFunction: () => click_bouleFocuser(6),
+      imgSrc: "/icons/focus6.svg",
+      html: "Focus on Boule 3",
+      cycler: useCycleList([
+        "Focus Boule 6",
+        "Focus Boule 4",
+        "Focus Boule 5",
+        "Focus All Boules",
+      ]),
+    },
+    {
+      name: "Focus All Boules",
+      clickFunction: () => click_bouleFocuser("all"),
+      imgSrc: "/icons/focusAll.svg",
+      html: "Focus all Boules",
+      cycler: useCycleList([
+        "Focus All Boules",
+        "Focus Boule 6",
+        "Focus Boule 5",
+        "Focus Boule 4",
+      ]),
     },
   ],
   [

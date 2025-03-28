@@ -38,8 +38,10 @@ export const useProtoStore = defineStore("protoStore", () => {
     return sortedBoules.value.filter((boule) => boule.distance < 30);
   });
 
+  const { history: filteredBoulesHistory } = useRefHistory(filteredBoules);
   const boulesToDisplay = computed(() => {
-    console.log("filteredBoules", filteredBoules.value);
+    console.log("filteredBoulesHistory", filteredBoulesHistory.value);
+    // console.log("filteredBoules", filteredBoules.value);
     if (sortedBoules.value.length > 0) {
       bus.emit("stopXR");
     }
@@ -215,35 +217,31 @@ export const useProtoStore = defineStore("protoStore", () => {
     "/sounds/noisehigh.mp3",
     "/sounds/noiselow.mp3",
     "/sounds/shortdeep.mp3",
+    "/sounds/waterBig.m4a",
+    "/sounds/waterMedium.m4a",
+    "/sounds/waterBigger.m4a",
+    "/sounds/noz.mp3",
+    "/sounds/noz2.mp3",
   ]);
   const player2AudioSrcs = ref([
     "/sounds/noise.mp3",
     "/sounds/noisehigh.mp3",
     "/sounds/noiselow.mp3",
     "/sounds/shortdeep.mp3",
+    "/sounds/waterBig.m4a",
+    "/sounds/waterMedium.m4a",
+    "/sounds/waterBigger.m4a",
+    "/sounds/noz.mp3",
+    "/sounds/noz2.mp3",
   ]);
   const player1AudioSrc = ref("/sounds/noise.mp3");
-  const player2AudioSrc = ref("/sounds/shortdeep.mp3");
+  const player2AudioSrc = ref("/sounds/waterBig.mp4");
 
   watch(player1AudioSrc, () => {
-    console.log("player1AudioSrc", player1AudioSrc.value);
-    if (player1AudioSrc.value === "/sounds/shortdeep.mp3") {
-      setTimeout(() => {
-        trigger.value++;
-      }, 2000);
-    } else {
-      trigger.value++;
-    }
+    trigger.value++;
   });
   watch(player2AudioSrc, () => {
-    console.log("player2AudioSrc", player2AudioSrc.value);
-    if (player2AudioSrc.value === "/sounds/shortdeep.mp3") {
-      setTimeout(() => {
-        trigger.value++;
-      }, 2000);
-    } else {
-      trigger.value++;
-    }
+    trigger.value++;
   });
 
   const lastPlayer1AudioSrc = computed(() => {

@@ -70,7 +70,7 @@ const startXR = async () => {
       new THREE.MeshBasicMaterial({
         color: 0x0000ff,
         transparent: true,
-        opacity: 1,
+        opacity: 0,
       })
     );
     reticle.matrixAutoUpdate = false;
@@ -81,7 +81,7 @@ const startXR = async () => {
     const material = new THREE.MeshBasicMaterial({
       color: 0xffa500,
       transparent: true,
-      opacity: 1,
+      opacity: 0,
     });
     plane = new THREE.Mesh(geometry, material);
     plane.rotation.x = -Math.PI / 2;
@@ -159,11 +159,15 @@ const startXR = async () => {
         // gl.deleteFramebuffer(framebuffer);
         // gl.bindFramebuffer(gl.FRAMEBUFFER, prev_framebuffer); // bind back the screen framebuffer
 
-
         if (frameCount % 10 === 0) {
           const newPredictions = await predictFromImage(bitmap);
           if (newPredictions.length > 0) {
             predictions.value = newPredictions;
+            const hasBoules = newPredictions.some(
+              (item) =>
+                item.class === "dark" ||
+                (item.class === "light" && item.confidence > 0.5)
+            );
             const hasCochonet = newPredictions.some(
               (item) => item.class === "cochonette" && item.confidence > 0.5
             );
