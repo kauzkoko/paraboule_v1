@@ -9,7 +9,7 @@ export async function useInference() {
 
   modelWorkerId.value = await inferEngine.startWorker(
     "bolobolo",
-    "20",
+    "24",
     "rf_li9xBZWuL5cSB9B343OFn9GGqpF2"
   );
   console.log("model has loaded", modelWorkerId.value);
