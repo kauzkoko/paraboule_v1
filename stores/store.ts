@@ -176,7 +176,7 @@ export const useProtoStore = defineStore("protoStore", () => {
         boule.color = "#111";
         boule.player = 1;
       } else if (item.class === "light") {
-        boule.color = "#333";
+        boule.color = "#555";
         boule.player = 2;
       }
 
