@@ -71,6 +71,40 @@ const meshRefs = useTemplateRef("boulesRefs");
 
 const bus = useEventBus("protoboules");
 
+bus.on((message, payload) => {
+  if (message === "flyToCochonetAndBack") {
+    flyToCochonetAndBack();
+  }
+  if (message === "flyToStart") {
+    flyToStart();
+  }
+  if (message === "stalefish180") {
+    stalefish180();
+  }
+  if (message === "startCircularRotation") {
+    startCircularRotation();
+  }
+  if (message === "lookAlongNegativeXAxis") {
+    lookAlongNegativeXAxis();
+  }
+  if (message === "lookAlongPositiveXAxis") {
+    lookAlongPositiveXAxis();
+  }
+  if (message === "lookAlongPositiveZAxis") {
+    lookAlongPositiveZAxis();
+  }
+  if (message === "lookAlongNegativeZAxis") {
+    lookAlongNegativeZAxis();
+  }
+  if (message === "flyToCochonet") {
+    flyToCochonet();
+  }
+  if (message === "toggleTopCamera") {
+    toggleTopCamera(payload.height);
+    console.log("toggleTopCamera", store.isTopCamera);
+  }
+});
+
 const store = useProtoStore();
 const { boulesToDisplay: boules, hihatTriggers } = storeToRefs(store);
 
@@ -416,40 +450,6 @@ function getScreenPosition(object, camera) {
 onKeyStroke(["ArrowDown"], (e) => {
   e.preventDefault();
   flyToStart();
-});
-
-bus.on((message, payload) => {
-  if (message === "flyToCochonetAndBack") {
-    flyToCochonetAndBack();
-  }
-  if (message === "flyToStart") {
-    flyToStart();
-  }
-  if (message === "stalefish180") {
-    stalefish180();
-  }
-  if (message === "startCircularRotation") {
-    startCircularRotation();
-  }
-  if (message === "lookAlongNegativeXAxis") {
-    lookAlongNegativeXAxis();
-  }
-  if (message === "lookAlongPositiveXAxis") {
-    lookAlongPositiveXAxis();
-  }
-  if (message === "lookAlongPositiveZAxis") {
-    lookAlongPositiveZAxis();
-  }
-  if (message === "lookAlongNegativeZAxis") {
-    lookAlongNegativeZAxis();
-  }
-  if (message === "flyToCochonet") {
-    flyToCochonet();
-  }
-  if (message === "toggleTopCamera") {
-    toggleTopCamera(payload.height);
-    console.log("toggleTopCamera", store.isTopCamera);
-  }
 });
 
 // screen position for haptic feedback

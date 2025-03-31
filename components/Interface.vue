@@ -148,9 +148,9 @@
 import { Howler } from "howler";
 import { useQRCode } from "@vueuse/integrations/useQRCode";
 
+const store = useProtoStore();
 const { speak } = useSpeech();
 const bus = useEventBus("protoboules");
-const store = useProtoStore();
 const { sendRawIntersections } = useXrController();
 
 const onTappingOnHaptic = () => {
@@ -159,9 +159,9 @@ const onTappingOnHaptic = () => {
 
 const onTappingOnSlider = () => {
   store.isTappingOnSlider = !store.isTappingOnSlider;
-  if (!store.isTappingOnSlider) {
-    // flyToStart();
-  }
+  // if (!store.isTappingOnSlider) {
+  //   // flyToStart();
+  // }
 };
 
 const onTappingOnTopCameraSlider = () => {
@@ -251,7 +251,7 @@ const setAlphaController = () => {
 const onFullscreenClick = () => {
   if (store.alphaController) {
     store.alphaController = false;
-    bus.emit("flyToStart");
+    flyToStart();
   }
   console.log("in onFullscreenClick", store.alphaController);
 };
@@ -273,8 +273,6 @@ const scanCamera = () => {
 };
 
 const scanForPoints = () => {
-  console.log("scanForPoints");
-  console.log("store.isScanningForPoints", store.isScanningForPoints);
   if (!afterLongPress) {
     if (store.xrRunning) {
       bus.emit("stopXR");
@@ -1200,13 +1198,6 @@ const pages = [
         "Haptic grid near",
       ]),
     },
-    {
-      name: "Add function",
-      clickFunction: addFunction,
-      // imgSrc: "/icons/referenz.svg",
-      html: "<div>+ Add</div>",
-      cycler: useCycleList(["Add function"]),
-    },
   ],
   [
     {
@@ -1225,13 +1216,6 @@ const pages = [
     },
   ],
   [
-    {
-      name: "Default",
-      clickFunction: () => {},
-      html: "Placeholder",
-      imgSrc: "/icons/watch.svg",
-      cycler: useCycleList(["Default"]),
-    },
     {
       name: "Alpha Controller",
       clickFunction: setAlphaController,
@@ -1288,10 +1272,32 @@ const pages = [
         () =>
           `<div class='text-14px opacity-50'>${store.prevYoloModel}</div><div class='text-16px'>${store.yoloModelCycler.state.id}</div><div class='text-14px opacity-50'>${store.nextYoloModel}</div>`
       ),
-      cycler: useCycleList(["Change YOLO model"]),
+      cycler: useCycleList(["Change YOLO model", "Add function"]),
     },
   ],
 ];
+
+const parkplatzPages = [
+  [
+    {
+      name: "Add function",
+      clickFunction: addFunction,
+      // imgSrc: "/icons/referenz.svg",
+      html: "<div>+ Add</div>",
+      cycler: useCycleList(["Add function"]),
+      modes: ["Dev", "Referee"],
+    },
+    {
+      name: "Default",
+      clickFunction: () => {},
+      html: "Placeholder",
+      imgSrc: "/icons/watch.svg",
+      cycler: useCycleList(["Default"]),
+      modes: ["Dev", "Referee"],
+    },
+  ],
+];
+const flatParkplatzPages = parkplatzPages.flat();
 
 const {
   goToNext,
@@ -1304,7 +1310,13 @@ const {
   current: currentPage,
 } = useStepper(pages);
 
-const flatPages = pages.flat();
+const parkplatzPagesBasedOnMode = flatParkplatzPages.filter((entry) => {
+  return entry.modes?.includes(store.modesCycler.state.name);
+});
+
+const allPages = [...pages, ...parkplatzPagesBasedOnMode];
+const flatPages = allPages.flat();
+
 const announcePage = () => {
   if (currentPage.value.length === 0) return;
   let names = [
@@ -1412,7 +1424,7 @@ watch(isSwiping, (val) => {
       }
     }
     if (direction.value === "down") {
-      bus.emit("flyToStart");
+      flyToStart();
     }
     if (direction.value === "up") {
       click_mute();

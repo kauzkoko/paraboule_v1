@@ -1,4 +1,5 @@
 import { acceptHMRUpdate } from "pinia";
+// import { modesList } from "~/utils/config";
 
 export const useProtoStore = defineStore("protoStore", () => {
   const supabase = useSupabaseClient();
@@ -9,6 +10,8 @@ export const useProtoStore = defineStore("protoStore", () => {
   const { sendSelectedBoules } = useFocusController();
 
   const bus = useEventBus("protoboules");
+
+  const modesCycler = useCycleList(modesList);
 
   const soundSrcs = [
     "/sounds/noise.mp3",
@@ -313,7 +316,9 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   const focusBoules = (bouleIndex) => {
     if (bouleIndex === "all")
-      selectedBoules.value = boulesToDisplay.map((_, index) => index).slice(1);
+      selectedBoules.value = boulesToDisplay.value
+        .map((_, index) => index)
+        .slice(1);
     else if (boulesToDisplay.value.length >= bouleIndex)
       selectedBoules.value = [bouleIndex];
     else {
@@ -423,7 +428,6 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   watch(rawIntersections, (newIntersections) => {
     if (newIntersections) {
-      console.log("newIntersections", newIntersections);
       setFromIntersections();
     }
   });
@@ -498,6 +502,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     incrementPlayer1score,
     incrementPlayer2score,
     focusBoules,
+    modesCycler,
   };
 });
 
