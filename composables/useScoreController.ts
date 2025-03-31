@@ -7,23 +7,107 @@ export function useScoreController() {
   let scoreController = supabase.channel("score-controller");
   scoreController.subscribe();
 
-  scoreController
-    .on("broadcast", { event: "score" }, (event) => {
-      console.log("score", event.payload.score);
-    })
+  scoreController.on("broadcast", { event: "score" }, (event) => {
+    store.players.player1.score = event.payload.player1Score;
+    store.players.player2.score = event.payload.player2Score;
+  });
 
-  function setNewScore(broadcast = true) {
-    bus.emit("score");
+  scoreController.on("broadcast", { event: "shotsTaken" }, (event) => {
+    store.globalShotsTaken = event.payload.globalShotsTaken;
+    store.players.player1.shotsTaken = event.payload.player1ShotsTaken;
+    store.players.player2.shotsTaken = event.payload.player2ShotsTaken;
+  });
+
+  scoreController.on("broadcast", { event: "globalShotsTaken" }, (event) => {
+    store.globalShotsTaken = event.payload.globalShotsTaken;
+  });
+
+  scoreController.on("broadcast", { event: "playersShotsTaken" }, (event) => {
+    store.players.player1.shotsTaken = event.payload.player1ShotsTaken;
+    store.players.player2.shotsTaken = event.payload.player2ShotsTaken;
+  });
+
+  scoreController.on("broadcast", { event: "allData" }, (event) => {
+    store.players.player1.score = event.payload.player1Score;
+    store.players.player2.score = event.payload.player2Score;
+    store.globalShotsTaken = event.payload.globalShotsTaken;
+    store.players.player1.shotsTaken = event.payload.player1ShotsTaken;
+    store.players.player2.shotsTaken = event.payload.player2ShotsTaken;
+  });
+
+  function sendShotsTaken(broadcast = true) {
+    if (broadcast) {
+      scoreController.send({
+        type: "broadcast",
+        event: "shotsTaken",
+        payload: {
+          globalShotsTaken: store.globalShotsTaken,
+          player1ShotsTaken: store.players.player1.shotsTaken,
+          player2ShotsTaken: store.players.player2.shotsTaken,
+        },
+      });
+    }
+  }
+
+  function sendGlobalShotsTaken(broadcast = true) {
+    if (broadcast) {
+      scoreController.send({
+        type: "broadcast",
+        event: "globalShotsTaken",
+        payload: {
+          globalShotsTaken: store.globalShotsTaken,
+        },
+      });
+    }
+  }
+
+  function sendPlayersShotsTaken(broadcast = true) {
+    if (broadcast) {
+      scoreController.send({
+        type: "broadcast",
+        event: "playersShotsTaken",
+        payload: {
+          player1ShotsTaken: store.players.player1.shotsTaken,
+          player2ShotsTaken: store.players.player2.shotsTaken,
+        },
+      });
+    }
+  }
+
+  function sendNewScore(broadcast = true) {
     if (broadcast) {
       scoreController.send({
         type: "broadcast",
         event: "score",
-        payload: {},
+        payload: {
+          player1Score: store.players.player1.score,
+          player2Score: store.players.player2.score,
+        },
+      });
+    }
+  }
+
+  function sendAllData(broadcast = true) {
+    if (broadcast) {
+      scoreController.send({
+        type: "broadcast",
+        event: "allData",
+        payload: {
+          player1Score: store.players.player1.score,
+          player2Score: store.players.player2.score,
+          globalShotsTaken: store.globalShotsTaken,
+          player1ShotsTaken: store.players.player1.shotsTaken,
+          player2ShotsTaken: store.players.player2.shotsTaken,
+        },
       });
     }
   }
 
   return {
-    setNewScore,
+    sendNewScore,
+    sendGlobalShotsTaken,
+    sendPlayersShotsTaken,
+    sendShotsTaken,
+    sendAllData,
   };
 }

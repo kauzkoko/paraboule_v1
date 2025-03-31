@@ -137,6 +137,10 @@ onBeforeRender(({ delta, elapsed }) => {
     console.log("isTouchingSlider", store.isTouchingSlider);
     cameraZ.value = map(y.value, 0, height.value, -30, 30);
   }
+  if (store.isTouchingTopCameraSlider) {
+    console.log("isTouchingTopCameraSlider", store.isTouchingTopCameraSlider);
+    cameraY.value = map(y.value, 0, height.value, 10, 200);
+  }
 });
 
 const mappedRelativeAlpha = computed(() => {
@@ -186,12 +190,12 @@ function lookAlongNegativeZAxis() {
   });
 }
 
-const toggleTopCamera = () => {
+const toggleTopCamera = (height = 80) => {
   console.log("toggleTopCamera");
   if (store.isTopCamera) {
     frontCamera();
   } else {
-    topCamera(70);
+    topCamera(height);
   }
   store.isTopCamera = !store.isTopCamera;
 };
@@ -414,7 +418,7 @@ onKeyStroke(["ArrowDown"], (e) => {
   flyToStart();
 });
 
-bus.on((message) => {
+bus.on((message, payload) => {
   if (message === "flyToCochonetAndBack") {
     flyToCochonetAndBack();
   }
@@ -443,7 +447,7 @@ bus.on((message) => {
     flyToCochonet();
   }
   if (message === "toggleTopCamera") {
-    toggleTopCamera();
+    toggleTopCamera(payload.height);
     console.log("toggleTopCamera", store.isTopCamera);
   }
 });

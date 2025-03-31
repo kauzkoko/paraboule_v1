@@ -14,6 +14,18 @@
       </div>
     </div>
   </div>
+  <div class="outer" v-show="store.isTouchingTopCameraSlider">
+    <div class="container">
+      <div class="big">
+        <div v-show="!store.isTappingOnTopCameraSlider">
+          <div>
+            Press and hold while sliding your finger vertically on the screen to
+            set height of camera. A single tap will exit.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="outer" v-show="store.isTouchingHaptic">
     <div class="container">
       <div class="big">
@@ -28,8 +40,11 @@
   <div
     class="outer"
     ref="el"
-    v-show="!store.isTouchingHaptic && !store.isTouchingSlider"
-    s
+    v-show="
+      !store.isTouchingHaptic &&
+      !store.isTouchingSlider &&
+      !store.isTouchingTopCameraSlider
+    "
   >
     <div class="container">
       <template
@@ -311,15 +326,7 @@ const click_stalefish180 = () => {
 
 const click_bouleFocuser = (bouleIndex) => {
   store.volume = 1;
-  if (bouleIndex === "all")
-    store.selectedBoules = store.boulesToDisplay
-      .map((_, index) => index)
-      .slice(1);
-  else if (store.boulesToDisplay.length >= bouleIndex)
-    store.selectedBoules = [bouleIndex];
-  else {
-    console.log("bouleIndex out of range", bouleIndex);
-  }
+  store.focusBoules(bouleIndex);
 };
 
 const qr = () => {
@@ -495,37 +502,22 @@ const onDoubleClick = () => {
 
 const incrementPlayer1 = () => {
   console.log("incrementPlayer1");
-  if (
-    store.players.player1.shotsTaken === 3 &&
-    store.players.player2.shotsTaken === 3
-  ) {
-    store.players.player1.shotsTaken = 0;
-    store.players.player2.shotsTaken = 0;
-  }
-  if (store.players.player1.shotsTaken < 3) {
-    store.players.player1.shotsTaken++;
-  }
+  store.incrementPlayer1shotsTaken();
 };
 const incrementPlayer2 = () => {
   console.log("incrementPlayer2");
-  if (
-    store.players.player2.shotsTaken === 3 &&
-    store.players.player1.shotsTaken === 3
-  ) {
-    store.players.player2.shotsTaken = 0;
-    store.players.player1.shotsTaken = 0;
-  }
-  if (store.players.player2.shotsTaken < 3) {
-    store.players.player2.shotsTaken++;
-  }
+  store.incrementPlayer2shotsTaken();
 };
-const computedNextShot = computed(
-  () =>
+
+const isNextRound = computed(() => {
+  return (
     store.players.player1.shotsTaken === 3 &&
     store.players.player2.shotsTaken === 3
-);
+  );
+});
+
 const computedAnnounceBallsPlayedHtml = computed(() => {
-  return computedNextShot.value
+  return isNextRound.value
     ? `<div class='text-40px'>
             <div>Next round?</div>
         </div>`
@@ -553,7 +545,7 @@ const announceBallsPlayed = () => {
   }. Player 2 has played ${store.players.player2.shotsTaken} ${
     store.players.player2.shotsTaken === 1 ? "ball" : "balls"
   }. `;
-  if (computedNextShot.value) {
+  if (isNextRound.value) {
     text.value +=
       "Current round is over. Please start a new round by pressing the plus button.";
   }
@@ -625,9 +617,16 @@ const click_slider = () => {
 
 const onClickToggleTopCameraSliderComponent = () => {
   store.isTouchingTopCameraSlider = !store.isTouchingTopCameraSlider;
+  if (!store.isTouchingTopCameraSlider) {
+    toggleTopCamera();
+  }
 };
 
-const click_toggleTopCamera = () => {
+const click_toggleFixedTopCamera = () => {
+  toggleTopCamera({ broadcast: true, height: 100 });
+};
+
+const click_toggleTopCameraSlider = () => {
   console.log("click_toggleTopCamera");
   store.isTouchingTopCameraSlider = !store.isTouchingTopCameraSlider;
   toggleTopCamera();
@@ -736,7 +735,7 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_scanField.mp3",
       cycler: useCycleList([
         "Scan Field",
-        "Toggle Top Camera",
+        "Toggle Top Camera Slider",
         "Scan and count points",
         "Set points from latest scan",
       ]),
@@ -940,16 +939,36 @@ const pages = [
   ],
   [
     {
-      name: "Toggle Top Camera",
-      clickFunction: click_toggleTopCamera,
-      html: "Toggle Top Camera",
-      cycler: useCycleList(["Toggle Top Camera"]),
+      name: "Toggle Top Camera Slider",
+      clickFunction: click_toggleTopCameraSlider,
+      html: "Toggle Top Camera Slider",
+      cycler: useCycleList(["Toggle Top Camera Slider"]),
     },
     {
       name: "Mute all sounds",
       clickFunction: click_mute,
       html: "Mute all sounds",
       cycler: useCycleList(["Mute all sounds"]),
+    },
+    {
+      name: "Player 1 Score Incrementer",
+      clickFunction: store.incrementPlayer1score,
+      imgSrc: "/icons/plus.svg",
+      // explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
+      cycler: useCycleList([
+        "Player 1 Score Incrementer",
+        "Player 2 Score Incrementer",
+      ]),
+    },
+    {
+      name: "Player 2 Score Incrementer",
+      clickFunction: store.incrementPlayer2score,
+      imgSrc: "/icons/plus.svg",
+      // explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
+      cycler: useCycleList([
+        "Player 2 Score Incrementer",
+        "Player 1 Score Incrementer",
+      ]),
     },
   ],
   [

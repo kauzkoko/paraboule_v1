@@ -4,6 +4,10 @@ export const useProtoStore = defineStore("protoStore", () => {
   const supabase = useSupabaseClient();
   let channel = supabase.channel("xr-controller");
 
+  const { sendNewScore, sendGlobalShotsTaken, sendPlayersShotsTaken } =
+    useScoreController();
+  const { sendSelectedBoules } = useFocusController();
+
   const bus = useEventBus("protoboules");
 
   const soundSrcs = [
@@ -39,11 +43,56 @@ export const useProtoStore = defineStore("protoStore", () => {
       score: 0,
     },
   });
+
+  const incrementPlayer1score = () => {
+    players.value.player1.score++;
+    sendNewScore();
+  };
+
+  const incrementPlayer2score = () => {
+    players.value.player2.score++;
+    sendNewScore();
+  };
+
+  const incrementPlayer1shotsTaken = () => {
+    if (
+      players.value.player1.shotsTaken === 3 &&
+      players.value.player2.shotsTaken === 3
+    ) {
+      players.value.player1.shotsTaken = 0;
+      players.value.player2.shotsTaken = 0;
+      sendPlayersShotsTaken();
+    }
+    if (players.value.player1.shotsTaken < 3) {
+      players.value.player1.shotsTaken++;
+      sendPlayersShotsTaken();
+    }
+  };
+
+  const incrementPlayer2shotsTaken = () => {
+    if (
+      players.value.player2.shotsTaken === 3 &&
+      players.value.player1.shotsTaken === 3
+    ) {
+      players.value.player2.shotsTaken = 0;
+      players.value.player1.shotsTaken = 0;
+      sendPlayersShotsTaken();
+    }
+    if (players.value.player2.shotsTaken < 3) {
+      players.value.player2.shotsTaken++;
+      sendPlayersShotsTaken();
+    }
+  };
+
   const globalShotsTaken = ref(0);
   const resetShotsTaken = () => {
     console.log("resetShotsTaken");
     globalShotsTaken.value = 0;
   };
+
+  watch(globalShotsTaken, (newGlobalShotsTaken) => {
+    sendGlobalShotsTaken();
+  });
 
   const boules = ref([]);
   const boulesCount = ref(0);
@@ -54,10 +103,13 @@ export const useProtoStore = defineStore("protoStore", () => {
   });
   const { history: filteredBoulesHistory } = useRefHistory(filteredBoules);
   const boulesToDisplay = computed(() => {
-    if (sortedBoules.value.length > 0) {
+    const amountBoulesAndCochonet = filteredBoules.value.length;
+    boulesCount.value = amountBoulesAndCochonet;
+    const amountOnlyBoules = amountBoulesAndCochonet - 1;
+    const minBoulesAmount = globalShotsTaken.value;
+    if (amountOnlyBoules >= minBoulesAmount) {
       bus.emit("stopXR");
     }
-    boulesCount.value = filteredBoules.value.length;
     return filteredBoules.value;
   });
 
@@ -166,9 +218,13 @@ export const useProtoStore = defineStore("protoStore", () => {
     }
   };
 
-  const { undo: undoPlayers } = useRefHistory(players, {
+  const { undo } = useRefHistory(players, {
     deep: true,
   });
+  const undoPlayers = () => {
+    undo();
+    sendPlayersShotsTaken();
+  };
 
   const currentSoundPlayer1 = computed(() => {
     return players.value.player1.audioCycler.state;
@@ -215,36 +271,37 @@ export const useProtoStore = defineStore("protoStore", () => {
   });
 
   // score / winner
-  const winnerPoints = ref(0);
-  const winnerClass = ref("");
+  const roundWinnerPoints = ref(0);
+  const roundWinnerClass = ref("");
   watch(
     () => boulesToDisplay.value,
     (newBoules) => {
-      winnerPoints.value = 0;
+      roundWinnerPoints.value = 0;
       if (newBoules.length < 2) return;
       const closestBoule = newBoules[1];
       const closestClass = closestBoule.class;
-      winnerPoints.value++;
-      winnerClass.value = closestClass;
+      roundWinnerPoints.value++;
+      roundWinnerClass.value = closestClass;
       if (newBoules.length > 2 && newBoules[2].class === closestClass) {
-        winnerPoints.value++;
+        roundWinnerPoints.value++;
       }
       if (newBoules.length > 3 && newBoules[3].class === closestClass) {
-        winnerPoints.value++;
+        roundWinnerPoints.value++;
       }
     }
   );
   const setScoreFromPoints = () => {
-    if (players.value.player1.class === winnerClass.value) {
-      players.value.player1.score += winnerPoints.value;
+    if (players.value.player1.class === roundWinnerClass.value) {
+      players.value.player1.score += roundWinnerPoints.value;
     } else {
-      players.value.player2.score += winnerPoints.value;
+      players.value.player2.score += roundWinnerPoints.value;
     }
+    sendNewScore();
   };
+
   const score = computed(() => {
     return `${players.value.player1.score} - ${players.value.player2.score}`;
   });
-
 
   const selectedBoules = ref([]);
   const {
@@ -253,6 +310,17 @@ export const useProtoStore = defineStore("protoStore", () => {
     go: goToBoule,
     index: currentlySelectedBouleIndex,
   } = useCycleList(boulesToDisplay);
+
+  const focusBoules = (bouleIndex) => {
+    if (bouleIndex === "all")
+      selectedBoules.value = boulesToDisplay.map((_, index) => index).slice(1);
+    else if (boulesToDisplay.value.length >= bouleIndex)
+      selectedBoules.value = [bouleIndex];
+    else {
+      console.log("bouleIndex out of range", bouleIndex);
+    }
+    sendSelectedBoules();
+  };
 
   const touchCounter = ref(0);
   const currentGlobalSoundSrc = ref("");
@@ -425,6 +493,11 @@ export const useProtoStore = defineStore("protoStore", () => {
     isTappingOnTopCameraSlider,
     globalShotsTaken,
     resetShotsTaken,
+    incrementPlayer1shotsTaken,
+    incrementPlayer2shotsTaken,
+    incrementPlayer1score,
+    incrementPlayer2score,
+    focusBoules,
   };
 });
 

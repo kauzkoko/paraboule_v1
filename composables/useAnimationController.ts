@@ -34,7 +34,7 @@ export function useAnimationController() {
       flyToCochonet(false);
     })
     .on("broadcast", { event: "toggleTopCamera" }, (event) => {
-      toggleTopCamera(false);
+      toggleTopCamera({ broadcast: false, height: event.payload.height ?? 80 });
     });
 
   function flyToStart(broadcast = true) {
@@ -136,13 +136,16 @@ export function useAnimationController() {
     }
   }
 
-  function toggleTopCamera(broadcast = true) {
-    bus.emit("toggleTopCamera");
-    if (broadcast) {
+  function toggleTopCamera(options?: { broadcast?: boolean; height?: number }) {
+    console.log(options);
+    bus.emit("toggleTopCamera", { height: options?.height ?? 80 });
+    if (options?.broadcast) {
       animationController.send({
         type: "broadcast",
         event: "toggleTopCamera",
-        payload: {},
+        payload: {
+          height: options?.height ?? 80,
+        },
       });
     }
   }
