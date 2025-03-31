@@ -72,11 +72,7 @@ const meshRefs = useTemplateRef("boulesRefs");
 const bus = useEventBus("protoboules");
 
 const store = useProtoStore();
-const {
-  boulesToDisplay: boules,
-  hihatTriggers,
-  isTouching,
-} = storeToRefs(store);
+const { boulesToDisplay: boules, hihatTriggers } = storeToRefs(store);
 
 const checkSelectedBoules = (index) => {
   if (store.volume === 0) return false;
@@ -200,7 +196,7 @@ const toggleTopCamera = () => {
   store.isTopCamera = !store.isTopCamera;
 };
 
-function topCamera(height = 50) {
+function topCamera(height = 80) {
   console.log("topCamera");
   gsap.to(cameraX, {
     value: 0,
@@ -453,39 +449,42 @@ bus.on((message) => {
 });
 
 // screen position for haptic feedback
-watch(isTouching, (newVal) => {
-  if (newVal) {
-    const height =
-      store.currentHapticGrid === "near"
-        ? 30
-        : store.currentHapticGrid === "medium"
-        ? 50
-        : 100;
-    topCamera(height);
-    setTimeout(() => {
-      if (meshRefs.value.length < 1) return;
-      let darkCounter = 0;
-      let lightCounter = 0;
-      meshRefs.value.forEach((mesh) => {
-        const screenPos = getScreenPosition(mesh, camera.value);
-        if (mesh.iClass === "dark") {
-          darkCounter++;
-        }
-        if (mesh.iClass === "light") {
-          lightCounter++;
-        }
-        screenPositions.value.push({
-          ...screenPos,
-          class: mesh.iClass,
-          classNumber: mesh.iClass === "dark" ? darkCounter : lightCounter,
+watch(
+  () => store.isTouchingHaptic,
+  (newVal) => {
+    if (newVal) {
+      const height =
+        store.currentHapticGrid === "near"
+          ? 30
+          : store.currentHapticGrid === "medium"
+          ? 50
+          : 100;
+      topCamera(height);
+      setTimeout(() => {
+        if (meshRefs.value.length < 1) return;
+        let darkCounter = 0;
+        let lightCounter = 0;
+        meshRefs.value.forEach((mesh) => {
+          const screenPos = getScreenPosition(mesh, camera.value);
+          if (mesh.iClass === "dark") {
+            darkCounter++;
+          }
+          if (mesh.iClass === "light") {
+            lightCounter++;
+          }
+          screenPositions.value.push({
+            ...screenPos,
+            class: mesh.iClass,
+            classNumber: mesh.iClass === "dark" ? darkCounter : lightCounter,
+          });
         });
-      });
-      bus.emit("screenPositions", screenPositions.value);
-    }, 1000);
-  } else {
-    frontCamera();
+        bus.emit("screenPositions", screenPositions.value);
+      }, 1000);
+    } else {
+      frontCamera();
+    }
   }
-});
+);
 </script>
 
 <style>

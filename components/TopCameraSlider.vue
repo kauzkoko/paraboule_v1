@@ -2,7 +2,7 @@
   <div
     class="fullScreenAll"
     :style="{
-      pointerEvents: store.isTouchingSlider ? 'auto' : 'none',
+      pointerEvents: store.isTouchingTopCameraSlider ? 'auto' : 'none',
     }"
   />
 </template>

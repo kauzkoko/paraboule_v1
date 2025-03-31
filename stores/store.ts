@@ -6,23 +6,6 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   const bus = useEventBus("protoboules");
 
-  const arSupported = ref(false);
-  const init = async () => {
-    arSupported.value = await navigator.xr?.isSessionSupported("immersive-ar");
-    if (arSupported.value) {
-      await startWorker();
-    }
-  };
-
-  const modelLoaded = ref(false);
-
-  const player1Name = ref("Player 1");
-  const player2Name = ref("Player 2");
-  const player1Class = ref("dark");
-  const player2Class = ref("light");
-  const player1Score = ref(0);
-  const player2Score = ref(0);
-
   const soundSrcs = [
     "/sounds/noise.mp3",
     "/sounds/noisehigh.mp3",
@@ -39,179 +22,101 @@ export const useProtoStore = defineStore("protoStore", () => {
     "/sounds/strudel/startpoint.mp3",
   ];
 
-  const soundComposables = soundSrcs.map((soundSrc) =>
-    useSoundComposable(soundSrc)
-  );
-
-  const playSoundBySrc = (soundSrc: string, duration = 0) => {
-    const soundIndex = soundSrcs.indexOf(soundSrc);
-    if (soundIndex !== -1) {
-      if (soundComposables[soundIndex]) {
-        soundComposables[soundIndex].play();
-      }
-    }
-  };
-
+  // score / players
   const players = ref({
     player1: {
+      name: "Player 1",
       shotsTaken: 0,
       class: "dark",
       audioCycler: useCycleList(soundSrcs),
       score: 0,
     },
     player2: {
+      name: "Player 2",
       shotsTaken: 0,
       class: "light",
       audioCycler: useCycleList(soundSrcs),
       score: 0,
     },
   });
-  const { undo: undoPlayers } = useRefHistory(players, {
-    deep: true,
-  });
-
-  const currentSoundPlayer1 = computed(() => {
-    return players.value.player1.audioCycler.state;
-  });
-  const currentSoundPlayer2 = computed(() => {
-    return players.value.player2.audioCycler.state;
-  });
-
-  const prevSoundPlayer1 = computed(() => {
-    const currentIndex = players.value.player1.audioCycler.index;
-    const lastIndex = soundSrcs.length - 1;
-    if (currentIndex === 0) return soundSrcs[lastIndex];
-    return soundSrcs[currentIndex - 1];
-  });
-  const nextSoundPlayer1 = computed(() => {
-    const currentIndex = players.value.player1.audioCycler.index;
-    const lastIndex = soundSrcs.length - 1;
-    if (currentIndex === lastIndex) return soundSrcs[0];
-    return soundSrcs[currentIndex + 1];
-  });
-
-  const prevSoundPlayer2 = computed(() => {
-    const currentIndex = players.value.player2.audioCycler.index;
-    const lastIndex = soundSrcs.length - 1;
-    if (currentIndex === 0) return soundSrcs[lastIndex];
-    return soundSrcs[currentIndex - 1];
-  });
-
-  const nextSoundPlayer2 = computed(() => {
-    const currentIndex = players.value.player2.audioCycler.index;
-    const lastIndex = soundSrcs.length - 1;
-    if (currentIndex === lastIndex) return soundSrcs[0];
-    return soundSrcs[currentIndex + 1];
-  });
-
-  watch(currentSoundPlayer1, (newSound) => {
-    toggle3dAudio();
-    setTimeout(() => {
-      toggle3dAudio();
-    }, 100);
-  });
-
-  watch(currentSoundPlayer2, (newSound) => {
-    toggle3dAudio();
-    setTimeout(() => {
-      toggle3dAudio();
-    }, 100);
-  });
-
-  const xrRunning = ref(false);
-  const isScanningForPoints = ref(false);
-
-  const isTopCamera = ref(false);
+  const globalShotsTaken = ref(0);
+  const resetShotsTaken = () => {
+    console.log("resetShotsTaken");
+    globalShotsTaken.value = 0;
+  };
 
   const boules = ref([]);
+  const boulesCount = ref(0);
   const sortedBoules = useSorted(boules, (a, b) => a.distance - b.distance);
-
-  const { history } = useRefHistory(sortedBoules);
+  const { history: sortedBoulesHistory } = useRefHistory(sortedBoules);
   const filteredBoules = computed(() => {
-    // TODO: filter results
-    // if (history.value.length > 1) {
-    //   const currentLength = sortedBoules.value.length;
-    //   const previousLength = history.value[1].snapshot.length;
-    //   if (currentLength === previousLength) {
-    //     console.log("Same length as previous snapshot", currentLength);
-    //     return sortedBoules.value.filter((boule) => boule.distance < 30);
-    //     bus.emit("stopXR");
-    //   }
-    // }
     return sortedBoules.value.filter((boule) => boule.distance < 30);
   });
-
-  const boulesCount = ref(0)
   const { history: filteredBoulesHistory } = useRefHistory(filteredBoules);
   const boulesToDisplay = computed(() => {
-    console.log("filteredBoulesHistory", filteredBoulesHistory.value);
-    console.log("sortedBoules", sortedBoules.value);
-    console.log("filteredBoules", filteredBoules.value);
-    // console.log("filteredBoules", filteredBoules.value);
     if (sortedBoules.value.length > 0) {
       bus.emit("stopXR");
     }
     boulesCount.value = filteredBoules.value.length;
-    console.log("boulesCount", boulesCount.value);
     return filteredBoules.value;
   });
 
-  const winnerPoints = ref(0);
-  const winnerClass = ref("");
-  watch(
-    () => sortedBoules.value,
-    (newSortedBoules) => {
-      winnerPoints.value = 0;
-      if (newSortedBoules.length < 2) return;
-      const closestBoule = newSortedBoules[1];
-      const closestClass = closestBoule.class;
-      winnerPoints.value++;
-      winnerClass.value = closestClass;
-      if (
-        newSortedBoules.length > 2 &&
-        newSortedBoules[2].class === closestClass
-      ) {
-        winnerPoints.value++;
-      }
-      if (
-        newSortedBoules.length > 3 &&
-        newSortedBoules[3].class === closestClass
-      ) {
-        winnerPoints.value++;
-      }
-    }
-  );
-  const setScoreFromPoints = () => {
-    if (player1Class.value === winnerClass.value) {
-      player1Score.value += winnerPoints.value;
-    } else {
-      player2Score.value += winnerPoints.value;
+  // yolo
+  const modelLoaded = ref(false);
+  const modelWorkerId = ref(null);
+  const init = async () => {
+    const { startWorker } = await useInference();
+    arSupported.value =
+      (await navigator.xr?.isSessionSupported("immersive-ar")) ?? false;
+    if (arSupported.value) {
+      await startWorker();
     }
   };
-  const score = computed(() => {
-    return `${player1Score.value} - ${player2Score.value}`;
+  const yoloModels = [
+    {
+      name: "bolobolo",
+      id: "24",
+      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
+    },
+    {
+      name: "bolobolo",
+      id: "25",
+      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
+    },
+    {
+      name: "bolobolo",
+      id: "26",
+      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
+    },
+    {
+      name: "bolobolo",
+      id: "27",
+      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
+    },
+  ];
+  const yoloModelCycler = useCycleList(yoloModels);
+  const prevYoloModel = computed(() => {
+    const currentIndex = yoloModelCycler.index.value;
+    const lastIndex = yoloModels.length - 1;
+    if (currentIndex === 0) return yoloModels[lastIndex].id;
+    return yoloModels[currentIndex - 1].id;
+  });
+  const nextYoloModel = computed(() => {
+    const currentIndex = yoloModelCycler.index.value;
+    const lastIndex = yoloModels.length - 1;
+    if (currentIndex === lastIndex) return yoloModels[0].id;
+    return yoloModels[currentIndex + 1].id;
+  });
+  watch(yoloModelCycler.index, async () => {
+    const { startWorker, stopWorker } = await useInference();
+    await stopWorker();
+    await startWorker();
   });
 
-  const currentHapticGrid = ref("near");
-  const touchCounter = ref(0);
-
-  const currentGlobalSoundSrc = ref("");
-
-  const selectedBoules = ref([]);
-  const {
-    next: nextBoule,
-    prev: prevBoule,
-    go: goToBoule,
-    index: currentlySelectedBouleIndex,
-  } = useCycleList(boulesToDisplay);
-
-  const bouleCount = computed(() => boulesToDisplay.value.length);
-
-  const deviceId = Math.random().toString(36).substring(2, 15);
-
-  const trigger = ref(0);
-  const hihatTriggers = ref([0, 0, 0, 0]);
-
+  // xr
+  const isScanningForPoints = ref(false);
+  const xrRunning = ref(false);
+  const arSupported = ref(false);
   const rawIntersections = ref([]);
   const mockIntersections = ref([
     {
@@ -248,6 +153,163 @@ export const useProtoStore = defineStore("protoStore", () => {
   const predictions = ref([]);
   const planeDetected = ref(false);
 
+  // player sounds
+  const soundComposables = soundSrcs.map((soundSrc) =>
+    useSoundComposable(soundSrc)
+  );
+  const playSoundBySrc = (soundSrc: string, duration = 0) => {
+    const soundIndex = soundSrcs.indexOf(soundSrc);
+    if (soundIndex !== -1) {
+      if (soundComposables[soundIndex]) {
+        soundComposables[soundIndex].play();
+      }
+    }
+  };
+
+  const { undo: undoPlayers } = useRefHistory(players, {
+    deep: true,
+  });
+
+  const currentSoundPlayer1 = computed(() => {
+    return players.value.player1.audioCycler.state;
+  });
+  const currentSoundPlayer2 = computed(() => {
+    return players.value.player2.audioCycler.state;
+  });
+  const prevSoundPlayer1 = computed(() => {
+    const currentIndex = players.value.player1.audioCycler.index;
+    const lastIndex = soundSrcs.length - 1;
+    if (currentIndex === 0) return soundSrcs[lastIndex];
+    return soundSrcs[currentIndex - 1];
+  });
+  const nextSoundPlayer1 = computed(() => {
+    const currentIndex = players.value.player1.audioCycler.index;
+    const lastIndex = soundSrcs.length - 1;
+    if (currentIndex === lastIndex) return soundSrcs[0];
+    return soundSrcs[currentIndex + 1];
+  });
+  const prevSoundPlayer2 = computed(() => {
+    const currentIndex = players.value.player2.audioCycler.index;
+    const lastIndex = soundSrcs.length - 1;
+    if (currentIndex === 0) return soundSrcs[lastIndex];
+    return soundSrcs[currentIndex - 1];
+  });
+  const nextSoundPlayer2 = computed(() => {
+    const currentIndex = players.value.player2.audioCycler.index;
+    const lastIndex = soundSrcs.length - 1;
+    if (currentIndex === lastIndex) return soundSrcs[0];
+    return soundSrcs[currentIndex + 1];
+  });
+  // find better solution
+  watch(currentSoundPlayer1, (newSound) => {
+    toggle3dAudio();
+    setTimeout(() => {
+      toggle3dAudio();
+    }, 100);
+  });
+  watch(currentSoundPlayer2, (newSound) => {
+    toggle3dAudio();
+    setTimeout(() => {
+      toggle3dAudio();
+    }, 100);
+  });
+
+  // score / winner
+  const winnerPoints = ref(0);
+  const winnerClass = ref("");
+  watch(
+    () => boulesToDisplay.value,
+    (newBoules) => {
+      winnerPoints.value = 0;
+      if (newBoules.length < 2) return;
+      const closestBoule = newBoules[1];
+      const closestClass = closestBoule.class;
+      winnerPoints.value++;
+      winnerClass.value = closestClass;
+      if (newBoules.length > 2 && newBoules[2].class === closestClass) {
+        winnerPoints.value++;
+      }
+      if (newBoules.length > 3 && newBoules[3].class === closestClass) {
+        winnerPoints.value++;
+      }
+    }
+  );
+  const setScoreFromPoints = () => {
+    if (players.value.player1.class === winnerClass.value) {
+      players.value.player1.score += winnerPoints.value;
+    } else {
+      players.value.player2.score += winnerPoints.value;
+    }
+  };
+  const score = computed(() => {
+    return `${players.value.player1.score} - ${players.value.player2.score}`;
+  });
+
+
+  const selectedBoules = ref([]);
+  const {
+    next: nextBoule,
+    prev: prevBoule,
+    go: goToBoule,
+    index: currentlySelectedBouleIndex,
+  } = useCycleList(boulesToDisplay);
+
+  const touchCounter = ref(0);
+  const currentGlobalSoundSrc = ref("");
+
+  // qr
+  const deviceId = Math.random().toString(36).substring(2, 15);
+
+  // animations
+  const isTopCamera = ref(false);
+  const isTouchingTopCameraSlider = ref(false);
+  const isTappingOnTopCameraSlider = ref(false);
+
+  // gyro
+  const { alpha: gyroAlpha } = useDeviceOrientation();
+  const alphaController = ref(false);
+  const baseAlpha = ref(0);
+
+  // haptic
+  const isTouching = ref(false);
+  const currentHapticGrid = ref("near");
+  const isTappingOnHaptic = ref(false);
+
+  // slider
+  const isTouchingSlider = ref(false);
+  const isTappingOnSlider = ref(false);
+
+  // stundenorientation
+  const hihatTriggers = ref([0, 0, 0, 0]);
+  const showStundenOrientation = ref(false);
+
+  // positional audio
+  const trigger = ref(0);
+  const helpers = ref(false);
+  const volume = ref(0);
+  const mute3dAudio = () => {
+    volume.value = 0;
+  };
+
+  let unmuteCounter = 0;
+  const unmute3dAudio = () => {
+    volume.value = 1;
+    if (unmuteCounter === 0) {
+      selectedBoules.value = boulesToDisplay.value
+        .map((_, index) => index)
+        .slice(1);
+    }
+    unmuteCounter++;
+  };
+
+  const toggle3dAudio = () => {
+    if (volume.value === 0) {
+      unmute3dAudio();
+    } else {
+      mute3dAudio();
+    }
+  };
+
   const setFromIntersections = () => {
     let cochonet = rawIntersections.value.find(
       (item) => item.class === "cochonet" || item.class === "cochonette"
@@ -255,12 +317,10 @@ export const useProtoStore = defineStore("protoStore", () => {
     let offsetX = 0;
     let offsetY = 0;
     let scaler = 23;
-
     if (cochonet) {
       offsetX = cochonet.x * scaler;
       offsetY = cochonet.z * scaler;
     }
-
     let tempBoules = [];
     rawIntersections.value.forEach((item) => {
       let scaledX = item.x * scaler - offsetX;
@@ -291,7 +351,6 @@ export const useProtoStore = defineStore("protoStore", () => {
       tempBoules.push(boule);
     });
     boules.value = tempBoules;
-    console.log("boules in setFromIntersections", boules.value);
   };
 
   watch(rawIntersections, (newIntersections) => {
@@ -300,126 +359,50 @@ export const useProtoStore = defineStore("protoStore", () => {
       setFromIntersections();
     }
   });
-
   channel
     .on("broadcast", { event: "rawIntersections" }, (data) => {
       console.log("rawIntersections", data);
       rawIntersections.value = data.payload.rawIntersections;
     })
     .subscribe();
-
-  // mock boules
   rawIntersections.value = mockIntersections.value;
 
-  const { alpha: gyroAlpha } = useDeviceOrientation();
-  const alphaController = ref(false);
-  const baseAlpha = ref(0);
-  const isTouching = ref(false);
-  const isTouchingSlider = ref(false);
-  const helpers = ref(false);
-  const showStundenOrientation = ref(false);
-  const volume = ref(0);
-
-  const mute3dAudio = () => {
-    volume.value = 0;
-  };
-
-  let unmuteCounter = 0;
-  const unmute3dAudio = () => {
-    volume.value = 1;
-    if (unmuteCounter === 0) {
-      selectedBoules.value = boulesToDisplay.value
-        .map((_, index) => index)
-        .slice(1);
-    }
-    unmuteCounter++;
-  };
-
-  const toggle3dAudio = () => {
-    if (volume.value === 0) {
-      unmute3dAudio();
-    } else {
-      mute3dAudio();
-    }
-  };
-
-  const yoloModels = [
-    {
-      name: "bolobolo",
-      id: "24",
-      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
-    },
-    {
-      name: "bolobolo",
-      id: "25",
-      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
-    },
-    {
-      name: "bolobolo",
-      id: "26",
-      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
-    },
-    {
-      name: "bolobolo",
-      id: "27",
-      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
-    },
-  ];
-  const yoloModelCycler = useCycleList(yoloModels);
-
-  const prevYoloModel = computed(() => {
-    const currentIndex = yoloModelCycler.index.value;
-    const lastIndex = yoloModels.length - 1;
-    if (currentIndex === 0) return yoloModels[lastIndex].id;
-    return yoloModels[currentIndex - 1].id;
-  });
-
-  const nextYoloModel = computed(() => {
-    const currentIndex = yoloModelCycler.index.value;
-    const lastIndex = yoloModels.length - 1;
-    if (currentIndex === lastIndex) return yoloModels[0].id;
-    return yoloModels[currentIndex + 1].id;
-  });
-
-  watch(yoloModelCycler.index, async () => {
-    const { startWorker, stopWorker } = await useInference();
-    await stopWorker();
-    await startWorker();
-  });
-
-  const modelWorkerId = ref(null);
-
   return {
+    yoloModelCycler,
+    prevYoloModel,
+    nextYoloModel,
+    playSoundBySrc,
+    modelWorkerId,
+    modelLoaded,
+    init,
+    arSupported,
+    xrRunning,
+    isScanningForPoints,
     boules,
     deviceId,
     rawIntersections,
     mockIntersections,
     predictions,
     planeDetected,
-    xrRunning,
     helpers,
     sortedBoules,
     filteredBoules,
     boulesToDisplay,
-    bouleCount,
     goToBoule,
     nextBoule,
+    selectedBoules,
     currentlySelectedBouleIndex,
-    modelLoaded,
     hihatTriggers,
-    player1Score,
-    player2Score,
-    isScanningForPoints,
     score,
-    winnerPoints,
-    winnerClass,
-    player1Name,
-    player2Name,
-    player1Class,
-    player2Class,
+    players,
+    undoPlayers,
+    currentSoundPlayer1,
+    currentSoundPlayer2,
+    prevSoundPlayer1,
+    nextSoundPlayer1,
+    prevSoundPlayer2,
+    nextSoundPlayer2,
     setScoreFromPoints,
-    currentHapticGrid,
-    touchCounter,
     currentGlobalSoundSrc,
     alphaController,
     baseAlpha,
@@ -433,23 +416,15 @@ export const useProtoStore = defineStore("protoStore", () => {
     unmute3dAudio,
     toggle3dAudio,
     isTopCamera,
-    selectedBoules,
-    players,
-    undoPlayers,
-    currentSoundPlayer1,
-    currentSoundPlayer2,
-    prevSoundPlayer1,
-    nextSoundPlayer1,
-    prevSoundPlayer2,
-    nextSoundPlayer2,
-    yoloModelCycler,
-    prevYoloModel,
-    nextYoloModel,
-    playSoundBySrc,
-    modelWorkerId,
-    init,
-    arSupported,
     boulesCount,
+    currentHapticGrid,
+    touchCounter,
+    isTouchingTopCameraSlider,
+    isTappingOnHaptic,
+    isTappingOnSlider,
+    isTappingOnTopCameraSlider,
+    globalShotsTaken,
+    resetShotsTaken,
   };
 });
 

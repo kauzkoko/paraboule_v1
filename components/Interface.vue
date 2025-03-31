@@ -2,15 +2,10 @@
   <div class="absolute left-0 w-100dvw h-100dvh" @click="onFullscreenClick()">
     <VirtualAudioSpace :trigger="audioTrigger"></VirtualAudioSpace>
   </div>
-  <VibrationGrid
-    @click="onClickHapticGrid"
-    @touchstart="onTappingOnHaptic"
-    @touchend="onTappingOnHaptic"
-  ></VibrationGrid>
-  <div class="outer" v-show="isTouchingSlider">
+  <div class="outer" v-show="store.isTouchingSlider">
     <div class="container">
       <div class="big">
-        <div v-show="!isTappingOnSlider">
+        <div v-show="!store.isTappingOnSlider">
           <div>
             Press and hold while sliding your finger vertically on the screen to
             navigate through the scene. A single tap will exit.
@@ -19,10 +14,10 @@
       </div>
     </div>
   </div>
-  <div class="outer" v-show="isTouching">
+  <div class="outer" v-show="store.isTouchingHaptic">
     <div class="container">
       <div class="big">
-        <div v-show="!isTappingOnHaptic">
+        <div v-show="!store.isTappingOnHaptic">
           <div>
             Tap, hold and move across the screen to navigate. Tap once to exit.
           </div>
@@ -30,7 +25,12 @@
       </div>
     </div>
   </div>
-  <div class="outer" ref="el" v-show="!isTouching && !isTouchingSlider" s>
+  <div
+    class="outer"
+    ref="el"
+    v-show="!store.isTouchingHaptic && !store.isTouchingSlider"
+    s
+  >
     <div class="container">
       <template
         v-for="(item, index) in currentPage"
@@ -113,10 +113,20 @@
     ></QrScanner>
   </div>
   <Slider
-    @click="isTouchingSlider = !isTouchingSlider"
+    @click="onClickSliderComponent"
     @touchstart="onTappingOnSlider"
     @touchend="onTappingOnSlider"
   />
+  <TopCameraSlider
+    @click="onClickToggleTopCameraSliderComponent"
+    @touchstart="onTappingOnTopCameraSlider"
+    @touchend="onTappingOnTopCameraSlider"
+  />
+  <VibrationGrid
+    @click="onClickHapticGridComponent"
+    @touchstart="onTappingOnHaptic"
+    @touchend="onTappingOnHaptic"
+  ></VibrationGrid>
 </template>
 
 <script setup>
@@ -124,34 +134,23 @@ import { Howler } from "howler";
 import { useQRCode } from "@vueuse/integrations/useQRCode";
 
 const { speak } = useSpeech();
-
 const bus = useEventBus("protoboules");
-
 const store = useProtoStore();
-const {
-  player1Score,
-  player2Score,
-  isTouching,
-  isTouchingSlider,
-  player1AudioSrc,
-  player2AudioSrc,
-} = storeToRefs(store);
-
 const { sendRawIntersections } = useXrController();
 
-const isTappingOnHaptic = ref(false);
 const onTappingOnHaptic = () => {
-  console.log("onTappingOnHaptic");
-  isTappingOnHaptic.value = !isTappingOnHaptic.value;
+  store.isTappingOnHaptic = !store.isTappingOnHaptic;
 };
 
-const isTappingOnSlider = ref(false);
 const onTappingOnSlider = () => {
-  isTappingOnSlider.value = !isTappingOnSlider.value;
-  if (!isTappingOnSlider.value) {
-    console.log("fly to start");
+  store.isTappingOnSlider = !store.isTappingOnSlider;
+  if (!store.isTappingOnSlider) {
     // flyToStart();
   }
+};
+
+const onTappingOnTopCameraSlider = () => {
+  store.isTappingOnTopCameraSlider = !store.isTappingOnTopCameraSlider;
 };
 
 const {
@@ -208,15 +207,16 @@ const onSwipe = (direction, e, index, item) => {
     currentPage.value[index].cycler.next();
   } else if (direction === "left") {
     currentPage.value[index].cycler.prev();
-  } else if (direction === "top") {
-    if (currentPage.value[index].name === "Change player 1 audio") {
+  } else if (direction === "bottom") {
+    if (currentPage.value[index].name === "Ping Cochonet") refreshPage();
+    else if (currentPage.value[index].name === "Change player 1 audio") {
       store.players.player1.audioCycler.prev();
     } else if (currentPage.value[index].name === "Change player 2 audio") {
       store.players.player2.audioCycler.prev();
     } else if (currentPage.value[index].name === "Change YOLO model") {
       store.yoloModelCycler.prev();
     }
-  } else if (direction === "bottom") {
+  } else if (direction === "top") {
     if (currentPage.value[index].name === "Change player 1 audio") {
       store.players.player1.audioCycler.next();
     } else if (currentPage.value[index].name === "Change player 2 audio") {
@@ -581,17 +581,19 @@ const scanqr = () => {
   }, 10000);
 };
 
-const scores = [];
+const scoresSounds = [];
 for (let i = 0; i <= 13; i++) {
   for (let j = 0; j <= 13; j++) {
-    scores.push(useSoundComposable(`/sounds/elevenlabs/scores/${i}_${j}.mp3`));
+    scoresSounds.push(
+      useSoundComposable(`/sounds/elevenlabs/scores/${i}_${j}.mp3`)
+    );
   }
 }
 
 const scoreStandings = () => {
   console.log("scoreStandings");
-  const index = player1Score.value * 14 + player2Score.value;
-  scores[index].play();
+  const index = store.players.player1.score * 14 + store.players.player2.score;
+  scoresSounds[index].play();
 };
 
 const pingShoes = () => {
@@ -612,38 +614,42 @@ const refreshPage = () => {
   window.location.reload();
 };
 
+const onClickSliderComponent = () => {
+  store.isTouchingSlider = !store.isTouchingSlider;
+};
+
 const click_slider = () => {
   console.log("click_slider");
   store.isTouchingSlider = !store.isTouchingSlider;
-  // TODO: add slider
+};
+
+const onClickToggleTopCameraSliderComponent = () => {
+  store.isTouchingTopCameraSlider = !store.isTouchingTopCameraSlider;
 };
 
 const click_toggleTopCamera = () => {
   console.log("click_toggleTopCamera");
+  store.isTouchingTopCameraSlider = !store.isTouchingTopCameraSlider;
   toggleTopCamera();
 };
 
-const onClickHapticGrid = () => {
-  isTouching.value = !isTouching.value;
-  console.log("onClickHapticGrid, isTouching", isTouching.value);
+const onClickHapticGridComponent = () => {
+  store.isTouchingHaptic = !store.isTouchingHaptic;
 };
 
 const click_hapticGridNear = () => {
   store.currentHapticGrid = "near";
-  isTouching.value = !isTouching.value;
-  console.log("click_hapticGridNear, isTouching", isTouching.value);
+  store.isTouchingHaptic = !store.isTouchingHaptic;
 };
 
 const click_hapticGridMedium = () => {
   store.currentHapticGrid = "medium";
-  isTouching.value = !isTouching.value;
-  console.log("click_hapticGridMedium, isTouching", isTouching.value);
+  store.isTouchingHaptic = !store.isTouchingHaptic;
 };
 
 const click_hapticGridFar = () => {
   store.currentHapticGrid = "far";
-  isTouching.value = !isTouching.value;
-  console.log("click_hapticGridFar, isTouching", isTouching.value);
+  store.isTouchingHaptic = !store.isTouchingHaptic;
 };
 
 const click_mute = () => {
@@ -765,41 +771,46 @@ const pages = [
   ],
   [
     {
-      name: "Pirate Radar",
-      clickFunction: startCocho,
-      imgSrc: "/icons/around.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_pirateRadar.mp3",
-      cycler: useCycleList(["Pirate Radar", "Boomerang", "Stalefish 180"]),
+      name: "Score Standings",
+      clickFunction: scoreStandings,
+      html: computedScoreStandingsHtml,
+      explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
+      cycler: useCycleList(["Score Standings"]),
     },
     {
-      name: "Boomerang",
-      clickFunction: flyCochoBack,
-      imgSrc: "/icons/boomerang1.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_boomerang.mp3",
-      cycler: useCycleList(["Boomerang", "Pirate Radar"]),
-    },
-    {
-      name: "Look along 12 o'clock",
-      clickFunction: lookAlongPositiveZAxis,
-      html: "Look along 12 o'clock",
-      imgSrc: "/icons/12oclock.svg",
+      name: "Scan and count points",
+      clickFunction: scanForPoints,
+      html: "Scan and count points",
       cycler: useCycleList([
-        "Look along 12 o'clock",
-        "Look along 9 o'clock",
-        "Look along 3 o'clock",
-        "Look along 6 o'clock",
+        "Scan and count points",
+        "Set points from latest scan",
+        "Scan field",
       ]),
     },
     {
-      name: "Haptic grid far",
-      clickFunction: click_hapticGridFar,
-      html: "Haptic grid far",
-      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      name: "Set points from latest scan",
+      clickFunction: setPointsFromLatestScan,
+      html: "Set points from latest scan",
       cycler: useCycleList([
-        "Haptic grid far",
-        "Haptic grid medium",
-        "Haptic grid near",
+        "Set points from latest scan",
+        "Scan and count points",
       ]),
+    },
+    {
+      name: "Increment shots taken",
+      clickFunction: () => {
+        if (store.globalShotsTaken < 7) {
+          store.globalShotsTaken++;
+        } else {
+          store.resetShotsTaken();
+        }
+      },
+      html: computed(() =>
+        store.globalShotsTaken < 7
+          ? store.globalShotsTaken
+          : "Reset shots taken"
+      ),
+      cycler: useCycleList(["Increment shots taken"]),
     },
   ],
   [
@@ -836,6 +847,45 @@ const pages = [
       imgSrc: "/icons/rewind.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
       cycler: useCycleList(["Rewind", "Announce Balls Played"]),
+    },
+  ],
+  [
+    {
+      name: "Pirate Radar",
+      clickFunction: startCocho,
+      imgSrc: "/icons/around.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_pirateRadar.mp3",
+      cycler: useCycleList(["Pirate Radar", "Boomerang", "Stalefish 180"]),
+    },
+    {
+      name: "Boomerang",
+      clickFunction: flyCochoBack,
+      imgSrc: "/icons/boomerang1.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_boomerang.mp3",
+      cycler: useCycleList(["Boomerang", "Pirate Radar"]),
+    },
+    {
+      name: "Look along 12 o'clock",
+      clickFunction: lookAlongPositiveZAxis,
+      html: "Look along 12 o'clock",
+      imgSrc: "/icons/12oclock.svg",
+      cycler: useCycleList([
+        "Look along 12 o'clock",
+        "Look along 9 o'clock",
+        "Look along 3 o'clock",
+        "Look along 6 o'clock",
+      ]),
+    },
+    {
+      name: "Haptic grid far",
+      clickFunction: click_hapticGridFar,
+      html: "Haptic grid far",
+      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      cycler: useCycleList([
+        "Haptic grid far",
+        "Haptic grid medium",
+        "Haptic grid near",
+      ]),
     },
   ],
   [
@@ -895,39 +945,11 @@ const pages = [
       html: "Toggle Top Camera",
       cycler: useCycleList(["Toggle Top Camera"]),
     },
-  ],
-  [
-    {
-      name: "Score Standings",
-      clickFunction: scoreStandings,
-      html: computedScoreStandingsHtml,
-      explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
-      cycler: useCycleList(["Score Standings"]),
-    },
     {
       name: "Mute all sounds",
       clickFunction: click_mute,
       html: "Mute all sounds",
       cycler: useCycleList(["Mute all sounds"]),
-    },
-    {
-      name: "Scan and count points",
-      clickFunction: scanForPoints,
-      html: "Scan and count points",
-      cycler: useCycleList([
-        "Scan and count points",
-        "Set points from latest scan",
-        "Scan field",
-      ]),
-    },
-    {
-      name: "Set points from latest scan",
-      clickFunction: setPointsFromLatestScan,
-      html: "Set points from latest scan",
-      cycler: useCycleList([
-        "Set points from latest scan",
-        "Scan and count points",
-      ]),
     },
   ],
   [
@@ -1330,7 +1352,6 @@ onLongPress(refs, longPressCallback, {
   },
   // distanceThreshold: 5,
   onMouseUp: () => {
-    console.log("onMouseUp");
     Howler.stop();
     setTimeout(() => {
       afterLongPress = false;
@@ -1345,7 +1366,6 @@ onLongPress(swiper, longPressCallback, {
     prevent: true,
   },
   onMouseUp: () => {
-    console.log("onMouseUp");
     Howler.stop();
     setTimeout(() => {
       afterLongPress = false;

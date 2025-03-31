@@ -1,15 +1,14 @@
 <template>
   <div
-    class="fullScreenAll flexCenter text-white z-999"
+    class="fullScreenAll flexCenter text-white"
     :style="{
-      pointerEvents: isTouching ? 'auto' : 'none',
+      pointerEvents: store.isTouchingHaptic ? 'auto' : 'none',
     }"
   />
 </template>
 
 <script setup>
 const store = useProtoStore();
-const { isTouching } = storeToRefs(store);
 
 const boules = ref([]);
 const bus = useEventBus("protoboules");
@@ -35,15 +34,12 @@ const lightBouleAudios = [
 ];
 
 watch([x, y], ([x, y]) => {
-  if (!isTouching) return;
+  if (!store.isTouchingHaptic) return;
   boules.value.forEach((boule) => {
     const distance = Math.sqrt(
       Math.pow(x - boule.x, 2) + Math.pow(y - boule.y, 2)
     );
-    console.log(`Distance to ${boule.class}:`, distance);
-
     if (distance < 10) {
-      console.log("Touching", boule.class);
       if (boule.class === "cochonet" || boule.class === "cochonet") {
         cochonet.play();
       } else if (boule.class === "dark") {
@@ -52,7 +48,6 @@ watch([x, y], ([x, y]) => {
         lightBouleAudios[boule.classNumber - 1].play();
       }
     } else if (distance < 50) {
-      console.log("Near", boule.class);
       useVibrate({ pattern: [50, 0] }).vibrate();
     }
   });
