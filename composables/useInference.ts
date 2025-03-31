@@ -1,26 +1,37 @@
 import { InferenceEngine, CVImage } from "inferencejs";
+const inferEngine = new InferenceEngine();
 
 export async function useInference() {
   const store = useProtoStore();
-  const { modelLoaded } = storeToRefs(store);
-
-  const inferEngine = new InferenceEngine();
-  let modelWorkerId = ref(null);
-
-  modelWorkerId.value = await inferEngine.startWorker(
-    "bolobolo",
-    "24",
-    "rf_li9xBZWuL5cSB9B343OFn9GGqpF2"
-  );
-  console.log("model has loaded", modelWorkerId.value);
-  modelLoaded.value = true;
+  const { modelLoaded, modelWorkerId } = storeToRefs(store);
 
   async function predictFromImage(outputImage: any) {
-    let predictions = modelWorkerId.value;
     const image = new CVImage(outputImage);
-    predictions = await inferEngine.infer(modelWorkerId.value, image);
+    let predictions = await inferEngine.infer(modelWorkerId.value, image);
     return predictions;
   }
 
-  return { modelWorkerId, predictFromImage };
+  async function startWorker() {
+    if (modelWorkerId.value) {
+      await inferEngine.stopWorker(modelWorkerId.value);
+    }
+    modelWorkerId.value = await inferEngine.startWorker(
+      store.yoloModelCycler.state.name,
+      store.yoloModelCycler.state.id,
+      store.yoloModelCycler.state.modelId
+    );
+    console.log("model has loaded", modelWorkerId.value);
+    modelLoaded.value = true;
+  }
+
+  async function stopWorker() {
+    console.log("stopping worker", modelWorkerId.value);
+    if (modelWorkerId.value) {
+      await inferEngine.stopWorker(modelWorkerId.value);
+      modelWorkerId.value = null;
+      modelLoaded.value = false;
+    }
+  }
+
+  return { predictFromImage, stopWorker, startWorker };
 }

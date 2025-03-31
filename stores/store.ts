@@ -6,6 +6,14 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   const bus = useEventBus("protoboules");
 
+  const arSupported = ref(false);
+  const init = async () => {
+    arSupported.value = await navigator.xr?.isSessionSupported("immersive-ar");
+    if (arSupported.value) {
+      await startWorker();
+    }
+  };
+
   const modelLoaded = ref(false);
 
   const player1Name = ref("Player 1");
@@ -14,6 +22,101 @@ export const useProtoStore = defineStore("protoStore", () => {
   const player2Class = ref("light");
   const player1Score = ref(0);
   const player2Score = ref(0);
+
+  const soundSrcs = [
+    "/sounds/noise.mp3",
+    "/sounds/noisehigh.mp3",
+    "/sounds/noiselow.mp3",
+    "/sounds/shortdeep.mp3",
+    "/sounds/waterBig.m4a",
+    "/sounds/waterMedium.m4a",
+    "/sounds/waterBigger.m4a",
+    "/sounds/noz.mp3",
+    "/sounds/noz2.mp3",
+    "/sounds/strudel/c3major.mp3",
+    "/sounds/strudel/e3major.mp3",
+    "/sounds/strudel/g3major.mp3",
+    "/sounds/strudel/startpoint.mp3",
+  ];
+
+  const soundComposables = soundSrcs.map((soundSrc) =>
+    useSoundComposable(soundSrc)
+  );
+
+  const playSoundBySrc = (soundSrc: string, duration = 0) => {
+    const soundIndex = soundSrcs.indexOf(soundSrc);
+    if (soundIndex !== -1) {
+      if (soundComposables[soundIndex]) {
+        soundComposables[soundIndex].play();
+      }
+    }
+  };
+
+  const players = ref({
+    player1: {
+      shotsTaken: 0,
+      class: "dark",
+      audioCycler: useCycleList(soundSrcs),
+      score: 0,
+    },
+    player2: {
+      shotsTaken: 0,
+      class: "light",
+      audioCycler: useCycleList(soundSrcs),
+      score: 0,
+    },
+  });
+  const { undo: undoPlayers } = useRefHistory(players, {
+    deep: true,
+  });
+
+  const currentSoundPlayer1 = computed(() => {
+    return players.value.player1.audioCycler.state;
+  });
+  const currentSoundPlayer2 = computed(() => {
+    return players.value.player2.audioCycler.state;
+  });
+
+  const prevSoundPlayer1 = computed(() => {
+    const currentIndex = players.value.player1.audioCycler.index;
+    const lastIndex = soundSrcs.length - 1;
+    if (currentIndex === 0) return soundSrcs[lastIndex];
+    return soundSrcs[currentIndex - 1];
+  });
+  const nextSoundPlayer1 = computed(() => {
+    const currentIndex = players.value.player1.audioCycler.index;
+    const lastIndex = soundSrcs.length - 1;
+    if (currentIndex === lastIndex) return soundSrcs[0];
+    return soundSrcs[currentIndex + 1];
+  });
+
+  const prevSoundPlayer2 = computed(() => {
+    const currentIndex = players.value.player2.audioCycler.index;
+    const lastIndex = soundSrcs.length - 1;
+    if (currentIndex === 0) return soundSrcs[lastIndex];
+    return soundSrcs[currentIndex - 1];
+  });
+
+  const nextSoundPlayer2 = computed(() => {
+    const currentIndex = players.value.player2.audioCycler.index;
+    const lastIndex = soundSrcs.length - 1;
+    if (currentIndex === lastIndex) return soundSrcs[0];
+    return soundSrcs[currentIndex + 1];
+  });
+
+  watch(currentSoundPlayer1, (newSound) => {
+    toggle3dAudio();
+    setTimeout(() => {
+      toggle3dAudio();
+    }, 100);
+  });
+
+  watch(currentSoundPlayer2, (newSound) => {
+    toggle3dAudio();
+    setTimeout(() => {
+      toggle3dAudio();
+    }, 100);
+  });
 
   const xrRunning = ref(false);
   const isScanningForPoints = ref(false);
@@ -38,13 +141,18 @@ export const useProtoStore = defineStore("protoStore", () => {
     return sortedBoules.value.filter((boule) => boule.distance < 30);
   });
 
+  const boulesCount = ref(0)
   const { history: filteredBoulesHistory } = useRefHistory(filteredBoules);
   const boulesToDisplay = computed(() => {
     console.log("filteredBoulesHistory", filteredBoulesHistory.value);
+    console.log("sortedBoules", sortedBoules.value);
+    console.log("filteredBoules", filteredBoules.value);
     // console.log("filteredBoules", filteredBoules.value);
     if (sortedBoules.value.length > 0) {
       bus.emit("stopXR");
     }
+    boulesCount.value = filteredBoules.value.length;
+    console.log("boulesCount", boulesCount.value);
     return filteredBoules.value;
   });
 
@@ -87,7 +195,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const currentHapticGrid = ref("near");
   const touchCounter = ref(0);
 
-  const currentSoundSrc = ref("");
+  const currentGlobalSoundSrc = ref("");
 
   const selectedBoules = ref([]);
   const {
@@ -212,101 +320,6 @@ export const useProtoStore = defineStore("protoStore", () => {
   const showStundenOrientation = ref(false);
   const volume = ref(0);
 
-  const player1AudioSrcs = ref([
-    "/sounds/noise.mp3",
-    "/sounds/noisehigh.mp3",
-    "/sounds/noiselow.mp3",
-    "/sounds/shortdeep.mp3",
-    "/sounds/waterBig.m4a",
-    "/sounds/waterMedium.m4a",
-    "/sounds/waterBigger.m4a",
-    "/sounds/noz.mp3",
-    "/sounds/noz2.mp3",
-    "/sounds/strudel/c3major.mp3",
-    "/sounds/strudel/e3major.mp3",
-    "/sounds/strudel/g3major.mp3",
-    "/sounds/strudel/startpoint.mp3",
-  ]);
-  const player2AudioSrcs = ref([
-    "/sounds/noise.mp3",
-    "/sounds/noisehigh.mp3",
-    "/sounds/noiselow.mp3",
-    "/sounds/shortdeep.mp3",
-    "/sounds/waterBig.m4a",
-    "/sounds/waterMedium.m4a",
-    "/sounds/waterBigger.m4a",
-    "/sounds/noz.mp3",
-    "/sounds/noz2.mp3",
-    "/sounds/strudel/c3major.mp3",
-    "/sounds/strudel/e3major.mp3",
-    "/sounds/strudel/g3major.mp3",
-    "/sounds/strudel/startpoint.mp3",
-  ]);
-  const player1AudioSrc = ref("/sounds/startpoint.mp3");
-  const player2AudioSrc = ref("/sounds/noz.mp3");
-
-  watch(player1AudioSrc, () => {
-    if (volume.value > 0) {
-      toggle3dAudio();
-      setTimeout(() => {
-        toggle3dAudio();
-      }, 200);
-    }
-  });
-  watch(player2AudioSrc, () => {
-    if (volume.value > 0) {
-      toggle3dAudio();
-      setTimeout(() => {
-        toggle3dAudio();
-      }, 200);
-    }
-
-  });
-
-  const lastPlayer1AudioSrc = computed(() => {
-    const currentPlayer1Index = player1AudioSrcs.value.findIndex(
-      (src) => src === player1AudioSrc.value
-    );
-    const previousPlayer1AudioSrc =
-      currentPlayer1Index > 0
-        ? player1AudioSrcs.value[currentPlayer1Index - 1]
-        : player1AudioSrcs.value[player1AudioSrcs.value.length - 1];
-    return previousPlayer1AudioSrc;
-  });
-
-  const nextPlayer1AudioSrc = computed(() => {
-    const currentPlayer1Index = player1AudioSrcs.value.findIndex(
-      (src) => src === player1AudioSrc.value
-    );
-    const nextPlayer1AudioSrc =
-      currentPlayer1Index < player1AudioSrcs.value.length - 1
-        ? player1AudioSrcs.value[currentPlayer1Index + 1]
-        : player1AudioSrcs.value[0];
-    return nextPlayer1AudioSrc;
-  });
-
-  const lastPlayer2AudioSrc = computed(() => {
-    const currentPlayer2Index = player2AudioSrcs.value.findIndex(
-      (src) => src === player2AudioSrc.value
-    );
-    const previousPlayer2AudioSrc =
-      currentPlayer2Index > 0
-        ? player2AudioSrcs.value[currentPlayer2Index - 1]
-        : player2AudioSrcs.value[player2AudioSrcs.value.length - 1];
-    return previousPlayer2AudioSrc;
-  });
-
-  const nextPlayer2AudioSrc = computed(() => {
-    const currentPlayer2Index = player2AudioSrcs.value.findIndex(
-      (src) => src === player2AudioSrc.value
-    );
-    const nextPlayer2AudioSrc =
-      currentPlayer2Index < player2AudioSrcs.value.length - 1
-        ? player2AudioSrcs.value[currentPlayer2Index + 1]
-        : player2AudioSrcs.value[0];
-    return nextPlayer2AudioSrc;
-  });
-
   const mute3dAudio = () => {
     volume.value = 0;
   };
@@ -329,6 +342,52 @@ export const useProtoStore = defineStore("protoStore", () => {
       mute3dAudio();
     }
   };
+
+  const yoloModels = [
+    {
+      name: "bolobolo",
+      id: "24",
+      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
+    },
+    {
+      name: "bolobolo",
+      id: "25",
+      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
+    },
+    {
+      name: "bolobolo",
+      id: "26",
+      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
+    },
+    {
+      name: "bolobolo",
+      id: "27",
+      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
+    },
+  ];
+  const yoloModelCycler = useCycleList(yoloModels);
+
+  const prevYoloModel = computed(() => {
+    const currentIndex = yoloModelCycler.index.value;
+    const lastIndex = yoloModels.length - 1;
+    if (currentIndex === 0) return yoloModels[lastIndex].id;
+    return yoloModels[currentIndex - 1].id;
+  });
+
+  const nextYoloModel = computed(() => {
+    const currentIndex = yoloModelCycler.index.value;
+    const lastIndex = yoloModels.length - 1;
+    if (currentIndex === lastIndex) return yoloModels[0].id;
+    return yoloModels[currentIndex + 1].id;
+  });
+
+  watch(yoloModelCycler.index, async () => {
+    const { startWorker, stopWorker } = await useInference();
+    await stopWorker();
+    await startWorker();
+  });
+
+  const modelWorkerId = ref(null);
 
   return {
     boules,
@@ -361,7 +420,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     setScoreFromPoints,
     currentHapticGrid,
     touchCounter,
-    currentSoundSrc,
+    currentGlobalSoundSrc,
     alphaController,
     baseAlpha,
     gyroAlpha,
@@ -375,14 +434,22 @@ export const useProtoStore = defineStore("protoStore", () => {
     toggle3dAudio,
     isTopCamera,
     selectedBoules,
-    player1AudioSrc,
-    player2AudioSrc,
-    player1AudioSrcs,
-    player2AudioSrcs,
-    lastPlayer1AudioSrc,
-    lastPlayer2AudioSrc,
-    nextPlayer1AudioSrc,
-    nextPlayer2AudioSrc,
+    players,
+    undoPlayers,
+    currentSoundPlayer1,
+    currentSoundPlayer2,
+    prevSoundPlayer1,
+    nextSoundPlayer1,
+    prevSoundPlayer2,
+    nextSoundPlayer2,
+    yoloModelCycler,
+    prevYoloModel,
+    nextYoloModel,
+    playSoundBySrc,
+    modelWorkerId,
+    init,
+    arSupported,
+    boulesCount,
   };
 });
 

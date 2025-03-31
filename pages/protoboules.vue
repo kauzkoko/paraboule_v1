@@ -10,4 +10,9 @@
 
 <script setup lang="ts">
 import { TresCanvas } from "@tresjs/core";
+
+const store = useProtoStore();
+onMounted(async () => {
+  await store.init();
+});
 </script>

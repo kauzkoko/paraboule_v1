@@ -13,7 +13,7 @@
   >
     <TresSphereGeometry :args="[boule.size, 24, 24]" />
     <CustomShaderMaterial
-      v-bind="materialProps"
+      v-bind="boule.player === 1 ? materialPropsRed : materialPropsBlue"
       transparent
       :opacity="checkSelectedBoules(index) ? 1 : 0"
       v-if="checkSelectedBoules(index)"
@@ -22,9 +22,9 @@
       v-if="checkSelectedBoules(index)"
       :url="
         boule.player === 1
-          ? store.player1AudioSrc
+          ? store.currentSoundPlayer1
           : boule.player === 2
-          ? store.player2AudioSrc
+          ? store.currentSoundPlayer2
           : '/strudel/still.mp3'
       "
     />
@@ -48,50 +48,17 @@
 import { useLoop, useRenderLoop } from "@tresjs/core";
 import { CustomShaderMaterial } from "@tresjs/cientos";
 import { gsap } from "gsap";
-import { MeshBasicMaterial } from "three";
 
 const { onLoop } = useRenderLoop();
-const materialProps = {
-  baseMaterial: MeshBasicMaterial,
-  fragmentShader: `
-    varying float vWobble;
-
-    uniform float u_Time;
-
-    void main() {
-      float wobble = vWobble * 0.5 + 0.5;
-      csm_FragColor = mix(vec4(1.5, 0.0, 0.0, 1.0), vec4(1.2, 0.6, 0.8, 1.0), wobble);
-    }
-  `,
-  vertexShader: `
-    uniform float u_Time;
-    uniform float u_WobbleSpeed;
-    uniform float u_WobbleAmplitude;
-    uniform float u_WobbleFrequency;
-
-    varying float vWobble;
-
-    void main() {
-      float wobble = sin(csm_Position.z * u_WobbleFrequency + u_Time * u_WobbleSpeed);
-      csm_Position += normal * wobble * u_WobbleAmplitude;
-
-      vWobble = wobble;
-    }
-  `,
-  uniforms: {
-    u_Time: { value: 0 },
-    u_WobbleSpeed: { value: 2 },
-    u_WobbleAmplitude: { value: 0.01 },
-    u_WobbleFrequency: { value: 1 },
-  },
-};
 
 onMounted(async () => {
   await nextTick();
 
   onLoop(() => {
-    materialProps.uniforms.u_Time.value +=
-      0.01 * materialProps.uniforms.u_WobbleSpeed.value;
+    materialPropsRed.uniforms.u_Time.value +=
+      0.01 * materialPropsRed.uniforms.u_WobbleSpeed.value;
+    materialPropsBlue.uniforms.u_Time.value +=
+      0.01 * materialPropsBlue.uniforms.u_WobbleSpeed.value;
   });
 });
 
@@ -105,7 +72,11 @@ const meshRefs = useTemplateRef("boulesRefs");
 const bus = useEventBus("protoboules");
 
 const store = useProtoStore();
-const { boulesToDisplay: boules, hihatTriggers, isTouching } = storeToRefs(store);
+const {
+  boulesToDisplay: boules,
+  hihatTriggers,
+  isTouching,
+} = storeToRefs(store);
 
 const checkSelectedBoules = (index) => {
   if (store.volume === 0) return false;

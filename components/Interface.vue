@@ -32,47 +32,57 @@
   </div>
   <div class="outer" ref="el" v-show="!isTouching && !isTouchingSlider" s>
     <div class="container">
-      <div
-        :ref="refs.set"
+      <template
         v-for="(item, index) in currentPage"
         :key="'grid-item-' + index"
-        class="grid-item"
-        :index="getIndex(item)"
-        @touchend="onTouchEnd"
-        v-touch:swipe="(dir, e) => onSwipe(dir, e, index, item)"
-        @click="onClick(item, index)"
-        @touchstart="onTouchStart(index)"
-        :style="{
-          background:
-            touchedIndex === index ? 'rgba(255,0,0,.25)' : 'transparent',
-          transition:
-            touchedIndex === index ? 'background 50ms' : 'background 500ms',
-        }"
       >
         <div
-          class="absolute text-hex-ff0000 text-12px px-2 py-2"
-          :class="{
-            'top-0 left-0': index === 0,
-            'top-0 right-0': index === 1,
-            'bottom-0 left-0': index === 2,
-            'bottom-0 right-0': index === 3,
+          :ref="refs.set"
+          class="grid-item"
+          :index="getIndex(item)"
+          @touchend="onTouchEnd"
+          v-touch:swipe="(dir, e) => onSwipe(dir, e, index, item)"
+          @click="onClick(item, index)"
+          @touchstart="onTouchStart(index)"
+          :style="{
+            background:
+              touchedIndex === index ? 'rgba(255,0,0,.25)' : 'transparent',
+            transition:
+              touchedIndex === index ? 'background 50ms' : 'background 500ms',
+            opacity: getItem(item).deactivated
+              ? getItem(item).deactivated.value
+                ? 0.5
+                : 1
+              : 1,
           }"
         >
-          {{ getItem(item).name }}
-        </div>
-        <div class="flex justify-center items-center w-full h-full">
-          <img
-            v-if="getItem(item).imgSrc"
-            :src="getItem(item).imgSrc.value ?? getItem(item).imgSrc"
-          />
           <div
-            v-else-if="getItem(item).html"
-            class="text-hex-ff0000 text-20px text-center flexCenter max-w-80%"
+            class="absolute text-hex-ff0000 text-12px px-2 py-2"
+            :class="{
+              'top-0 left-0': index === 0,
+              'top-0 right-0': index === 1,
+              'bottom-0 left-0': index === 2,
+              'bottom-0 right-0': index === 3,
+            }"
           >
-            <div v-html="getItem(item).html.value ?? getItem(item).html"></div>
+            {{ getItem(item).name }}
+          </div>
+          <div class="flex justify-center items-center w-full h-full">
+            <img
+              v-if="getItem(item).imgSrc"
+              :src="getItem(item).imgSrc.value ?? getItem(item).imgSrc"
+            />
+            <div
+              v-else-if="getItem(item).html"
+              class="text-hex-ff0000 text-20px text-center flexCenter max-w-80%"
+            >
+              <div
+                v-html="getItem(item).html.value ?? getItem(item).html"
+              ></div>
+            </div>
           </div>
         </div>
-      </div>
+      </template>
     </div>
     <div
       class="center-circle"
@@ -111,6 +121,9 @@
 
 <script setup>
 import { Howler } from "howler";
+import { useQRCode } from "@vueuse/integrations/useQRCode";
+
+const { speak } = useSpeech();
 
 const bus = useEventBus("protoboules");
 
@@ -191,25 +204,25 @@ watch(
 );
 
 const onSwipe = (direction, e, index, item) => {
-  console.log("direction", direction);
-  console.log("currentPage.value[index]", currentPage.value[index]);
   if (direction === "right") {
     currentPage.value[index].cycler.next();
   } else if (direction === "left") {
     currentPage.value[index].cycler.prev();
   } else if (direction === "top") {
-    currentPage.value[index].audioCycler?.next();
     if (currentPage.value[index].name === "Change player 1 audio") {
-      player1AudioSrc.value = currentPage.value[index].audioCycler?.state;
+      store.players.player1.audioCycler.prev();
     } else if (currentPage.value[index].name === "Change player 2 audio") {
-      player2AudioSrc.value = currentPage.value[index].audioCycler?.state;
+      store.players.player2.audioCycler.prev();
+    } else if (currentPage.value[index].name === "Change YOLO model") {
+      store.yoloModelCycler.prev();
     }
   } else if (direction === "bottom") {
-    currentPage.value[index].audioCycler?.prev();
     if (currentPage.value[index].name === "Change player 1 audio") {
-      player1AudioSrc.value = currentPage.value[index].audioCycler?.state;
+      store.players.player1.audioCycler.next();
     } else if (currentPage.value[index].name === "Change player 2 audio") {
-      player2AudioSrc.value = currentPage.value[index].audioCycler?.state;
+      store.players.player2.audioCycler.next();
+    } else if (currentPage.value[index].name === "Change YOLO model") {
+      store.yoloModelCycler.next();
     }
   }
 };
@@ -231,10 +244,15 @@ const onFullscreenClick = () => {
 // register click functions
 const scanCamera = () => {
   if (!afterLongPress) {
-    if (store.xrRunning) {
-      bus.emit("stopXR");
-    } else if (store.modelLoaded) {
-      bus.emit("startXR");
+    if (store.arSupported) {
+      if (store.xrRunning) {
+        bus.emit("stopXR");
+      } else if (store.modelLoaded) {
+        bus.emit("startXR");
+      }
+    } else {
+      console.log("AR not supported");
+      speak("AR not supported");
     }
   }
 };
@@ -475,47 +493,36 @@ const onDoubleClick = () => {
   }
 };
 
-const players = ref({
-  player1: {
-    shotsTaken: 0,
-  },
-  player2: {
-    shotsTaken: 0,
-  },
-});
-const { undo } = useRefHistory(players, {
-  deep: true,
-});
 const incrementPlayer1 = () => {
   console.log("incrementPlayer1");
   if (
-    players.value.player1.shotsTaken === 3 &&
-    players.value.player2.shotsTaken === 3
+    store.players.player1.shotsTaken === 3 &&
+    store.players.player2.shotsTaken === 3
   ) {
-    players.value.player1.shotsTaken = 0;
-    players.value.player2.shotsTaken = 0;
+    store.players.player1.shotsTaken = 0;
+    store.players.player2.shotsTaken = 0;
   }
-  if (players.value.player1.shotsTaken < 3) {
-    players.value.player1.shotsTaken++;
+  if (store.players.player1.shotsTaken < 3) {
+    store.players.player1.shotsTaken++;
   }
 };
 const incrementPlayer2 = () => {
   console.log("incrementPlayer2");
   if (
-    players.value.player2.shotsTaken === 3 &&
-    players.value.player1.shotsTaken === 3
+    store.players.player2.shotsTaken === 3 &&
+    store.players.player1.shotsTaken === 3
   ) {
-    players.value.player2.shotsTaken = 0;
-    players.value.player1.shotsTaken = 0;
+    store.players.player2.shotsTaken = 0;
+    store.players.player1.shotsTaken = 0;
   }
-  if (players.value.player2.shotsTaken < 3) {
-    players.value.player2.shotsTaken++;
+  if (store.players.player2.shotsTaken < 3) {
+    store.players.player2.shotsTaken++;
   }
 };
 const computedNextShot = computed(
   () =>
-    players.value.player1.shotsTaken === 3 &&
-    players.value.player2.shotsTaken === 3
+    store.players.player1.shotsTaken === 3 &&
+    store.players.player2.shotsTaken === 3
 );
 const computedAnnounceBallsPlayedHtml = computed(() => {
   return computedNextShot.value
@@ -524,28 +531,27 @@ const computedAnnounceBallsPlayedHtml = computed(() => {
         </div>`
     : `
         <div class='text-48px'>
-          <div>${players.value.player1.shotsTaken} / 3</div><br />
+          <div>${store.players.player1.shotsTaken} / 3</div><br />
           <div class='h-3px bg-hex-ff0000 w-100%'></div><br/>
-          <div>${players.value.player2.shotsTaken} / 3</div>
+          <div>${store.players.player2.shotsTaken} / 3</div>
         </div>`;
 });
 
 const computedScoreStandingsHtml = computed(() => {
   return `
     <div class='text-48px'>
-      <div>${player1Score.value} / 13</div><br />
+      <div>${store.players.player1.score} / 13</div><br />
       <div class='h-3px bg-hex-ff0000 w-100%'></div><br/>
-      <div>${player2Score.value} / 13</div>
+      <div>${store.players.player2.score} / 13</div>
     </div>`;
 });
-const { speak } = useSpeech();
 const text = ref("");
 const announceBallsPlayed = () => {
   console.log("announceBallsPlayed");
-  text.value = `Player 1 has played ${players.value.player1.shotsTaken} ${
-    players.value.player1.shotsTaken === 1 ? "ball" : "balls"
-  }. Player 2 has played ${players.value.player2.shotsTaken} ${
-    players.value.player2.shotsTaken === 1 ? "ball" : "balls"
+  text.value = `Player 1 has played ${store.players.player1.shotsTaken} ${
+    store.players.player1.shotsTaken === 1 ? "ball" : "balls"
+  }. Player 2 has played ${store.players.player2.shotsTaken} ${
+    store.players.player2.shotsTaken === 1 ? "ball" : "balls"
   }. `;
   if (computedNextShot.value) {
     text.value +=
@@ -556,7 +562,7 @@ const announceBallsPlayed = () => {
 
 const rewind = () => {
   console.log("rewind");
-  undo();
+  store.undoPlayers();
 };
 
 const scanForQr = ref(false);
@@ -652,7 +658,6 @@ const addFunction = () => {
   // TODO: add add function
 };
 
-import { useQRCode } from "@vueuse/integrations/useQRCode";
 const url = ref("asdfdsadf");
 const qrcode = useQRCode(url.value, {
   margin: 1,
@@ -719,6 +724,7 @@ const pages = [
     },
     {
       name: "Scan Field",
+      deactivated: computed(() => !store.arSupported),
       clickFunction: scanCamera,
       imgSrc: "/icons/scanCamera.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_scanField.mp3",
@@ -742,6 +748,7 @@ const pages = [
     },
     {
       name: "Focus All Boules",
+      deactivated: computed(() => store.boulesCount < 1),
       clickFunction: () => click_bouleFocuser("all"),
       imgSrc: "/icons/focusAll.svg",
       html: "Focus all Boules",
@@ -994,63 +1001,105 @@ const pages = [
   [
     {
       name: "Focus Boule 1",
+      deactivated: computed(() => store.boulesCount < 2),
       clickFunction: () => click_bouleFocuser(1),
       imgSrc: "/icons/focus1.svg",
       html: "Focus on Boule 1",
-      cycler: useCycleList(["Focus Boule 1", "Focus Boule 2"]),
+      cycler: useCycleList([
+        "Focus Boule 1",
+        "Focus Boule 2",
+        "Focus Boule 3",
+        "Focus Boule 4",
+        "Focus Boule 5",
+        "Focus Boule 6",
+        "Focus All Boules",
+      ]),
     },
     {
       name: "Focus Boule 2",
+      deactivated: computed(() => store.boulesCount < 3),
       clickFunction: () => click_bouleFocuser(2),
       imgSrc: "/icons/focus2.svg",
       html: "Focus on Boule 2",
-      cycler: useCycleList(["Focus Boule 2", "Focus Boule 1"]),
+      cycler: useCycleList([
+        "Focus Boule 2",
+        "Focus Boule 3",
+        "Focus Boule 4",
+        "Focus Boule 5",
+        "Focus Boule 6",
+        "Focus Boule 1",
+      ]),
     },
     {
       name: "Focus Boule 3",
+      deactivated: computed(() => store.boulesCount < 4),
       clickFunction: () => click_bouleFocuser(3),
       imgSrc: "/icons/focus3.svg",
       html: "Focus on Boule 3",
-      cycler: useCycleList(["Focus Boule 3", "Focus All Boules"]),
+      cycler: useCycleList([
+        "Focus Boule 3",
+        "Focus Boule 4",
+        "Focus Boule 5",
+        "Focus Boule 6",
+        "Focus Boule 1",
+      ]),
     },
     {
-      name: "Focus All Boules",
-      clickFunction: () => click_bouleFocuser("all"),
-      imgSrc: "/icons/focusAll.svg",
-      html: "Focus all Boules",
-      cycler: useCycleList(["Focus All Boules", "Focus Boule 3"]),
+      name: "Focus Cochonet",
+      deactivated: computed(() => store.boulesCount < 1),
+      clickFunction: () => click_bouleFocuser(0),
+      html: "Focus Cochonet",
+      cycler: useCycleList([
+        "Focus Cochonet",
+        "Focus All Boules",
+        "Focus Boule 1",
+        "Focus Boule 2",
+        "Focus Boule 3",
+        "Focus Boule 4",
+        "Focus Boule 5",
+        "Focus Boule 6",
+      ]),
     },
   ],
   [
     {
       name: "Focus Boule 4",
+      deactivated: computed(() => store.boulesCount < 5),
       clickFunction: () => click_bouleFocuser(4),
       imgSrc: "/icons/focus4.svg",
-      html: "Focus on Boule 1",
+      html: "Focus on Boule 4",
       cycler: useCycleList([
         "Focus Boule 4",
         "Focus Boule 5",
         "Focus Boule 6",
+        "Focus Boule 1",
+        "Focus Boule 2",
+        "Focus Boule 3",
         "Focus All Boules",
       ]),
     },
     {
       name: "Focus Boule 5",
+      deactivated: computed(() => store.boulesCount < 6),
       clickFunction: () => click_bouleFocuser(5),
       imgSrc: "/icons/focus5.svg",
-      html: "Focus on Boule 2",
+      html: "Focus on Boule 5",
       cycler: useCycleList([
         "Focus Boule 5",
-        "Focus Boule 4",
         "Focus Boule 6",
+        "Focus Boule 1",
+        "Focus Boule 2",
+        "Focus Boule 3",
+        "Focus Boule 4",
         "Focus All Boules",
       ]),
     },
     {
       name: "Focus Boule 6",
+      deactivated: computed(() => store.boulesCount < 7),
       clickFunction: () => click_bouleFocuser(6),
       imgSrc: "/icons/focus6.svg",
-      html: "Focus on Boule 3",
+      html: "Focus on Boule 6",
       cycler: useCycleList([
         "Focus Boule 6",
         "Focus Boule 4",
@@ -1060,14 +1109,19 @@ const pages = [
     },
     {
       name: "Focus All Boules",
+      deactivated: computed(() => store.boulesCount < 1),
       clickFunction: () => click_bouleFocuser("all"),
       imgSrc: "/icons/focusAll.svg",
       html: "Focus all Boules",
       cycler: useCycleList([
         "Focus All Boules",
-        "Focus Boule 6",
-        "Focus Boule 5",
+        "Focus Cochonet",
+        "Focus Boule 1",
+        "Focus Boule 2",
+        "Focus Boule 3",
         "Focus Boule 4",
+        "Focus Boule 5",
+        "Focus Boule 6",
       ]),
     },
   ],
@@ -1163,28 +1217,37 @@ const pages = [
     {
       name: "Change player 1 audio",
       clickFunction: () => {
-        console.log("play the currently selected audio");
+        store.playSoundBySrc(store.currentSoundPlayer1);
       },
       html: computed(
         () =>
-          `<div class='text-14px opacity-50'>${store.lastPlayer1AudioSrc}</div><div class='text-16px'>${store.player1AudioSrc}</div><div class='text-14px opacity-50'>${store.nextPlayer1AudioSrc}</div>`
+          `<div class='text-14px opacity-50'>${store.prevSoundPlayer1}</div><div class='text-16px'>${store.currentSoundPlayer1}</div><div class='text-14px opacity-50'>${store.nextSoundPlayer1}</div>`
       ),
       explanationSrc: "/sounds/elevenlabs/explanation_player1AudioCycler.mp3",
       cycler: useCycleList(["Change player 1 audio"]),
-      audioCycler: useCycleList(store.player1AudioSrcs),
     },
     {
       name: "Change player 2 audio",
       clickFunction: () => {
-        console.log("play the currently selected audio");
+        store.playSoundBySrc(store.currentSoundPlayer2);
       },
       html: computed(
         () =>
-          `<div class='text-14px opacity-50'>${store.lastPlayer2AudioSrc}</div><div class='text-16px'>${store.player2AudioSrc}</div><div class='text-14px opacity-50'>${store.nextPlayer2AudioSrc}</div>`
+          `<div class='text-14px opacity-50'>${store.prevSoundPlayer2}</div><div class='text-16px'>${store.currentSoundPlayer2}</div><div class='text-14px opacity-50'>${store.nextSoundPlayer2}</div>`
       ),
       explanationSrc: "/sounds/elevenlabs/explanation_player2AudioCycler.mp3",
       cycler: useCycleList(["Change player 2 audio"]),
-      audioCycler: useCycleList(store.player2AudioSrcs),
+    },
+    {
+      name: "Change YOLO model",
+      clickFunction: () => {
+        speak(`YOLO model is ${store.yoloModelCycler.state.id}.`);
+      },
+      html: computed(
+        () =>
+          `<div class='text-14px opacity-50'>${store.prevYoloModel}</div><div class='text-16px'>${store.yoloModelCycler.state.id}</div><div class='text-14px opacity-50'>${store.nextYoloModel}</div>`
+      ),
+      cycler: useCycleList(["Change YOLO model"]),
     },
   ],
 ];

@@ -11,7 +11,7 @@ export function useSoundComposable(soundSrc: string, duration = 0) {
       console.log("Already speaking, stopping current speech");
       return;
     }
-    if (sound.isPlaying.value && store.currentSoundSrc === soundSrc) {
+    if (sound.isPlaying.value && store.currentGlobalSoundSrc === soundSrc) {
       sound.stop();
     } else {
       sound.play();
@@ -23,7 +23,7 @@ export function useSoundComposable(soundSrc: string, duration = 0) {
           sound.stop();
         }, duration);
       }
-      store.currentSoundSrc = soundSrc;
+      store.currentGlobalSoundSrc = soundSrc;
     }
   };
 
