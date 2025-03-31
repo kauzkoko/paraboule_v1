@@ -35,4 +35,8 @@ export const modesList = [
     name: "Multiplayer",
     description: "Multiplayer mode",
   },
+  {
+    name: "All",
+    description: "All mode",
+  },
 ];
