@@ -14,7 +14,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const initIndex = modesList.findIndex((mode) => mode.name === "All");
   modesCycler.go(initIndex);
 
-
+  const predictionVisualiser = ref(false);
   const soundSrcs = [
     "/sounds/noise.mp3",
     "/sounds/noisehigh.mp3",
@@ -505,6 +505,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     incrementPlayer2score,
     focusBoules,
     modesCycler,
+    predictionVisualiser,
   };
 });
 

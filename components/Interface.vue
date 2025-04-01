@@ -37,13 +37,25 @@
       </div>
     </div>
   </div>
+  <div class="outer pointer-events-none" v-show="store.predictionVisualiser" >
+    <div class="container">
+      <div class="big">
+        <div v-show="!store.predictionVisualiser">
+          <div>
+            Tap once to exit.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div
     class="outer"
     ref="el"
     v-show="
       !store.isTouchingHaptic &&
       !store.isTouchingSlider &&
-      !store.isTouchingTopCameraSlider
+      !store.isTouchingTopCameraSlider &&
+      !store.predictionVisualiser
     "
   >
     <div class="container">
@@ -142,6 +154,7 @@
     @touchstart="onTappingOnHaptic"
     @touchend="onTappingOnHaptic"
   ></VibrationGrid>
+  <PredictionVisualiser @click="console.log('clicked')"></PredictionVisualiser>
 </template>
 
 <script setup>
@@ -1344,6 +1357,15 @@ const pages = [
       cycler: useCycleList(["Mute all sounds"]),
       modes: ["All", "Dev"],
     },
+    {
+      name: "Prediction Visualiser",
+      clickFunction: () => {
+        store.predictionVisualiser = !store.predictionVisualiser;
+      },
+      html: "Prediction Visualiser",
+      cycler: useCycleList(["Prediction Visualiser"]),
+      modes: ["All", "Dev"],
+    },
   ],
 ];
 
@@ -1542,6 +1564,7 @@ onKeyStroke(["1", "2", "3", "4", "5", "6", "7", "8", "9"], (e) => {
   position: fixed;
   left: 0;
   bottom: 0;
+  z-index: 1000;
 }
 
 .container {
