@@ -15,6 +15,8 @@ export const useProtoStore = defineStore("protoStore", () => {
   modesCycler.go(initIndex);
 
   const predictionVisualiser = ref(false);
+
+  const predictionTo3d = ref(false);
   const soundSrcs = [
     "/sounds/noise.mp3",
     "/sounds/noisehigh.mp3",
@@ -506,6 +508,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     focusBoules,
     modesCycler,
     predictionVisualiser,
+    predictionTo3d
   };
 });
 
