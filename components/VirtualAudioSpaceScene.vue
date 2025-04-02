@@ -195,6 +195,9 @@ function lookAlongNegativeXAxis() {
     value: -270,
     duration: 1,
     ease: "power2.out",
+    onComplete: () => {
+      hihatTriggers.value[3]++;
+    },
   });
 }
 
@@ -205,6 +208,9 @@ function lookAlongPositiveXAxis() {
     value: -90,
     duration: 1,
     ease: "power2.out",
+    onComplete: () => {
+      hihatTriggers.value[1]++;
+    },
   });
 }
 
@@ -223,6 +229,7 @@ function lookAlongNegativeZAxis() {
     ease: "power2.out",
     onComplete: () => {
       alpha.value = 0;
+      hihatTriggers.value[0]++;
     },
   });
 }
@@ -234,6 +241,9 @@ function lookAlongPositiveZAxis() {
     value: -180,
     duration: 1,
     ease: "power2.out",
+    onComplete: () => {
+      hihatTriggers.value[2]++;
+    },
   });
 }
 
@@ -388,6 +398,11 @@ function startCircularRotation() {
     value: targetZ,
     duration: 1,
     ease: "power2.out",
+    onStart: () => {
+      gsap.delayedCall(0.7, () => {
+        hihatTriggers.value[0]++;
+      });
+    },
   });
   let duration = 8;
   gsap.to(alpha, {
@@ -397,7 +412,6 @@ function startCircularRotation() {
     // repeat: -1, // Infinite repetition
     ease: "none",
     onStart: () => {
-      hihatTriggers.value[0]++;
       gsap.delayedCall(duration / 4 - 0.3, () => {
         if (circleAroundCochonet) {
           hihatTriggers.value[1]++;
