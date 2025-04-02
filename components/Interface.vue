@@ -170,11 +170,18 @@
 <script setup>
 import { Howler } from "howler";
 import { useQRCode } from "@vueuse/integrations/useQRCode";
+import { gsap } from "gsap";
 
 const store = useProtoStore();
 const { speak } = useSpeech();
 const bus = useEventBus("protoboules");
+const { sendReverseField } = useScanController();
 const { sendRawIntersections } = useXrController();
+const { sendPlayCocho, sendPlayShoes, sendPlayPhone } = useSoundController({
+  listen: true,
+});
+const { sendMute, sendUnmute } = useAssistantController();
+const { sendGlobalShotsTaken } = useScoreController();
 
 const onTappingOnHaptic = () => {
   store.isTappingOnHaptic = !store.isTappingOnHaptic;
@@ -211,9 +218,6 @@ const {
   vibratePageTwelve,
 } = useVibrations();
 
-const { sendPlayCocho, sendPlayShoes, sendPlayPhone } = useSoundController({
-  listen: true,
-});
 const {
   startCircularRotation,
   flyToCochonetAndBack,
@@ -557,8 +561,8 @@ const computedAnnounceBallsPlayedHtml = computed(() => {
 
 const computedScoreStandingsHtml = computed(() => {
   return `
-    <div class='text-48px'>
-      <div>${store.players.player1.score} / 13</div><br />
+    <div class='text-48px word-break-none'>
+      <div class='whitespace-nowrap'>${store.players.player1.score} / 13</div><br />
       <div class='h-3px bg-hex-ff0000 w-100%'></div><br/>
       <div>${store.players.player2.score} / 13</div>
     </div>`;
@@ -685,11 +689,16 @@ const click_hapticGridFar = () => {
   store.isTouchingHaptic = !store.isTouchingHaptic;
 };
 
-const click_mute = () => {
-  console.log("click_mute");
+const click_toggleMute = () => {
+  console.log("click_toggleMute");
   Howler.stop();
   store.toggle3dAudio();
   window.speechSynthesis.cancel();
+  if (store.volume === 0) {
+    sendMute();
+  } else {
+    sendUnmute();
+  }
 };
 
 const addFunction = () => {
@@ -773,19 +782,16 @@ const pages = [
         "Toggle Top Camera Slider",
         "Scan and count points",
         "Set points from latest scan",
+        "Increment shots taken",
       ]),
-      modes: ["All", "Dev", "Testing", "Solo"],
+      modes: ["All", "Dev", "Testing", "Solo", "Referee"],
     },
     {
       name: "Alpha Controller",
       clickFunction: setAlphaController,
       imgSrc: "/icons/gyros.svg",
       html: "Toggle Alpha Controller",
-      cycler: useCycleList([
-        "Alpha Controller",
-        "Slider",
-        "Show Stunden Orientation",
-      ]),
+      cycler: useCycleList(["Alpha Controller", "Slider", "Fly to Cochonet"]),
       modes: ["All", "Dev", "Testing", "Player", "Solo"],
     },
     {
@@ -802,6 +808,8 @@ const pages = [
         "Focus Boule 4",
         "Focus Boule 5",
         "Focus Boule 6",
+        "Focus Cochonet",
+        "Quick Focuser",
       ]),
       modes: ["All", "Dev", "Testing", "Player", "Solo"],
     },
@@ -812,7 +820,14 @@ const pages = [
       clickFunction: scoreStandings,
       html: computedScoreStandingsHtml,
       explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
-      cycler: useCycleList(["Score Standings"]),
+      cycler: useCycleList([
+        "Score Standings",
+        "Increment shots taken",
+        "Scan and count points",
+        "Set points from latest scan",
+        "Player 1 Score Incrementer",
+        "Player 2 Score Incrementer",
+      ]),
       modes: ["All", "Dev", "Testing", "Player", "Referee"],
     },
     {
@@ -822,7 +837,6 @@ const pages = [
       cycler: useCycleList([
         "Scan and count points",
         "Set points from latest scan",
-        "Scan field",
       ]),
       modes: ["All", "Dev", "Testing", "Referee", "Solo"],
     },
@@ -865,8 +879,9 @@ const pages = [
       cycler: useCycleList([
         "Player 1 Shot Incrementer",
         "Player 2 Shot Incrementer",
+        "Increment shots taken",
       ]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "Referee"],
     },
     {
       name: "Player 2 Shot Incrementer",
@@ -1032,7 +1047,7 @@ const pages = [
         "/sounds/elevenlabs/explanation_pairingStatusAnnouncer.mp3",
       html: "Pairing-Status:<br />Connected to 3wasds3w2.",
       cycler: useCycleList(["Pairing Status", "Ping Phone"]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "QR"],
     },
     {
       name: "Ping Phone",
@@ -1040,7 +1055,7 @@ const pages = [
       imgSrc: "/icons/pingPhone.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_phonePinger.mp3",
       cycler: useCycleList(["Ping Phone", "Pairing Status"]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "QR"],
     },
     {
       name: "Scan QR",
@@ -1048,6 +1063,7 @@ const pages = [
       imgSrc: "/icons/scanQr1.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_qrScanner.mp3",
       cycler: useCycleList(["Scan QR", "Unique QR"]),
+      modes: ["All", "Dev", "Testing", "QR"],
     },
     {
       name: "Unique QR",
@@ -1056,7 +1072,7 @@ const pages = [
       // html: computedUniqueQrHtml",
       explanationSrc: "/sounds/elevenlabs/explanation_uniqueQr.mp3",
       cycler: useCycleList(["Unique QR", "Scan QR"]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "QR"],
     },
   ],
   [
@@ -1066,7 +1082,7 @@ const pages = [
       html: "Send scan results to other device",
       explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
       cycler: useCycleList(["Raw Intersections", "Refresh page"]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "Referee"],
     },
     {
       name: "Refresh page",
@@ -1131,7 +1147,7 @@ const pages = [
         "Focus Boule 6",
         "Focus Boule 1",
       ]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "Player"],
     },
     {
       name: "Focus Boule 3",
@@ -1146,7 +1162,7 @@ const pages = [
         "Focus Boule 6",
         "Focus Boule 1",
       ]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "Player"],
     },
     {
       name: "Focus Cochonet",
@@ -1163,7 +1179,7 @@ const pages = [
         "Focus Boule 5",
         "Focus Boule 6",
       ]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "Player"],
     },
   ],
   [
@@ -1182,7 +1198,7 @@ const pages = [
         "Focus Boule 3",
         "Focus All Boules",
       ]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "Player"],
     },
     {
       name: "Focus Boule 5",
@@ -1199,7 +1215,7 @@ const pages = [
         "Focus Boule 4",
         "Focus All Boules",
       ]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "Player"],
     },
     {
       name: "Focus Boule 6",
@@ -1213,7 +1229,7 @@ const pages = [
         "Focus Boule 5",
         "Focus All Boules",
       ]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "Player"],
     },
     {
       name: "Focus All Boules",
@@ -1231,7 +1247,7 @@ const pages = [
         "Focus Boule 5",
         "Focus Boule 6",
       ]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "Player"],
     },
   ],
   [
@@ -1245,7 +1261,7 @@ const pages = [
         "Haptic grid medium",
         "Haptic grid far",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing"],
     },
     {
       name: "Haptic grid medium",
@@ -1257,7 +1273,7 @@ const pages = [
         "Haptic grid near",
         "Haptic grid far",
       ]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "Player"],
     },
     {
       name: "Haptic grid far",
@@ -1279,7 +1295,7 @@ const pages = [
       imgSrc: "/icons/hoolahoop.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_hoolaPinger.mp3",
       cycler: useCycleList(["Ping Startpoint", "Ping Cochonet"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing"],
     },
     {
       name: "Stalefish 180",
@@ -1287,7 +1303,7 @@ const pages = [
       imgSrc: "/icons/stalefish180.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_throughTurnAndBack.mp3",
       cycler: useCycleList(["Stalefish 180"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing"],
     },
   ],
   [
@@ -1297,7 +1313,7 @@ const pages = [
       imgSrc: "/icons/gyros.svg",
       html: "Toggle Alpha Controller",
       cycler: useCycleList(["Alpha Controller"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing"],
     },
     {
       name: "Fly to Cochonet",
@@ -1305,7 +1321,7 @@ const pages = [
       imgSrc: "/icons/flyToCochonet.svg",
       html: "Fly to Cochonet",
       cycler: useCycleList(["Fly to Cochonet"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing"],
     },
     {
       name: "Slider",
@@ -1313,7 +1329,7 @@ const pages = [
       imgSrc: "/icons/slider.svg",
       html: "Slider",
       cycler: useCycleList(["Slider"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing"],
     },
   ],
   [
@@ -1374,11 +1390,11 @@ const pages = [
       modes: ["All"],
     },
     {
-      name: "Mute all sounds",
-      clickFunction: click_mute,
-      html: "Mute all sounds",
-      cycler: useCycleList(["Mute all sounds"]),
-      modes: ["All", "Dev"],
+      name: "Toggle mute",
+      clickFunction: click_toggleMute,
+      html: "Toggle mute",
+      cycler: useCycleList(["Toggle mute"]),
+      modes: ["All", "Dev", "Testing"],
     },
     {
       name: "Prediction Visualiser",
@@ -1387,7 +1403,7 @@ const pages = [
       },
       html: "Prediction Visualiser",
       cycler: useCycleList(["Prediction Visualiser"]),
-      modes: ["All", "Dev"],
+      modes: ["All", "Dev", "Testing"],
     },
   ],
   [
@@ -1396,13 +1412,14 @@ const pages = [
       deactivated: computed(() => !store.reverseField),
       clickFunction: () => {
         store.reverseField = !store.reverseField;
+        sendReverseField();
         speak(`Field ${store.reverseField ? "reversed" : "normal"}`);
       },
       html: computed(
         () => `Toggle Reverse Field: ${store.reverseField ? "ON" : "OFF"}`
       ),
       cycler: useCycleList(["Toggle Reverse Field"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Referee"],
     },
     {
       name: "Referee Mode",
@@ -1445,7 +1462,48 @@ const pages = [
     },
   ],
   [
-  {
+    {
+      name: "Quick Focuser",
+      clickFunction: () => {
+        if (store.volume === 0) {
+          store.volume = 1;
+          const prevSelectedBoules = store.selectedBoules;
+          const amountOfBoulesToDisplay = store.boulesToDisplay.length;
+          for (let i = 0; i < amountOfBoulesToDisplay; i++) {
+            setTimeout(() => {
+              store.focusBoules(i);
+            }, i * 800);
+            if (i === amountOfBoulesToDisplay - 1) {
+              setTimeout(() => {
+                if (prevSelectedBoules.length > 1) {
+                  click_bouleFocuser("all");
+                } else if (prevSelectedBoules.length === 1) {
+                  click_bouleFocuser(prevSelectedBoules[0]);
+                } else {
+                  console.log("no boules were selected");
+                }
+                store.volume = 0;
+              }, i * 800 + 800);
+            }
+          }
+        }
+      },
+      html: "Quick Focuser",
+      cycler: useCycleList(["Quick Focuser"]),
+      modes: ["All"],
+    },
+    {
+      name: "Mock Intersections",
+      clickFunction: () => {
+        store.mockIntersectionsCycler.next();
+        store.setMockIntersections();
+        sendRawIntersections();
+      },
+      html: "Mock Intersections",
+      cycler: useCycleList(["Mock Intersections"]),
+      modes: ["All", "Dev", "Testing", "Referee", "Assistant"],
+    },
+    {
       name: "Change Mode",
       clickFunction: () => {
         speak(`Current mode is ${store.modesCycler.state.name}`);
@@ -1457,7 +1515,7 @@ const pages = [
       cycler: useCycleList(["Change Mode"]),
       modes: ["All"],
     },
-  ]
+  ],
 ];
 
 const flatPages = pages.flat();
@@ -1636,7 +1694,7 @@ watch(isSwiping, (val) => {
       flyToStart();
     }
     if (direction.value === "up") {
-      click_mute();
+      click_toggleMute();
     }
 
     if (stepperIndex.value === 0) vibratePageOne();
@@ -1679,6 +1737,10 @@ onKeyStroke(["1", "2", "3", "4", "5", "6", "7", "8", "9"], (e) => {
   if (pageIndex >= 0 && pageIndex < pages.length) {
     goTo(stepNames.value[pageIndex]);
   }
+});
+
+onKeyStroke(["v"], (e) => {
+  store.volumePulse++;
 });
 </script>
 

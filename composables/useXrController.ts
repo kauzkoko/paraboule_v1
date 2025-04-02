@@ -1,16 +1,19 @@
 export function useXrController() {
   const store = useProtoStore();
-  const { rawIntersections } = storeToRefs(store);
 
   const supabase = useSupabaseClient();
-  let channel = supabase.channel("xr-controller");
-  channel.subscribe();
+  let xrController = supabase.channel("xr-controller");
+  xrController.subscribe();
+
+  xrController.on("broadcast", { event: "rawIntersections" }, (event) => {
+    store.rawIntersections = event.payload.rawIntersections;
+  });
 
   function sendRawIntersections() {
-    channel.send({
+    xrController.send({
       type: "broadcast",
       event: "rawIntersections",
-      payload: { rawIntersections: rawIntersections.value },
+      payload: { rawIntersections: store.rawIntersections },
     });
   }
 

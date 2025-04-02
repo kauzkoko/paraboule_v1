@@ -12,8 +12,29 @@
 </script>
 
 <style>
+:root {
+  --red: #ff0000;
+  --blue: #0000ff;
+  --green: #00ff00;
+  --yellow: #ffff00;
+  --purple: #800080;
+  --orange: #ffa500;
+  --pink: #ffc0cb;
+  --gray: #808080;
+  --white: #ffffff;
+  --black: #000000;
+  --background: var(--black);
+  --foreground: var(--white);
+  --primary: var(--red);
+  --stroke: var(--white);
+  --light: var(--#696969);
+  --dark: var(--#bebebe);
+  --cochonet: var(--yellow);
+}
+
+
 html, body {
-  background-color: black;
+  background-color: var(--background);
   margin: 0;
   padding: 0;
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, "Trebuchet MS", Verdana, sans-serif;

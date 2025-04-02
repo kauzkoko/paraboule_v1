@@ -13,7 +13,13 @@
   >
     <TresSphereGeometry :args="[boule.size, 24, 24]" />
     <CustomShaderMaterial
-      v-bind="boule.player === 1 ? materialPropsRed : materialPropsBlue"
+      v-bind="
+        boule.player === 1
+          ? materialPropsRed
+          : boule.player === 2
+          ? materialPropsBlue
+          : materialPropsYellow
+      "
       transparent
       :opacity="checkSelectedBoules(index) ? 1 : 0"
       v-if="checkSelectedBoules(index)"
@@ -25,6 +31,8 @@
           ? store.currentSoundPlayer1
           : boule.player === 2
           ? store.currentSoundPlayer2
+          : checkSelectedBoules(index)
+          ? '/sounds/shortdeep.mp3'
           : '/strudel/still.mp3'
       "
     />

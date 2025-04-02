@@ -1,11 +1,7 @@
 import { acceptHMRUpdate } from "pinia";
 
 export const useProtoStore = defineStore("protoStore", () => {
-  const supabase = useSupabaseClient();
-  let channel = supabase.channel("xr-controller");
-
-  const { sendNewScore, sendGlobalShotsTaken, sendPlayersShotsTaken } =
-    useScoreController();
+  const { sendNewScore, sendPlayersShotsTaken } = useScoreController();
   const { sendSelectedBoules } = useFocusController();
 
   const bus = useEventBus("protoboules");
@@ -20,7 +16,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     if (currentIndex === 0) return modesList[lastIndex].name;
     return modesList[currentIndex - 1].name;
   });
-  
+
   const nextMode = computed(() => {
     const currentIndex = modesCycler.index.value;
     const lastIndex = modesList.length - 1;
@@ -35,16 +31,16 @@ export const useProtoStore = defineStore("protoStore", () => {
     "/sounds/noise.mp3",
     "/sounds/noisehigh.mp3",
     "/sounds/noiselow.mp3",
-    "/sounds/shortdeep.mp3",
     "/sounds/waterBig.m4a",
     "/sounds/waterMedium.m4a",
     "/sounds/waterBigger.m4a",
-    "/sounds/noz.mp3",
-    "/sounds/noz2.mp3",
     "/sounds/strudel/c3major.mp3",
     "/sounds/strudel/e3major.mp3",
     "/sounds/strudel/g3major.mp3",
     "/sounds/strudel/startpoint.mp3",
+    "/sounds/shortdeep.mp3",
+    "/sounds/noz2.mp3",
+    "/sounds/noz.mp3",
   ];
 
   // score / players
@@ -53,15 +49,23 @@ export const useProtoStore = defineStore("protoStore", () => {
       name: "Player 1",
       shotsTaken: 0,
       class: "dark",
-      audioCycler: useCycleList(soundSrcs),
+      audioCycler: useCycleList(soundSrcs, {
+        initialValue: soundSrcs[soundSrcs.length - 1],
+      }),
       score: 0,
+      color: "#ff0000",
+      colorCode: "#ff0000",
+      colorName: "red",
     },
     player2: {
       name: "Player 2",
       shotsTaken: 0,
       class: "light",
-      audioCycler: useCycleList(soundSrcs),
+      audioCycler: useCycleList(soundSrcs, { initialValue: soundSrcs[7] }),
       score: 0,
+      color: "#0000ff",
+      colorCode: "#0000ff",
+      colorName: "blue",
     },
   });
 
@@ -107,7 +111,6 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   const globalShotsTaken = ref(0);
   const resetShotsTaken = () => {
-    console.log("resetShotsTaken");
     globalShotsTaken.value = 0;
   };
 
@@ -122,7 +125,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     if (reverseField.value) {
       return sortedBoules.value.map((boule) => {
         return {
-        ...boule,
+          ...boule,
           x: boule.x * -1,
           y: boule.y * -1,
         };
@@ -136,8 +139,8 @@ export const useProtoStore = defineStore("protoStore", () => {
     const amountBoulesAndCochonet = filteredBoules.value.length;
     boulesCount.value = amountBoulesAndCochonet;
     const amountOnlyBoules = amountBoulesAndCochonet - 1;
-    const minBoulesAmount = globalShotsTaken.value;
-    if (amountOnlyBoules >= minBoulesAmount) {
+    const maxBoulesAmount = globalShotsTaken.value;
+    if (amountOnlyBoules <= maxBoulesAmount) {
       bus.emit("stopXR");
     }
     return filteredBoules.value;
@@ -203,38 +206,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const xrRunning = ref(false);
   const arSupported = ref(false);
   const rawIntersections = ref([]);
-  const mockIntersections = ref([
-    {
-      x: 0.15217870875827644,
-      y: 0.11757755279540989,
-      z: -2.14242094133827,
-      class: "cochonet",
-    },
-    {
-      x: 0.3014103032020119,
-      y: 0.11757755279540989,
-      z: -2.3185530158534984,
-      class: "dark",
-    },
-    {
-      x: 0.019827494002689575,
-      y: 0.13757755279540984,
-      z: -1.873205403607142,
-      class: "light",
-    },
-    {
-      x: 0.35239538925638664,
-      y: 0.050841178894042934,
-      z: -2.040454871744344,
-      class: "dark",
-    },
-    {
-      x: 0.20640927469181287,
-      y: 0.10841178894042956,
-      z: -1.9825655394221926,
-      class: "light",
-    },
-  ]);
+  const mockIntersectionsCycler = useCycleList(mockIntersections);
   const predictions = ref([]);
   const planeDetected = ref(false);
 
@@ -336,6 +308,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     return `${players.value.player1.score} - ${players.value.player2.score}`;
   });
 
+  const volumePulse = ref(0);
   const selectedBoules = ref([]);
   const {
     next: nextBoule,
@@ -354,6 +327,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     else {
       console.log("bouleIndex out of range", bouleIndex);
     }
+    volumePulse.value++;
     sendSelectedBoules();
   };
 
@@ -461,13 +435,11 @@ export const useProtoStore = defineStore("protoStore", () => {
       setFromIntersections();
     }
   });
-  channel
-    .on("broadcast", { event: "rawIntersections" }, (data) => {
-      console.log("rawIntersections", data);
-      rawIntersections.value = data.payload.rawIntersections;
-    })
-    .subscribe();
-  rawIntersections.value = mockIntersections.value;
+
+  const setMockIntersections = () => {
+    rawIntersections.value = mockIntersectionsCycler.state.value;
+  };
+  setMockIntersections();
 
   return {
     yoloModelCycler,
@@ -538,6 +510,9 @@ export const useProtoStore = defineStore("protoStore", () => {
     reverseField,
     prevMode,
     nextMode,
+    volumePulse,
+    mockIntersectionsCycler,
+    setMockIntersections,
   };
 });
 

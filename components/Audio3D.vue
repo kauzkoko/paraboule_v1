@@ -47,12 +47,49 @@ const props = defineProps({
 const positionalAudioRef = useTemplateRef("positionalAudioRef");
 const store = useProtoStore();
 const { volume, trigger } = storeToRefs(store);
+import { gsap } from "gsap";
+
+watch(() => store.volumePulse, () => {
+  if (positionalAudioRef.value) {
+    console.log("volumePulse", store.volumePulse);
+    gsap.to(positionalAudioRef.value.instance.gain.gain, {
+      value: 2,
+      duration: .3,
+      ease: "power2.out",
+      onComplete: () => {
+        gsap.to(positionalAudioRef.value.instance.gain.gain, {
+          value: 1,
+          duration: 0.2,
+          ease: "power2.out",
+        });
+      },
+    });
+  }
+});
+
+if (positionalAudioRef.value) {
+  positionalAudioRef.value.instance.gain.gain.value = 0;
+}
 
 watchEffect(() => {
   trigger.value = props.localTrigger;
   if (positionalAudioRef.value) {
     positionalAudioRef.value.instance.visible = props.localHelper;
-    positionalAudioRef.value.instance.gain.gain.value = volume.value ?? props.localVolume;
+    gsap.to(positionalAudioRef.value.instance.gain.gain, {
+      value: volume.value ?? props.localVolume,
+      duration: 5,
+      ease: "power2.out"
+    });
+  }
+});
+
+onUnmounted(() => {
+  if (positionalAudioRef.value) {
+    gsap.to(positionalAudioRef.value.instance.gain.gain, {
+      value: 0,
+      duration: 0.5,
+      ease: "power2.out"
+    });
   }
 });
 </script>

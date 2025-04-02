@@ -12,10 +12,10 @@
           top: prediction.bbox.y / 1 + 'px',
           borderColor:
             prediction.class === 'cochonet'
-              ? 'red'
-              : prediction.class === 'dark'
-              ? '#999'
-              : '#eee',
+            ? 'var(--cochonet)'
+            : prediction.class === 'dark'
+            ? 'var(--light)'
+            : 'var(--dark)',
         }"
       >
         <div>{{ index }}</div>
