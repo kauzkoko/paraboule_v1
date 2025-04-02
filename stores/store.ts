@@ -111,10 +111,6 @@ export const useProtoStore = defineStore("protoStore", () => {
     globalShotsTaken.value = 0;
   };
 
-  watch(globalShotsTaken, (newGlobalShotsTaken) => {
-    sendGlobalShotsTaken();
-  });
-
   const reverseField = ref(false);
 
   const boules = ref([]);

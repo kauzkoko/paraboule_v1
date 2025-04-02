@@ -841,8 +841,10 @@ const pages = [
       clickFunction: () => {
         if (store.globalShotsTaken < 7) {
           store.globalShotsTaken++;
+          sendGlobalShotsTaken();
         } else {
           store.resetShotsTaken();
+          sendGlobalShotsTaken();
         }
       },
       html: computed(() =>
