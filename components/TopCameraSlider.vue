@@ -1,6 +1,7 @@
 <template>
   <div
     class="fullScreenAll"
+    v-if="store.isTouchingTopCameraSlider"
     :style="{
       pointerEvents: store.isTouchingTopCameraSlider ? 'auto' : 'none',
     }"

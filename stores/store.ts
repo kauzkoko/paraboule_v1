@@ -101,12 +101,25 @@ export const useProtoStore = defineStore("protoStore", () => {
     sendGlobalShotsTaken();
   });
 
+  const reverseField = ref(false);
+
   const boules = ref([]);
   const boulesCount = ref(0);
   const sortedBoules = useSorted(boules, (a, b) => a.distance - b.distance);
   const { history: sortedBoulesHistory } = useRefHistory(sortedBoules);
   const filteredBoules = computed(() => {
-    return sortedBoules.value.filter((boule) => boule.distance < 30);
+    // return sortedBoules.value.filter((boule) => boule.distance < 30);
+    if (reverseField.value) {
+      return sortedBoules.value.map((boule) => {
+        return {
+        ...boule,
+          x: boule.x * -1,
+          y: boule.y * -1,
+        };
+      });
+    } else {
+      return sortedBoules.value;
+    }
   });
   const { history: filteredBoulesHistory } = useRefHistory(filteredBoules);
   const boulesToDisplay = computed(() => {
@@ -125,11 +138,14 @@ export const useProtoStore = defineStore("protoStore", () => {
   const modelWorkerId = ref(null);
   const init = async () => {
     const { startWorker } = await useInference();
+    await startWorker();
+
     arSupported.value =
       (await navigator.xr?.isSessionSupported("immersive-ar")) ?? false;
-    if (arSupported.value) {
-      await startWorker();
-    }
+    console.log("arSupported", arSupported.value);
+    // if (arSupported.value) {
+    //   await startWorker();
+    // }
   };
   const yoloModels = [
     {
@@ -508,7 +524,8 @@ export const useProtoStore = defineStore("protoStore", () => {
     focusBoules,
     modesCycler,
     predictionVisualiser,
-    predictionTo3d
+    predictionTo3d,
+    reverseField,
   };
 });
 

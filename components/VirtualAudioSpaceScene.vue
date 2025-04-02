@@ -5,7 +5,7 @@
     ref="camera"
   />
   <TresMesh
-    v-for="(boule, index) in boules"
+    v-for="(boule, index) in boulesToDisplay"
     :key="index"
     :iClass="boule.class"
     ref="boulesRefs"
@@ -106,7 +106,7 @@ bus.on((message, payload) => {
 });
 
 const store = useProtoStore();
-const { boulesToDisplay: boules, hihatTriggers } = storeToRefs(store);
+const { boulesToDisplay, hihatTriggers } = storeToRefs(store);
 
 const checkSelectedBoules = (index) => {
   if (store.volume === 0) return false;
@@ -168,11 +168,11 @@ onBeforeRender(({ delta, elapsed }) => {
     alpha.value = mappedRelativeAlpha.value;
   }
   if (store.isTouchingSlider) {
-    console.log("isTouchingSlider", store.isTouchingSlider);
+    // console.log("isTouchingSlider", store.isTouchingSlider);
     cameraZ.value = map(y.value, 0, height.value, -30, 30);
   }
   if (store.isTouchingTopCameraSlider) {
-    console.log("isTouchingTopCameraSlider", store.isTouchingTopCameraSlider);
+    // console.log("isTouchingTopCameraSlider", store.isTouchingTopCameraSlider);
     cameraY.value = map(y.value, 0, height.value, 10, 200);
   }
 });
@@ -189,15 +189,17 @@ const mappedRelativeAlpha = computed(() => {
 });
 
 function lookAlongNegativeXAxis() {
+  console.log("neg x current alpha", alpha.value);
   goToZero();
   gsap.to(alpha, {
-    value: 90,
+    value: -270,
     duration: 1,
     ease: "power2.out",
   });
 }
 
 function lookAlongPositiveXAxis() {
+  console.log("pos x current alpha", alpha.value);
   goToZero();
   gsap.to(alpha, {
     value: -90,
@@ -206,19 +208,30 @@ function lookAlongPositiveXAxis() {
   });
 }
 
-function lookAlongPositiveZAxis() {
+function lookAlongNegativeZAxis() {
+  console.log("neg z current alpha", alpha.value);
+  let goToAlpha = 0;
+  if (alpha.value === -270) {
+    goToAlpha = -360;
+  } else {
+    goToAlpha = 0;
+  }
   goToZero();
   gsap.to(alpha, {
-    value: 0,
+    value: goToAlpha,
     duration: 1,
     ease: "power2.out",
+    onComplete: () => {
+      alpha.value = 0;
+    },
   });
 }
 
-function lookAlongNegativeZAxis() {
+function lookAlongPositiveZAxis() {
+  console.log("pos z current alpha", alpha.value);
   goToZero();
   gsap.to(alpha, {
-    value: 180,
+    value: -180,
     duration: 1,
     ease: "power2.out",
   });

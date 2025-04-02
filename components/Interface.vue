@@ -2,7 +2,11 @@
   <div class="absolute left-0 w-100dvw h-100dvh" @click="onFullscreenClick()">
     <VirtualAudioSpace :trigger="audioTrigger"></VirtualAudioSpace>
   </div>
-  <div class="outer" v-show="store.isTouchingSlider">
+  <div
+    class="outer"
+    v-show="store.isTouchingSlider"
+    @click="onClickSliderComponent"
+  >
     <div class="container">
       <div class="big">
         <div v-show="!store.isTappingOnSlider">
@@ -14,7 +18,11 @@
       </div>
     </div>
   </div>
-  <div class="outer" v-show="store.isTouchingTopCameraSlider">
+  <div
+    class="outer"
+    v-show="store.isTouchingTopCameraSlider"
+    @click="onClickTopCameraSliderComponent"
+  >
     <div class="container">
       <div class="big">
         <div v-show="!store.isTappingOnTopCameraSlider">
@@ -26,7 +34,11 @@
       </div>
     </div>
   </div>
-  <div class="outer" v-show="store.isTouchingHaptic">
+  <div
+    class="outer"
+    v-show="store.isTouchingHaptic"
+    @click="onClickHapticGridComponent"
+  >
     <div class="container">
       <div class="big">
         <div v-show="!store.isTappingOnHaptic">
@@ -37,13 +49,11 @@
       </div>
     </div>
   </div>
-  <div class="outer pointer-events-none" v-show="store.predictionVisualiser" >
+  <div class="outer pointer-events-none" v-show="store.predictionVisualiser">
     <div class="container">
       <div class="big">
         <div v-show="!store.predictionVisualiser">
-          <div>
-            Tap once to exit.
-          </div>
+          <div>Tap once to exit.</div>
         </div>
       </div>
     </div>
@@ -154,7 +164,7 @@
     @touchstart="onTappingOnHaptic"
     @touchend="onTappingOnHaptic"
   ></VibrationGrid>
-  <PredictionVisualiser @click="console.log('clicked')"></PredictionVisualiser>
+  <PredictionVisualiser></PredictionVisualiser>
 </template>
 
 <script setup>
@@ -171,6 +181,7 @@ const onTappingOnHaptic = () => {
 };
 
 const onTappingOnSlider = () => {
+  console.log("onTappingOnSlider");
   store.isTappingOnSlider = !store.isTappingOnSlider;
   // if (!store.isTappingOnSlider) {
   //   // flyToStart();
@@ -305,9 +316,9 @@ const setPointsFromLatestScan = () => {
   store.setScoreFromPoints();
 };
 
-const ping = () => {
+const click_pingCochonet = () => {
   if (!afterLongPress) {
-    sendPlayCocho();
+    sendPlayCocho(5000);
   }
 };
 
@@ -618,6 +629,7 @@ const refreshPage = () => {
 };
 
 const onClickSliderComponent = () => {
+  console.log("onClickSliderComponent");
   store.isTouchingSlider = !store.isTouchingSlider;
 };
 
@@ -641,6 +653,13 @@ const click_toggleTopCameraSlider = () => {
   console.log("click_toggleTopCamera");
   store.isTouchingTopCameraSlider = !store.isTouchingTopCameraSlider;
   toggleTopCamera();
+};
+
+const onClickTopCameraSliderComponent = () => {
+  if (store.isTouchingTopCameraSlider) {
+    toggleTopCamera();
+  }
+  store.isTouchingTopCameraSlider = !store.isTouchingTopCameraSlider;
 };
 
 const onClickHapticGridComponent = () => {
@@ -733,7 +752,7 @@ const pages = [
   [
     {
       name: "Ping Cochonet",
-      clickFunction: ping,
+      clickFunction: click_pingCochonet,
       imgSrc: "/icons/cocho.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pingCocho.mp3",
       cycler: useCycleList(["Ping Cochonet", "Ping Startpoint"]),
@@ -890,7 +909,7 @@ const pages = [
     },
     {
       name: "Look along 12 o'clock",
-      clickFunction: lookAlongPositiveZAxis,
+      clickFunction: lookAlongNegativeZAxis,
       html: "Look along 12 o'clock",
       imgSrc: "/icons/12oclock.svg",
       cycler: useCycleList([
@@ -917,7 +936,7 @@ const pages = [
   [
     {
       name: "Look along 12 o'clock",
-      clickFunction: lookAlongPositiveZAxis,
+      clickFunction: lookAlongNegativeZAxis,
       html: "Look along 12 o'clock",
       imgSrc: "/icons/12oclock.svg",
       cycler: useCycleList([
@@ -956,7 +975,7 @@ const pages = [
     },
     {
       name: "Look along 6 o'clock",
-      clickFunction: lookAlongNegativeZAxis,
+      clickFunction: lookAlongPositiveZAxis,
       html: "Look along 6 o'clock",
       imgSrc: "/icons/6oclock.svg",
       cycler: useCycleList([
@@ -1139,9 +1158,7 @@ const pages = [
         "Focus Boule 6",
       ]),
       modes: ["All", "Dev", "Testing"],
-
     },
-    
   ],
   [
     {
@@ -1367,22 +1384,59 @@ const pages = [
       modes: ["All", "Dev"],
     },
   ],
+  [
+    {
+      name: "Change Mode",
+      clickFunction: () => {
+        store.modesCycler.next();
+        speak(`Mode changed to ${store.modesCycler.state.name}`);
+      },
+      html: computed(() => `Current Mode: ${store.modesCycler.state.name}`),
+      cycler: useCycleList(["Change Mode"]),
+      modes: modesList.map((mode) => mode.name),
+    },
+    {
+      name: "Toggle Reverse Field",
+      deactivated: computed(() => !store.reverseField),
+      clickFunction: () => {
+        store.reverseField = !store.reverseField;
+        speak(`Field ${store.reverseField ? "reversed" : "normal"}`);
+      },
+      html: computed(
+        () => `Toggle Reverse Field: ${store.reverseField ? "ON" : "OFF"}`
+      ),
+      cycler: useCycleList(["Toggle Reverse Field"]),
+      modes: ["All", "Dev", "Testing", "Player"],
+    },
+  ],
 ];
 
 const flatPages = pages.flat();
 
-let pagesBasedOnMode = [];
-pages.forEach((page) => {
-  pagesBasedOnMode.push(
-    page.filter((item) => {
-      if (typeof item.modes === "object") {
-        return item.modes?.includes(store.modesCycler.state.name);
-      } else {
-        return true;
-      }
-    })
-  );
-});
+let pagesBasedOnMode = ref([]);
+const setPagesBasedOnMode = () => {
+  pages.forEach((page) => {
+    pagesBasedOnMode.value.push(
+      page.filter((item) => {
+        if (typeof item.modes === "object") {
+          return item.modes?.includes(store.modesCycler.state.name);
+        } else {
+          return true;
+        }
+      })
+    );
+  });
+};
+setPagesBasedOnMode();
+
+watch(
+  () => store.modesCycler.state,
+  () => {
+    console.log("mode changed", store.modesCycler.state.name);
+    pagesBasedOnMode.value = [];
+    setPagesBasedOnMode();
+  }
+);
 
 const {
   goToNext,

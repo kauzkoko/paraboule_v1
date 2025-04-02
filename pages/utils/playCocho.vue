@@ -4,7 +4,7 @@
       <button
         @click="sendPlay"
         class="w-30vw aspect-1 rounded-full bg-hex-ff0000 border-none"
-        :style="{backgroundColor: isPlaying ? 'blue' : 'red'}"
+        :style="{ backgroundColor: isPlaying ? 'blue' : 'red' }"
       >
         sendPlayCocho
       </button>
@@ -28,7 +28,7 @@ channel
       noz.pause();
       noz.currentTime = 0;
       isPlaying.value = false;
-    }, 3000);
+    }, event.payload.duration ?? 5000);
   })
   .subscribe();
 
@@ -36,7 +36,7 @@ let sendPlay = () => {
   channel.send({
     type: "broadcast",
     event: "playCocho",
-    payload: {},
+    payload: { duration: 5000 },
   });
 };
 </script>

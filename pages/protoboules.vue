@@ -12,6 +12,7 @@
 import { TresCanvas } from "@tresjs/core";
 
 const store = useProtoStore();
+
 onMounted(async () => {
   await store.init();
 });

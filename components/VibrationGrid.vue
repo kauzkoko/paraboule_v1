@@ -1,6 +1,7 @@
 <template>
   <div
     class="fullScreenAll flexCenter text-white"
+    v-if="store.isTouchingHaptic"
     :style="{
       pointerEvents: store.isTouchingHaptic ? 'auto' : 'none',
     }"

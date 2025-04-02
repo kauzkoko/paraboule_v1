@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="overflow-y-auto h-screen">
     <template v-for="route in routes" :key="route.path">
       <NuxtLink
         v-if="!route.path.startsWith('/archive')"

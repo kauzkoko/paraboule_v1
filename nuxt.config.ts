@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     "@unocss/nuxt",
     "@vite-pwa/nuxt",
     "@vueuse/sound/nuxt",
+    "@nuxt/scripts"
   ],
   supabase: {
     redirect: false,
@@ -94,10 +95,11 @@ export default defineNuxtConfig({
       ],
     },
     workbox: {
-      globPatterns: ["**/*.{js,css,html,png,svg,ico}"],
+      globPatterns: ["**/*.{js,css,html,png,svg,ico,mp3,m4a}"],
+      maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6 MiB limit to handle larger assets
     },
     injectManifest: {
-      globPatterns: ["**/*.{js,css,html,png,svg,ico}"],
+      globPatterns: ["**/*.{js,css,html,png,svg,ico,mp3,m4a}"],
       maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
     },
     client: {
@@ -127,5 +129,10 @@ export default defineNuxtConfig({
   },
   pinia: {
     storesDirs: ["./stores/**"],
+  },
+  scripts: {
+    globals: {
+      strudel: 'https://unpkg.com/@strudel/web@1.0.3',
+    }
   }
 });
