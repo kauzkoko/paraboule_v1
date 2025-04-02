@@ -66,4 +66,8 @@ let sendPlay = () => {
     payload: {},
   });
 };
+
+onUnmounted(() => {
+  evaluate("hush()");
+});
 </script>

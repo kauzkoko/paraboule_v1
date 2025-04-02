@@ -59,4 +59,8 @@ const slowPlay = () => {
 const stopPlay = () => {
   evaluate("hush()");
 };
+
+onUnmounted(() => {
+  evaluate("hush()");
+});
 </script>

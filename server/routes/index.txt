@@ -1,0 +1,4 @@
+// server/routes/index.ts
+export default defineEventHandler(async (event) => {
+	return sendRedirect(event, '/protoboules', 302)
+})

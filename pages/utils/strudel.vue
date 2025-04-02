@@ -31,5 +31,9 @@ onLoaded(() => {
     evaluate("hush()");
   });
 });
+
+onUnmounted(() => {
+  evaluate("hush()");
+});
 </script>
 

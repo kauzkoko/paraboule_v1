@@ -14,6 +14,20 @@ export const useProtoStore = defineStore("protoStore", () => {
   const initIndex = modesList.findIndex((mode) => mode.name === "All");
   modesCycler.go(initIndex);
 
+  const prevMode = computed(() => {
+    const currentIndex = modesCycler.index.value;
+    const lastIndex = modesList.length - 1;
+    if (currentIndex === 0) return modesList[lastIndex].name;
+    return modesList[currentIndex - 1].name;
+  });
+  
+  const nextMode = computed(() => {
+    const currentIndex = modesCycler.index.value;
+    const lastIndex = modesList.length - 1;
+    if (currentIndex === lastIndex) return modesList[0].name;
+    return modesList[currentIndex + 1].name;
+  });
+
   const predictionVisualiser = ref(false);
 
   const predictionTo3d = ref(false);
@@ -526,6 +540,8 @@ export const useProtoStore = defineStore("protoStore", () => {
     predictionVisualiser,
     predictionTo3d,
     reverseField,
+    prevMode,
+    nextMode,
   };
 });
 

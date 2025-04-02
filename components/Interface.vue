@@ -254,6 +254,8 @@ const onSwipe = (direction, e, index, item) => {
       store.players.player2.audioCycler.prev();
     } else if (currentPage.value[index].name === "Change YOLO model") {
       store.yoloModelCycler.prev();
+    } else if (currentPage.value[index].name === "Change Mode") {
+      store.modesCycler.prev();
     }
   } else if (direction === "top") {
     if (currentPage.value[index].name === "Change player 1 audio") {
@@ -262,6 +264,8 @@ const onSwipe = (direction, e, index, item) => {
       store.players.player2.audioCycler.next();
     } else if (currentPage.value[index].name === "Change YOLO model") {
       store.yoloModelCycler.next();
+    } else if (currentPage.value[index].name === "Change Mode") {
+      store.modesCycler.next();
     }
   }
 };
@@ -756,7 +760,7 @@ const pages = [
       imgSrc: "/icons/cocho.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pingCocho.mp3",
       cycler: useCycleList(["Ping Cochonet", "Ping Startpoint"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "Solo"],
     },
     {
       name: "Scan Field",
@@ -770,7 +774,7 @@ const pages = [
         "Scan and count points",
         "Set points from latest scan",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Solo"],
     },
     {
       name: "Alpha Controller",
@@ -782,7 +786,7 @@ const pages = [
         "Slider",
         "Show Stunden Orientation",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "Solo"],
     },
     {
       name: "Focus All Boules",
@@ -799,7 +803,7 @@ const pages = [
         "Focus Boule 5",
         "Focus Boule 6",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "Solo"],
     },
   ],
   [
@@ -809,7 +813,7 @@ const pages = [
       html: computedScoreStandingsHtml,
       explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
       cycler: useCycleList(["Score Standings"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "Referee"],
     },
     {
       name: "Scan and count points",
@@ -820,7 +824,7 @@ const pages = [
         "Set points from latest scan",
         "Scan field",
       ]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "Referee", "Solo"],
     },
     {
       name: "Set points from latest scan",
@@ -1386,16 +1390,6 @@ const pages = [
   ],
   [
     {
-      name: "Change Mode",
-      clickFunction: () => {
-        store.modesCycler.next();
-        speak(`Mode changed to ${store.modesCycler.state.name}`);
-      },
-      html: computed(() => `Current Mode: ${store.modesCycler.state.name}`),
-      cycler: useCycleList(["Change Mode"]),
-      modes: modesList.map((mode) => mode.name),
-    },
-    {
       name: "Toggle Reverse Field",
       deactivated: computed(() => !store.reverseField),
       clickFunction: () => {
@@ -1408,12 +1402,78 @@ const pages = [
       cycler: useCycleList(["Toggle Reverse Field"]),
       modes: ["All", "Dev", "Testing", "Player"],
     },
+    {
+      name: "Referee Mode",
+      clickFunction: () => {
+        const findRefereeModeIndex = modesList.findIndex(
+          (mode) => mode.name === "Referee"
+        );
+        store.modesCycler.go(findRefereeModeIndex);
+        speak("Referee mode activated");
+      },
+      html: "Activate Referee Mode",
+      cycler: useCycleList(["Referee Mode"]),
+      modes: ["All", "Dev", "Testing", "Player"],
+    },
+    {
+      name: "Player Mode",
+      clickFunction: () => {
+        const findPlayerModeIndex = modesList.findIndex(
+          (mode) => mode.name === "Player"
+        );
+        store.modesCycler.go(findPlayerModeIndex);
+        speak("Player mode activated");
+      },
+      html: "Activate Player Mode",
+      cycler: useCycleList(["Player Mode"]),
+      modes: ["All", "Dev", "Testing", "Referee"],
+    },
+    {
+      name: "All Mode",
+      clickFunction: () => {
+        const findAllModeIndex = modesList.findIndex(
+          (mode) => mode.name === "All"
+        );
+        store.modesCycler.go(findAllModeIndex);
+        speak("All mode activated");
+      },
+      html: "Activate All Mode",
+      cycler: useCycleList(["All Mode"]),
+      modes: ["Dev", "Testing", "Player", "Referee", "Solo"],
+    },
   ],
+  [
+  {
+      name: "Change Mode",
+      clickFunction: () => {
+        speak(`Current mode is ${store.modesCycler.state.name}`);
+      },
+      html: computed(
+        () =>
+          `<div class='text-14px opacity-50'>${store.prevMode}</div><div class='text-16px'>${store.modesCycler.state.name}</div><div class='text-14px opacity-50'>${store.nextMode}</div>`
+      ),
+      cycler: useCycleList(["Change Mode"]),
+      modes: ["All"],
+    },
+  ]
 ];
 
 const flatPages = pages.flat();
 
+const flatModes = ref(true);
 let pagesBasedOnMode = ref([]);
+
+const {
+  goToNext,
+  goToPrevious,
+  goTo,
+  stepNames,
+  isLast,
+  isFirst,
+  index: stepperIndex,
+  current: currentPage,
+} = useStepper(pagesBasedOnMode);
+
 const setPagesBasedOnMode = () => {
   pages.forEach((page) => {
     pagesBasedOnMode.value.push(
@@ -1426,6 +1486,33 @@ const setPagesBasedOnMode = () => {
       })
     );
   });
+  if (flatModes) {
+    console.log("flatModes", flatModes);
+    let tempFlatPagesBasedOnMode = [];
+    pagesBasedOnMode.value.forEach((page) => {
+      page.forEach((item) => {
+        tempFlatPagesBasedOnMode.push(item);
+      });
+    });
+    const tempLength = tempFlatPagesBasedOnMode.length;
+    const itemsPerRow = 4;
+    const rows = Math.ceil(tempFlatPagesBasedOnMode.length / itemsPerRow);
+
+    let structuredPages = [];
+    for (let i = 0; i < rows; i++) {
+      let row = [];
+      for (let j = 0; j < itemsPerRow; j++) {
+        const index = i * itemsPerRow + j;
+        if (index < tempFlatPagesBasedOnMode.length) {
+          row.push(tempFlatPagesBasedOnMode[index]);
+        }
+      }
+      structuredPages.push(row);
+    }
+    pagesBasedOnMode.value = structuredPages;
+    console.log("Structured pages created:", pagesBasedOnMode.value);
+    goTo(stepNames.value[0]);
+  }
 };
 setPagesBasedOnMode();
 
@@ -1437,17 +1524,6 @@ watch(
     setPagesBasedOnMode();
   }
 );
-
-const {
-  goToNext,
-  goToPrevious,
-  goTo,
-  stepNames,
-  isLast,
-  isFirst,
-  index: stepperIndex,
-  current: currentPage,
-} = useStepper(pagesBasedOnMode);
 
 const announcePage = () => {
   if (currentPage.value.length === 0) return;
@@ -1589,7 +1665,6 @@ onKeyStroke(["ArrowLeft"], (e) => {
 onKeyStroke(["ArrowRight"], (e) => {
   e.preventDefault();
   if (isLast.value) {
-    9;
     const firstStep = stepNames.value[0];
     goTo(firstStep);
   } else {
