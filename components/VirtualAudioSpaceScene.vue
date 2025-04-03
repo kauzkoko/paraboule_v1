@@ -109,7 +109,6 @@ bus.on((message, payload) => {
   }
   if (message === "toggleTopCamera") {
     toggleTopCamera(payload.height);
-    console.log("toggleTopCamera", store.isTopCamera);
   }
 });
 
@@ -176,11 +175,9 @@ onBeforeRender(({ delta, elapsed }) => {
     alpha.value = mappedRelativeAlpha.value;
   }
   if (store.isTouchingSlider) {
-    // console.log("isTouchingSlider", store.isTouchingSlider);
     cameraZ.value = map(y.value, 0, height.value, -30, 30);
   }
   if (store.isTouchingTopCameraSlider) {
-    // console.log("isTouchingTopCameraSlider", store.isTouchingTopCameraSlider);
     cameraY.value = map(y.value, 0, height.value, 10, 200);
   }
 });
@@ -197,7 +194,6 @@ const mappedRelativeAlpha = computed(() => {
 });
 
 function lookAlongNegativeXAxis() {
-  console.log("neg x current alpha", alpha.value);
   goToZero();
   gsap.to(alpha, {
     value: -270,
@@ -210,7 +206,6 @@ function lookAlongNegativeXAxis() {
 }
 
 function lookAlongPositiveXAxis() {
-  console.log("pos x current alpha", alpha.value);
   goToZero();
   gsap.to(alpha, {
     value: -90,
@@ -223,7 +218,6 @@ function lookAlongPositiveXAxis() {
 }
 
 function lookAlongNegativeZAxis() {
-  console.log("neg z current alpha", alpha.value);
   let goToAlpha = 0;
   if (alpha.value === -270) {
     goToAlpha = -360;
@@ -243,7 +237,6 @@ function lookAlongNegativeZAxis() {
 }
 
 function lookAlongPositiveZAxis() {
-  console.log("pos z current alpha", alpha.value);
   goToZero();
   gsap.to(alpha, {
     value: -180,
@@ -256,7 +249,6 @@ function lookAlongPositiveZAxis() {
 }
 
 const toggleTopCamera = (height = 80) => {
-  console.log("toggleTopCamera");
   if (store.isTopCamera) {
     frontCamera();
   } else {
@@ -266,7 +258,6 @@ const toggleTopCamera = (height = 80) => {
 };
 
 function topCamera(height = 80) {
-  console.log("topCamera");
   gsap.to(cameraX, {
     value: 0,
     duration: 1,
@@ -318,6 +309,8 @@ function frontCamera() {
 }
 
 function flyToStart() {
+  store.showStundenOrientation = false
+  store.lookAlongCycler.state = "Look along 12 o'clock"
   killTweens();
   frontCamera();
   gsap.to(cameraX, {

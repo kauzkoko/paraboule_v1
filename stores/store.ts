@@ -28,6 +28,13 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   const predictionTo3d = ref(false);
 
+  const lookAlongCycler = useCycleList([
+    "Look along 12 o'clock",
+    "Look along 3 o'clock",
+    "Look along 6 o'clock",
+    "Look along 9 o'clock",
+  ]);
+
   // score / players
   const players = ref({
     player1: {
@@ -130,6 +137,17 @@ export const useProtoStore = defineStore("protoStore", () => {
     }
     return filteredBoules.value;
   });
+
+  const bouleFocuserCycler = useCycleList([
+    "Focus Cochonet",
+    "Focus All Boules",
+    "Focus Boule 1",
+    "Focus Boule 2",
+    "Focus Boule 3",
+    "Focus Boule 4",  
+    "Focus Boule 5",
+    "Focus Boule 6",
+  ]);
 
   // yolo
   const modelLoaded = ref(false);
@@ -498,6 +516,8 @@ export const useProtoStore = defineStore("protoStore", () => {
     volumePulse,
     mockIntersectionsCycler,
     setMockIntersections,
+    lookAlongCycler,
+    bouleFocuserCycler,
   };
 });
 
