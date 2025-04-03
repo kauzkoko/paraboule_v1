@@ -27,7 +27,13 @@ export function useSoundComposable(soundSrc: string, duration = 0) {
     }
   };
 
+  const stop = () => {
+    sound.stop();
+  };
+
   return {
     play,
+    stop,
+    isPlaying: sound.isPlaying,
   };
 }

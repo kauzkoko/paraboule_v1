@@ -17,25 +17,26 @@ export function useSoundController(options: { listen: boolean }) {
     }
   });
 
-  function sendPlayCocho(duration = 5000) {
+  function sendPlayCochonet(duration = 5000) {
+    console.log("sending playCochonet event to sound controller: ", duration);
     channel.send({
       type: "broadcast",
-      event: "playCocho",
+      event: "playCochonet",
       payload: { duration },
     });
-    sendCochonetMqtt((duration / 1000).toString());
+    // sendCochonetMqtt((duration / 1000).toString());
   }
 
-  function sendPlayShoes(duration = 5000) {
+  function sendPlayHoola(duration = 5000) {
     channel.send({
       type: "broadcast",
-      event: "playShoes",
+      event: "playHoola",
       payload: { duration },
     });
-    sendHoolaMqtt((duration / 1000).toString());
+    // sendHoolaMqtt((duration / 1000).toString());
   }
 
-  function sendPlayPhone(duration = 5) {
+  function sendPlayPhone(duration = 5000) {
     channel.send({
       type: "broadcast",
       event: "playPhone",
@@ -43,5 +44,5 @@ export function useSoundController(options: { listen: boolean }) {
     });
   }
 
-  return { sendPlayCocho, sendPlayShoes, sendPlayPhone };
+  return { sendPlayCochonet, sendPlayHoola, sendPlayPhone };
 }

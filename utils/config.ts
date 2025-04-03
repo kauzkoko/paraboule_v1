@@ -112,3 +112,19 @@ export const mockIntersections = [
     },
   ],
 ];
+
+export const soundSrcs = [
+  "/sounds/noise.mp3",
+  "/sounds/noisehigh.mp3",
+  "/sounds/noiselow.mp3",
+  "/sounds/waterBig.m4a",
+  "/sounds/waterMedium.m4a",
+  "/sounds/waterBigger.m4a",
+  "/sounds/strudel/c3major.mp3",
+  "/sounds/strudel/e3major.mp3",
+  "/sounds/strudel/g3major.mp3",
+  "/sounds/strudel/startpoint.mp3",
+  "/sounds/shortdeep.mp3",
+  "/sounds/noz2.mp3",
+  "/sounds/noz.mp3",
+];

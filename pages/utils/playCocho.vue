@@ -6,7 +6,7 @@
         class="w-30vw aspect-1 rounded-full bg-hex-ff0000 border-none"
         :style="{ backgroundColor: isPlaying ? 'blue' : 'red' }"
       >
-        sendPlayCocho
+        sendPlayCochonet
       </button>
     </div>
   </div>
@@ -20,7 +20,7 @@ let channel = supabase.channel("sound-controller");
 
 const isPlaying = ref(false);
 channel
-  .on("broadcast", { event: "playCocho" }, (event) => {
+  .on("broadcast", { event: "playCochonet" }, (event) => {
     console.log("received event on vue page: ", event);
     noz.play();
     isPlaying.value = true;
@@ -35,7 +35,7 @@ channel
 let sendPlay = () => {
   channel.send({
     type: "broadcast",
-    event: "playCocho",
+    event: "playCochonet",
     payload: { duration: 5000 },
   });
 };

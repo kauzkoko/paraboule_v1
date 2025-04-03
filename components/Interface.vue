@@ -177,7 +177,7 @@ const { speak } = useSpeech();
 const bus = useEventBus("protoboules");
 const { sendReverseField } = useScanController();
 const { sendRawIntersections } = useXrController();
-const { sendPlayCocho, sendPlayShoes, sendPlayPhone } = useSoundController({
+const { sendPlayCochonet, sendPlayHoola, sendPlayPhone } = useSoundController({
   listen: true,
 });
 const { sendMute, sendUnmute } = useAssistantController();
@@ -326,7 +326,7 @@ const setPointsFromLatestScan = () => {
 
 const click_pingCochonet = () => {
   if (!afterLongPress) {
-    sendPlayCocho(5000);
+    sendPlayCochonet(5000);
   }
 };
 
@@ -621,7 +621,7 @@ const scoreStandings = () => {
 const pingShoes = () => {
   console.log("pingShoes");
   if (!afterLongPress) {
-    sendPlayShoes();
+    sendPlayHoola();
   }
 };
 
