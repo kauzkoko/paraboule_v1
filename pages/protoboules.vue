@@ -1,7 +1,8 @@
 <template>
   <div id="overlay">
     <TresCanvas>
-      <XR />
+      <!-- <XR /> -->
+      <XRonly />
     </TresCanvas>
     <Interface />
     <Predictions />

@@ -105,7 +105,7 @@
             {{ getItem(item).name }}
           </div>
           <div class="flex justify-center items-center w-full h-full">
-            <img
+            <!-- <img
               v-if="getItem(item).imgSrc"
               :src="getItem(item).imgSrc.value ?? getItem(item).imgSrc"
             />
@@ -116,6 +116,11 @@
               <div
                 v-html="getItem(item).html.value ?? getItem(item).html"
               ></div>
+            </div> -->
+            <div
+              class="text-hex-ff0000 text-20px text-center flexCenter max-w-80%"
+            >
+              {{ getItem(item).name }}
             </div>
           </div>
         </div>
@@ -764,14 +769,29 @@ const onTouchEnd = () => {
 const pages = [
   [
     {
-      name: "Alpha Controller",
-      clickFunction: setAlphaController,
-      imgSrc: "/icons/gyros.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_gyro.mp3",
-      html: "Toggle Alpha Controller",
-      cycler: useCycleList(["Alpha Controller", "Slider", "Fly to Cochonet"]),
-      modes: ["All", "Dev", "Testing", "Player", "Solo"],
+      name: "Scan Field",
+      deactivated: computed(() => !store.arSupported),
+      clickFunction: scanCamera,
+      imgSrc: "/icons/scanCamera.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_scanField.mp3",
+      cycler: useCycleList([
+        "Scan Field",
+        "Toggle Top Camera Slider",
+        "Scan and count points",
+        "Set points from latest scan",
+        "Increment shots taken",
+      ]),
+      modes: ["All", "Dev", "Testing", "Solo", "Referee", "Player"],
     },
+    // {
+    //   name: "Alpha Controller",
+    //   clickFunction: setAlphaController,
+    //   imgSrc: "/icons/gyros.svg",
+    //   explanationSrc: "/sounds/elevenlabs/explanation_gyro.mp3",
+    //   html: "Toggle Alpha Controller",
+    //   cycler: useCycleList(["Alpha Controller", "Slider", "Fly to Cochonet"]),
+    //   modes: ["All", "Dev", "Testing", "Player", "Solo"],
+    // },
     {
       name: "Ping Cochonet",
       clickFunction: click_pingCochonet,
@@ -1101,21 +1121,6 @@ const pages = [
     },
   ],
   [
-    {
-      name: "Scan Field",
-      deactivated: computed(() => !store.arSupported),
-      clickFunction: scanCamera,
-      imgSrc: "/icons/scanCamera.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_scanField.mp3",
-      cycler: useCycleList([
-        "Scan Field",
-        "Toggle Top Camera Slider",
-        "Scan and count points",
-        "Set points from latest scan",
-        "Increment shots taken",
-      ]),
-      modes: ["All", "Dev", "Testing", "Solo", "Referee"],
-    },
     {
       name: "Score Standings",
       clickFunction: scoreStandings,

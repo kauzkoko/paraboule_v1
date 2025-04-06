@@ -108,6 +108,7 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   const reverseField = ref(false);
 
+  const isSearching = ref(true);
   const boules = ref([]);
   const boulesCount = ref(0);
   const sortedBoules = useSorted(boules, (a, b) => a.distance - b.distance);
@@ -133,7 +134,9 @@ export const useProtoStore = defineStore("protoStore", () => {
     const amountOnlyBoules = amountBoulesAndCochonet - 1;
     const maxBoulesAmount = globalShotsTaken.value;
     if (amountOnlyBoules <= maxBoulesAmount) {
-      bus.emit("stopXR");
+      console.log("filteredBoulesHistory.value.length", filteredBoulesHistory.value.length);
+      if (filteredBoulesHistory.value.length > 1) isSearching.value = false;
+      // bus.emit("stopXR");
     }
     return filteredBoules.value;
   });
@@ -144,7 +147,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     "Focus Boule 1",
     "Focus Boule 2",
     "Focus Boule 3",
-    "Focus Boule 4",  
+    "Focus Boule 4",
     "Focus Boule 5",
     "Focus Boule 6",
   ]);
@@ -518,6 +521,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     setMockIntersections,
     lookAlongCycler,
     bouleFocuserCycler,
+    isSearching,
   };
 });
 
