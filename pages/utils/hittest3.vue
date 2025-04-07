@@ -12,7 +12,6 @@
 
 <script setup>
 import * as THREE from "three";
-import * as Tone from "tone";
 
 const store = useProtoStore();
 const { predictFromImage, startWorker } = await useInference();
@@ -148,10 +147,6 @@ const calculateMedianPosition = () => {
 
 async function start() {
   init();
-  const synth = new Tone.Synth().toDestination();
-  Tone.start();
-  synth.triggerAttackRelease("C4", "2n");
-
   if (currentSession === null) {
     try {
       const session = await navigator.xr.requestSession("immersive-ar", {
@@ -254,54 +249,6 @@ function init() {
   scene.add(plane);
 }
 
-let sound;
-
-const changeSound = () => {
-  Tone.Offline(() => {
-    // Calculate distance between camera and currentIntersectionMesh
-    let distance = 0;
-    if (currentIntersectionMesh) {
-      const cameraPosition = new THREE.Vector3();
-      camera.getWorldPosition(cameraPosition);
-
-      const meshPosition = new THREE.Vector3();
-      currentIntersectionMesh.getWorldPosition(meshPosition);
-
-      distance = cameraPosition.distanceTo(meshPosition);
-      console.log("Distance to intersection mesh:", distance);
-    }
-    const freq = Math.floor(map(distance, 0, 10, 2000, 100));
-
-    const oscillator = new Tone.Oscillator({
-      frequency: freq,
-      type: "sine",
-    })
-      .toDestination()
-      .start(0);
-  }, 2).then((toneBuffer) => {
-    const audioContext = listener.context;
-    const audioBuffer = audioContext.createBuffer(
-      1,
-      toneBuffer.length,
-      toneBuffer.sampleRate
-    );
-    for (let channel = 0; channel < 1; channel++) {
-      const channelData = audioBuffer.getChannelData(channel);
-      channelData.set(toneBuffer.getChannelData(channel));
-    }
-    console.log("setting buffer", audioBuffer);
-    sound.stop();
-    sound.setBuffer(audioBuffer);
-    sound.setRefDistance(1);
-    sound.setRolloffFactor(1);
-    sound.setDistanceModel("exponential");
-    sound.setMaxDistance(50);
-    sound.setLoop(true);
-    sound.setVolume(1);
-    sound.play();
-  });
-};
-
 let currentIntersectionMesh = null;
 function intersectPrediction(prediction) {
   const raycaster = new THREE.Raycaster();
@@ -318,6 +265,7 @@ function intersectPrediction(prediction) {
 
   if (intersects.length > 0) {
     const intersectPoint = intersects[0].point;
+    // Create a sphere at the intersection point
     const sphereGeometry = new THREE.SphereGeometry(0.05, 32, 32);
     const sphereMaterial = new THREE.MeshBasicMaterial({
       color: 0xff0000,
@@ -326,59 +274,28 @@ function intersectPrediction(prediction) {
     });
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     sphere.position.copy(intersectPoint);
+    // // Add positional audio to the sphere
+    // const listener = new THREE.AudioListener();
+    // camera.value.add(listener);
 
-    sound = new THREE.PositionalAudio(listener);
+    const sound = new THREE.PositionalAudio(listener);
+    const audioLoader = new THREE.AudioLoader();
 
-    // render 2 seconds of the oscillator
-    Tone.Offline(() => {
-      // only nodes created in this callback will be recorded
-      const oscillator = new Tone.Oscillator({
-        frequency: 440,
-        type: "sine",
-      })
-        .toDestination()
-        .start(0);
-    }, 2).then((toneBuffer) => {
-      // Convert Tone.js buffer to AudioBuffer
-      const audioContext = listener.context;
-      const audioBuffer = audioContext.createBuffer(
-        // toneBuffer.numberOfChannels,
-        1,
-        toneBuffer.length,
-        toneBuffer.sampleRate
-      );
-
-      // Copy the data from Tone.js buffer to AudioBuffer
-      // for (let channel = 0; channel < toneBuffer.numberOfChannels; channel++) {
-      for (let channel = 0; channel < 1; channel++) {
-        const channelData = audioBuffer.getChannelData(channel);
-        channelData.set(toneBuffer.getChannelData(channel));
-      }
-
-      // Set the converted buffer to the PositionalAudio
-      sound.setBuffer(audioBuffer);
-      sound.setRefDistance(1);
-      sound.setRolloffFactor(1);
-      sound.setDistanceModel("exponential");
-      sound.setMaxDistance(50);
+    // Load a sound and set it as the PositionalAudio object's buffer
+    audioLoader.load("/sounds/noz.mp3", function (buffer) {
+      sound.setBuffer(buffer);
+      sound.setRefDistance(1); // At what distance the volume reduction starts
+      sound.setRolloffFactor(1); // How quickly the volume reduces with distance
+      sound.setDistanceModel("exponential"); // Linear distance model
+      sound.setMaxDistance(50); // Maximum distance at which the sound can be heard
       sound.setLoop(true);
       sound.setVolume(1);
       sound.play();
-
-      sounds.push(sound);
     });
-
-    setInterval(() => {
-      changeSound();
-    }, 10);
-
-    // setTimeout(() => {
-    //   console.log("stopping sound", sound);
-    //   sound.stop();
-    // }, 2000);
+    sounds.push(sound);
 
     sphere.add(sound);
-
+    // Store the sphere as the intersection mesh for later removal
     if (currentIntersectionMesh) {
       scene.remove(currentIntersectionMesh);
     }

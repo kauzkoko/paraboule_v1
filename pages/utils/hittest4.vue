@@ -370,7 +370,7 @@ function intersectPrediction(prediction) {
 
     setInterval(() => {
       changeSound();
-    }, 10);
+    }, 50);
 
     // setTimeout(() => {
     //   console.log("stopping sound", sound);
