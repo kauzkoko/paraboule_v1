@@ -1,11 +1,40 @@
 <template>
-  <div id="container" class="w-dvw h-dvh">
+  <div id="container" class="w-dvw h-dvh text-white">
     <div class="fixed bottom-0 left-0">
-      <button @click="start" id="startButton">Start AR</button>
-      <button @click="stop" id="stopButton">Stop AR</button>
-      <button @click="addMesh()">Add mesh</button>
-      <button @click="calculateMedianPosition()">Log meshes</button>
-      <button @click="isReady = true">Ready</button>
+      <div>
+        <div>current Interval {{ intervalRef }}</div>
+        <div class="flex items-center justify-between">
+          <div>1</div>
+          <input
+            class="h-100px w-80dvw"
+            type="range"
+            min="3"
+            max="50"
+            step="1"
+            v-model="intervalMock1"
+          />
+          <div>50</div>
+        </div>
+        <div class="flex items-center justify-between">
+          <div>50</div>
+          <input
+            class="h-100px w-80dvw"
+            type="range"
+            min="50"
+            max="1000"
+            step="50"
+            v-model="intervalMock2"
+          />
+          <div>1000</div>
+        </div>
+      </div>
+      <div>
+        <button @click="start" id="startButton">Start AR</button>
+        <button @click="stop" id="stopButton">Stop AR</button>
+        <button @click="addMesh()">Add mesh</button>
+        <button @click="calculateMedianPosition()">Log meshes</button>
+        <button @click="isReady = true">Ready</button>
+      </div>
     </div>
   </div>
 </template>
@@ -16,6 +45,18 @@ import * as Tone from "tone";
 
 const store = useProtoStore();
 const { predictFromImage, startWorker } = await useInference();
+
+const intervalMock1 = ref(20);
+const intervalMock2 = ref(500);
+const intervalRef = ref(100);
+
+watch(intervalMock1, () => {
+  intervalRef.value = intervalMock1.value;
+});
+
+watch(intervalMock2, () => {
+  intervalRef.value = intervalMock2.value;
+});
 
 let container;
 let camera, scene, renderer;
@@ -150,7 +191,7 @@ async function start() {
   init();
   const synth = new Tone.Synth().toDestination();
   Tone.start();
-  synth.triggerAttackRelease("C4", "2n");
+  synth.triggerAttackRelease("C4", ".2s");
 
   if (currentSession === null) {
     try {
@@ -254,23 +295,27 @@ function init() {
   scene.add(plane);
 }
 
+let distance;
+const getDistance = () => {
+  if (currentIntersectionMesh) {
+    const cameraPosition = new THREE.Vector3();
+    camera.getWorldPosition(cameraPosition);
+
+    const meshPosition = new THREE.Vector3();
+    currentIntersectionMesh.getWorldPosition(meshPosition);
+
+    distance = cameraPosition.distanceTo(meshPosition);
+    console.log("Distance to intersection mesh:", distance);
+  }
+  return distance;
+};
+
 let sound;
 
 const changeSound = () => {
   Tone.Offline(() => {
-    // Calculate distance between camera and currentIntersectionMesh
-    let distance = 0;
-    if (currentIntersectionMesh) {
-      const cameraPosition = new THREE.Vector3();
-      camera.getWorldPosition(cameraPosition);
-
-      const meshPosition = new THREE.Vector3();
-      currentIntersectionMesh.getWorldPosition(meshPosition);
-
-      distance = cameraPosition.distanceTo(meshPosition);
-      console.log("Distance to intersection mesh:", distance);
-    }
-    const freq = Math.floor(map(distance, 0, 10, 3000, 100));
+    getDistance();
+    const freq = Math.floor(map(distance, 0, 10, 1000, 100));
 
     const oscillator = new Tone.Oscillator({
       frequency: freq,
@@ -278,7 +323,7 @@ const changeSound = () => {
     })
       .toDestination()
       .start(0);
-  }, 1).then((toneBuffer) => {
+  }, intervalRef.value).then((toneBuffer) => {
     const audioContext = listener.context;
     const audioBuffer = audioContext.createBuffer(
       1,
@@ -293,7 +338,7 @@ const changeSound = () => {
     // sound.setRolloffFactor(1);
     // sound.setDistanceModel("exponential");
     // sound.setMaxDistance(50);
-    // sound.setLoop(true);
+    // sound.setLoop(false);
     // sound.setVolume(1);
     sound.play();
   });
@@ -326,53 +371,37 @@ function intersectPrediction(prediction) {
 
     sound = new THREE.PositionalAudio(listener);
 
-    // render 2 seconds of the oscillator
+    setInterval(() => {
+        changeSound();
+      }, intervalRef.value);
     Tone.Offline(() => {
-      // only nodes created in this callback will be recorded
       const oscillator = new Tone.Oscillator({
         frequency: 440,
         type: "sine",
+        fadeIn: 0.2,
       })
         .toDestination()
         .start(0);
-    }, 0.5).then((toneBuffer) => {
-      // Convert Tone.js buffer to AudioBuffer
+    }, intervalRef.value).then((toneBuffer) => {
       const audioContext = listener.context;
       const audioBuffer = audioContext.createBuffer(
-        // toneBuffer.numberOfChannels,
         1,
         toneBuffer.length,
         toneBuffer.sampleRate
       );
 
-      // Copy the data from Tone.js buffer to AudioBuffer
-      // for (let channel = 0; channel < toneBuffer.numberOfChannels; channel++) {
-      for (let channel = 0; channel < 1; channel++) {
-        const channelData = audioBuffer.getChannelData(channel);
-        channelData.set(toneBuffer.getChannelData(channel));
-      }
-
-      // Set the converted buffer to the PositionalAudio
+      const channelData = audioBuffer.getChannelData(0);
+      channelData.set(toneBuffer.getChannelData(0));
       sound.setBuffer(audioBuffer);
       sound.setRefDistance(1);
       sound.setRolloffFactor(1);
       sound.setDistanceModel("exponential");
       sound.setMaxDistance(50);
-      sound.setLoop(true);
+      sound.setLoop(false);
       sound.setVolume(1);
       sound.play();
-
-      setInterval(() => {
-        changeSound();
-      }, 50);
-
       sounds.push(sound);
     });
-
-    // setTimeout(() => {
-    //   console.log("stopping sound", sound);
-    //   sound.stop();
-    // }, 2000);
 
     sphere.add(sound);
 
