@@ -134,7 +134,10 @@ export const useProtoStore = defineStore("protoStore", () => {
     const amountOnlyBoules = amountBoulesAndCochonet - 1;
     const maxBoulesAmount = globalShotsTaken.value;
     if (amountOnlyBoules <= maxBoulesAmount) {
-      console.log("filteredBoulesHistory.value.length", filteredBoulesHistory.value.length);
+      console.log(
+        "filteredBoulesHistory.value.length",
+        filteredBoulesHistory.value.length
+      );
       if (filteredBoulesHistory.value.length > 1) isSearching.value = false;
       // bus.emit("stopXR");
     }
@@ -187,8 +190,28 @@ export const useProtoStore = defineStore("protoStore", () => {
       id: "27",
       modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
     },
+    {
+      name: "babouche-hzhjy",
+      id: "2",
+      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
+    },
+    {
+      name: "babouche-hzhjy",
+      id: "1",
+      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
+    },
   ];
-  const yoloModelCycler = useCycleList(yoloModels);
+
+  const baboucheModels = yoloModels.filter(
+    (model) => model.name === "babouche-hzhjy"
+  );
+  const boloboloModels = yoloModels.filter(
+    (model) => model.name === "bolobolo"
+  );
+
+  const yoloModelCycler = useCycleList(baboucheModels, {
+    initialValue: baboucheModels[0],
+  });
   const prevYoloModel = computed(() => {
     const currentIndex = yoloModelCycler.index.value;
     const lastIndex = yoloModels.length - 1;

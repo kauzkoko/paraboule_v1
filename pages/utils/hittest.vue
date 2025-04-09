@@ -1,18 +1,40 @@
 <template>
   <div ref="container" class="w-dvw h-dvh">
-    <div class="fixed bottom-0 left-0 children:w-100px">
-      <button
-        @click="toggleStartStop"
-        :class="{ 'bg-green-500': arStarted, 'bg-red-500': !arStarted }"
-      >
-        Toggle AR
-      </button>
-      <button
-        @click="isReady = !isReady"
-        :class="{ 'bg-green-500': isReady, 'bg-red-500': !isReady }"
-      >
-        Ready
-      </button>
+    <div class="fixed bottom-0 left-0 children:w-100px children:p-5">
+      <div class="flex flex-row gap-5">
+        <button
+          @click="toggleStartStop"
+          :class="{ 'bg-green-500': arStarted, 'bg-red-500': !arStarted }"
+        >
+          Toggle AR
+        </button>
+        <button
+          @click="isReady = !isReady"
+          :class="{ 'bg-green-500': isReady, 'bg-red-500': !isReady }"
+        >
+          isReady
+        </button>
+        <button
+          @click="toggleMute"
+          :class="{ 'bg-green-500': isMuted, 'bg-red-500': !isMuted }"
+        >
+          isMuted
+        </button>
+      </div>
+      <div class="flex flex-row gap-5">
+        <button
+          @click="setStartPointByRay"
+          :class="{ 'bg-green-500': isReady, 'bg-red-500': !isReady }"
+        >
+          Set startpoint by ray
+        </button>
+        <button
+          @click="setStartPointAtCameraPosition"
+          :class="{ 'bg-green-500': isReady, 'bg-red-500': !isReady }"
+        >
+          Set startpoint at camera position
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -23,6 +45,9 @@ import * as Tone from "tone";
 
 const store = useProtoStore();
 const { predictFromImage, startWorker } = await useInference();
+
+const { x, y } = useMouse();
+const { width, height } = useWindowSize();
 
 const container = ref(null);
 
@@ -46,7 +71,7 @@ const isFirstPlane = ref(true);
 let isPredicting = ref(true);
 
 const bouleCounter = ref(2);
-
+const isMuted = ref(false);
 const cleanup = () => {
   if (renderer) renderer.dispose();
   renderer;
@@ -64,6 +89,7 @@ const cleanup = () => {
   isReady.value = false;
   isFirstPlane.value = true;
   isPredicting.value = false;
+  isMuted.value = true;
 };
 
 onMounted(async () => {
@@ -85,9 +111,18 @@ function toggleStartStop() {
   }
 }
 
+const toggleMute = () => {
+  if (isMuted.value) {
+    isMuted.value = false;
+  } else {
+    isMuted.value = true;
+  }
+};
+
 async function start() {
   isPredicting.value = true;
   arStarted.value = true;
+  isMuted.value = false;
   init();
   const synth = new Tone.Synth().toDestination();
   synth.triggerAttackRelease("C5", ".2s");
@@ -115,6 +150,7 @@ function stop() {
   arStarted.value = false;
   isFirstPlane.value = true;
   isPredicting.value = false;
+  isMuted.value = true;
   const synth = new Tone.Synth().toDestination();
   synth.triggerAttackRelease("C5", "0.1s");
   synth.triggerAttackRelease("B4", "0.1s", Tone.now() + 0.1);
@@ -194,7 +230,7 @@ function init() {
 let sound;
 let sound2;
 let currentIntersectionMesh = null;
-function intersectPrediction(prediction) {
+function intersectPrediction(prediction, type = "boule") {
   const raycaster = new THREE.Raycaster();
   const input = new THREE.Vector2();
 
@@ -207,7 +243,10 @@ function intersectPrediction(prediction) {
 
   if (intersects.length > 0) {
     const intersectPoint = intersects[0].point;
-    const sphereGeometry = new THREE.SphereGeometry(0.05, 32, 32);
+    const sphereGeometry =
+      type === "boule"
+        ? new THREE.SphereGeometry(0.05, 32, 32)
+        : new THREE.BoxGeometry(0.05, 0.05, 0.05);
     const sphereMaterial = new THREE.MeshBasicMaterial({
       color: 0xff0000,
       transparent: true,
@@ -264,7 +303,7 @@ function intersectPrediction(prediction) {
       sound2.setLoop(true);
       sound2.setVolume(0);
       sound2.setPlaybackRate(1);
-      sound2.play();
+      // sound2.play();
     });
 
     sounds.push(sound);
@@ -278,6 +317,63 @@ function intersectPrediction(prediction) {
     scene.add(currentIntersectionMesh);
     return intersectPoint;
   }
+}
+
+function setStartPointAtCameraPosition() {
+  const cameraPosition = new THREE.Vector3();
+  camera.getWorldPosition(cameraPosition);
+
+  // Create marker at intersection point
+  const markerGeometry = new THREE.CylinderGeometry(0.3, 0.3, 0.1, 32);
+  const markerMaterial = new THREE.MeshBasicMaterial({
+    color: 0xff0000,
+    transparent: true,
+    opacity: 0.5,
+  });
+  const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+  marker.position.copy(cameraPosition);
+  // Set the y position to the floor (y=0)
+  marker.position.y = 0;
+  scene.add(marker);
+}
+
+function setStartPointByRay() {
+  // Create a raycaster from the camera's position
+  const raycaster = new THREE.Raycaster();
+  const cameraPosition = new THREE.Vector3();
+  const cameraDirection = new THREE.Vector3();
+  camera.getWorldPosition(cameraPosition);
+  camera.getWorldDirection(cameraDirection);
+
+  raycaster.set(cameraPosition, cameraDirection);
+
+  // Check intersection with the detected plane
+  const intersects = raycaster.intersectObject(detectedPlane);
+
+  if (intersects.length > 0) {
+    const intersectPoint = intersects[0].point;
+    console.log("Start point set at:", intersectPoint);
+
+    // Create marker at intersection point
+    const markerGeometry = new THREE.CylinderGeometry(0.3, 0.3, 0.1, 32);
+    const markerMaterial = new THREE.MeshBasicMaterial({
+      color: 0xff0000,
+      transparent: true,
+      opacity: 0.5,
+    });
+    const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+    marker.position.copy(intersectPoint);
+    scene.add(marker);
+  } else {
+    console.log("No intersection with plane found");
+  }
+}
+
+function getScreenPosition(object, camera) {
+  const vector = object.position.clone().project(camera);
+  const x = (vector.x * 0.5 + 0.5) * width.value;
+  const y = (1 - (vector.y * 0.5 + 0.5)) * height.value;
+  return { x, y };
 }
 
 async function animate(timestamp, frame) {
@@ -303,14 +399,29 @@ async function animate(timestamp, frame) {
     // }
 
     // update sound rate
-    if (currentIntersectionMesh && frameCount % 5 === 0) {
+    if (currentIntersectionMesh && frameCount % 5 === 0 && !isMuted.value) {
       const cameraPosition = new THREE.Vector3();
       const cameraDirection = new THREE.Vector3();
       camera.getWorldPosition(cameraPosition);
       camera.getWorldDirection(cameraDirection);
-
       const meshPosition = new THREE.Vector3();
       currentIntersectionMesh.getWorldPosition(meshPosition);
+
+      const screenPosition = getScreenPosition(currentIntersectionMesh, camera);
+      const inXscreen = screenPosition.x > 0 && screenPosition.x < width.value;
+      const inYscreen = screenPosition.y > 0 && screenPosition.y < height.value;
+      const inScreen = inXscreen && inYscreen;
+      // const halfWidth = width.value / 2;
+      // if (inXscreen && inYscreen && screenPosition.x > halfWidth) {
+      //   console.log("right");
+      // }
+      // if (inXscreen && inYscreen && screenPosition.x < halfWidth) {
+      //   console.log("left");
+      // }
+      if (inScreen) {
+        console.log("in screen");
+        useVibrate({ pattern: [10, 0] }).vibrate();
+      }
 
       const directionToMesh = meshPosition
         .clone()
@@ -319,33 +430,46 @@ async function animate(timestamp, frame) {
       const angle = THREE.MathUtils.radToDeg(
         cameraDirection.angleTo(directionToMesh)
       );
+
       let distance = cameraPosition.distanceTo(meshPosition);
 
+      const directionXZ = new THREE.Vector2(
+        directionToMesh.x,
+        directionToMesh.z
+      ).normalize();
+      const cameraDirectionXZ = new THREE.Vector2(
+        cameraDirection.x,
+        cameraDirection.z
+      ).normalize();
+      const angleXZ = THREE.MathUtils.radToDeg(
+        Math.acos(directionXZ.dot(cameraDirectionXZ))
+      );
+      console.log("Angle on XZ plane:", angleXZ);
+
       // Update playback rate
+      sound.setVolume(1);
       let rate = map(distance, 0, 10, 2, 0.2);
       if (distance < 1) {
         rate = map(distance, 0, 1, 4, 2);
       }
       sound.setPlaybackRate(rate);
 
-      // Update noise volume
-      console.log("angle", angle);
       let absoluteAngle = Math.abs(angle);
-      console.log("absoluteAngle", absoluteAngle);
       let normalizedAngle =
         absoluteAngle <= 45 ? map(absoluteAngle, 0, 45, 1, 0) : 0;
-      console.log("normalizedAngle", normalizedAngle);
       let normalizedAnglePow = Math.pow(normalizedAngle, 4);
-      console.log("normalizedAnglePow", normalizedAnglePow);
-      let volume = normalizedAnglePow;
-      // sound2.setVolume(volume);
-      sound2.setVolume(0);
 
       let freq = map(normalizedAnglePow, 0, 1, 200, 20000);
-      console.log("freq", freq);
       sound
         .getFilters()[0]
         .frequency.setValueAtTime(freq, sound.context.currentTime);
+    } else if (
+      currentIntersectionMesh &&
+      isMuted.value &&
+      frameCount % 5 === 0
+    ) {
+      sound.setVolume(0);
+      sound2.setVolume(0);
     }
 
     if (hitTestSource) {
@@ -397,8 +521,18 @@ async function animate(timestamp, frame) {
           const newPredictions = await predictFromImage(bitmap);
 
           newPredictions.forEach((prediction) => {
-            if (prediction.confidence > 0.85) {
-              let intersectPoint = intersectPrediction(prediction);
+            console.log("prediction", prediction);
+
+            if (prediction.class === "shoes" && prediction.confidence > 0.75) {
+              let intersectPoint = intersectPrediction(prediction, "shoes");
+              isPredicting.value = false;
+            } else if (
+              (prediction.class === "dark" ||
+                prediction.class === "light" ||
+                prediction.class === "cochonette") &&
+              prediction.confidence > 0.85
+            ) {
+              let intersectPoint = intersectPrediction(prediction, "boule");
               console.log("intersectPoint", intersectPoint);
               isPredicting.value = false;
             }
