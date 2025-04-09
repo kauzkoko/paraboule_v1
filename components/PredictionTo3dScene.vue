@@ -41,7 +41,7 @@
     />
   </TresMesh>
   <TresAmbientLight :intensity="230" />
-  <Grid />
+  <GridComponent />
 </template>
 
 <script setup>

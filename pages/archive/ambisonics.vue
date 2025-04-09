@@ -18,7 +18,7 @@
     </TresMesh>
     <TresAmbientLight :intensity="100" />
     <TresDirectionalLight />
-    <Grid />
+    <GridComponent />
   </TresCanvas>
   <div
     class="fullScreen bg-black fixed left-0 top-0"

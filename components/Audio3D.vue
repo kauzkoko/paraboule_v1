@@ -42,6 +42,10 @@ const props = defineProps({
     type: Number,
     default: 1,
   },
+  localPlaybackRate: {
+    type: Number,
+    default: 1,
+  },
 });
 
 const positionalAudioRef = useTemplateRef("positionalAudioRef");
@@ -67,13 +71,15 @@ watch(() => store.volumePulse, () => {
   }
 });
 
-if (positionalAudioRef.value) {
-  positionalAudioRef.value.instance.gain.gain.value = 0;
-}
+
+// if (positionalAudioRef.value) {
+//   positionalAudioRef.value.instance.gain.gain.value = 0;
+// }
 
 watchEffect(() => {
   trigger.value = props.localTrigger;
   if (positionalAudioRef.value) {
+    positionalAudioRef.value.instance.playbackRate = props.localPlaybackRate;
     positionalAudioRef.value.instance.visible = props.localHelper;
     gsap.to(positionalAudioRef.value.instance.gain.gain, {
       value: volume.value ?? props.localVolume,

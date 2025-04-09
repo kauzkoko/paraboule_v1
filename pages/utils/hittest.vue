@@ -1,11 +1,18 @@
 <template>
-  <div id="container" class="w-dvw h-dvh">
-    <div class="fixed bottom-0 left-0">
-      <button @click="start" id="startButton">Start AR</button>
-      <button @click="stop" id="stopButton">Stop AR</button>
-      <button @click="addMesh()">Add mesh</button>
-      <button @click="calculateMedianPosition()">Log meshes</button>
-      <button @click="isReady = true">Ready</button>
+  <div ref="container" class="w-dvw h-dvh">
+    <div class="fixed bottom-0 left-0 children:w-100px">
+      <button
+        @click="toggleStartStop"
+        :class="{ 'bg-green-500': arStarted, 'bg-red-500': !arStarted }"
+      >
+        Toggle AR
+      </button>
+      <button
+        @click="isReady = !isReady"
+        :class="{ 'bg-green-500': isReady, 'bg-red-500': !isReady }"
+      >
+        Ready
+      </button>
     </div>
   </div>
 </template>
@@ -17,27 +24,28 @@ import * as Tone from "tone";
 const store = useProtoStore();
 const { predictFromImage, startWorker } = await useInference();
 
-let container;
+const container = ref(null);
+
 let camera, scene, renderer;
 let controller;
-
 let meshes = [];
-let reticle;
-let plane;
+let detectedPlane;
 
 let listener;
 let sounds = [];
 
+let currentSession = null;
+
+let frameCount = 0;
+let framebuffer;
 let hitTestSource = null;
 let hitTestSourceRequested = false;
 
-let currentSession = null;
+const isReady = ref(false);
+const isFirstPlane = ref(true);
+let isPredicting = ref(true);
 
-onMounted(async () => {
-  if (!store.modelLoaded && !store.modelWorkerId) {
-    await startWorker();
-  }
-});
+const bouleCounter = ref(2);
 
 const cleanup = () => {
   if (renderer) renderer.dispose();
@@ -53,104 +61,29 @@ const cleanup = () => {
   meshes = [];
   currentSession = null;
 };
-
+onMounted(async () => {
+  if (!store.modelLoaded && !store.modelWorkerId) {
+    await startWorker();
+  }
+});
 onUnmounted(() => {
   cleanup();
 });
 
-function addMesh() {
-  if (reticle.visible) {
-    const geometry = new THREE.SphereGeometry(0.05, 32, 32).translate(
-      0,
-      0.1,
-      0
-    );
-    const material = new THREE.MeshPhongMaterial({
-      color: "red",
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    reticle.matrix.decompose(mesh.position, mesh.quaternion, mesh.scale);
-    //   mesh.scale.y = Math.random() * 2 + 1;
-
-    meshes.push(mesh);
-    scene.add(mesh);
+const arStarted = ref(false);
+function toggleStartStop() {
+  if (arStarted.value) {
+    stop();
+  } else {
+    start();
   }
 }
-// Calculate the median position of all meshes
-const calculateMedianPosition = () => {
-  console.log(meshes);
-
-  if (meshes.length === 0) {
-    console.log("No meshes to calculate median position");
-    return null;
-  }
-
-  // Sum up all positions
-  const sumPosition = new THREE.Vector3();
-  meshes.forEach((mesh) => {
-    sumPosition.add(mesh.position);
-  });
-
-  // Divide by number of meshes to get median
-  const medianPosition = sumPosition.divideScalar(meshes.length);
-  console.log("Median position:", medianPosition);
-
-  // Create a blue ball at the median position
-  const createBlueBallAtMedian = (position) => {
-    if (!position) return;
-
-    // Create a blue sphere geometry
-    const geometry = new THREE.SphereGeometry(0.1, 32, 32);
-    const material = new THREE.MeshBasicMaterial({
-      color: 0x0000ff,
-      transparent: true,
-      opacity: 0.5,
-    });
-    const blueBall = new THREE.Mesh(geometry, material);
-
-    // Set the position to the median position
-    blueBall.position.copy(position);
-
-    // Create a positional audio source
-    const sound = new THREE.PositionalAudio(listener);
-    sounds.push(sound);
-
-    // Load a sound and set it as the PositionalAudio object's buffer
-    const audioLoader = new THREE.AudioLoader();
-    audioLoader.load("/sounds/waterBigger.m4a", function (buffer) {
-      sound.setBuffer(buffer);
-      sound.setRefDistance(1.0); // 1 meter reference distance
-      sound.setRolloffFactor(1.0); // Physically accurate rolloff
-      sound.setMaxDistance(10000); // Maximum distance for sound
-      sound.setDistanceModel("exponential"); // Most physically accurate model
-      sound.setLoop(true);
-      sound.setVolume(1);
-      sound.play();
-    });
-
-    // Add the sound to the mesh
-    blueBall.add(sound);
-
-    // Add the blue ball to the scene
-    scene.add(blueBall);
-
-    console.log("Blue ball added at median position:", position);
-
-    // Add to meshes array to track it
-    meshes.push(blueBall);
-  };
-
-  // Create and add the blue ball
-  createBlueBallAtMedian(medianPosition);
-
-  return medianPosition;
-};
 
 async function start() {
+  arStarted.value = true;
   init();
   const synth = new Tone.Synth().toDestination();
-  Tone.start();
-  synth.triggerAttackRelease("C4", "2n");
+  synth.triggerAttackRelease("C5", ".2s");
 
   if (currentSession === null) {
     try {
@@ -161,7 +94,7 @@ async function start() {
           "camera-access",
           "dom-overlay",
         ],
-        domOverlay: { root: document.getElementById("container") },
+        domOverlay: { root: container.value },
       });
       await onSessionStarted(session);
     } catch (err) {
@@ -171,6 +104,15 @@ async function start() {
 }
 
 function stop() {
+  arStarted.value = false;
+  isFirstPlane.value = true;
+  isPredicting.value = false;
+  const synth = new Tone.Synth().toDestination();
+  synth.triggerAttackRelease("C5", "0.1s");
+  synth.triggerAttackRelease("B4", "0.1s", Tone.now() + 0.1);
+  synth.triggerAttackRelease("A4", "0.1s", Tone.now() + 0.2);
+  synth.triggerAttackRelease("G4", "0.1s", Tone.now() + 0.3);
+  synth.triggerAttackRelease("F4", "0.1s", Tone.now() + 0.4);
   if (currentSession !== null) {
     currentSession.end();
   }
@@ -197,7 +139,7 @@ function onSessionEnded() {
 }
 
 function init() {
-  container = document.getElementById("container");
+  Tone.start();
 
   scene = new THREE.Scene();
 
@@ -223,82 +165,25 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setAnimationLoop(animate);
   renderer.xr.enabled = true;
-  container.appendChild(renderer.domElement);
+  container.value.appendChild(renderer.domElement);
 
   controller = renderer.xr.getController(0);
   scene.add(controller);
 
-  reticle = new THREE.Mesh(
-    new THREE.PlaneGeometry(1.3, 5).rotateX(-Math.PI / 2),
-    // new THREE.RingGeometry(0.15, 0.2, 32).rotateX(-Math.PI / 2),
+  detectedPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.5, 8).rotateX(-Math.PI / 2),
     new THREE.MeshBasicMaterial({
-      color: 0xffff00,
+      color: 0xff0000,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.2,
     })
   );
-  reticle.matrixAutoUpdate = false;
-  reticle.visible = false;
-  scene.add(reticle);
-
-  const planeGeometry = new THREE.PlaneGeometry(50, 50);
-  const planeMaterial = new THREE.MeshBasicMaterial({
-    color: 0xffa500,
-    transparent: true,
-    opacity: 0.5,
-  });
-  plane = new THREE.Mesh(planeGeometry, planeMaterial);
-  plane.rotation.x = -Math.PI / 2;
-  plane.matrixAutoUpdate = false;
-  plane.visible = false;
-  scene.add(plane);
+  detectedPlane.matrixAutoUpdate = false;
+  detectedPlane.visible = false;
+  scene.add(detectedPlane);
 }
 
 let sound;
-
-const changeSound = () => {
-  Tone.Offline(() => {
-    // Calculate distance between camera and currentIntersectionMesh
-    let distance = 0;
-    if (currentIntersectionMesh) {
-      const cameraPosition = new THREE.Vector3();
-      camera.getWorldPosition(cameraPosition);
-
-      const meshPosition = new THREE.Vector3();
-      currentIntersectionMesh.getWorldPosition(meshPosition);
-
-      distance = cameraPosition.distanceTo(meshPosition);
-      console.log("Distance to intersection mesh:", distance);
-    }
-    const freq = Math.floor(map(distance, 0, 10, 3000, 100));
-
-    const oscillator = new Tone.Oscillator({
-      frequency: freq,
-      type: "sine",
-    })
-      .toDestination()
-      .start(0);
-  }, 1).then((toneBuffer) => {
-    const audioContext = listener.context;
-    const audioBuffer = audioContext.createBuffer(
-      1,
-      toneBuffer.length,
-      toneBuffer.sampleRate
-    );
-    const channelData = audioBuffer.getChannelData(0);
-    channelData.set(toneBuffer.getChannelData(0));
-    sound.stop();
-    sound.setBuffer(audioBuffer);
-    // sound.setRefDistance(1);
-    // sound.setRolloffFactor(1);
-    // sound.setDistanceModel("exponential");
-    // sound.setMaxDistance(50);
-    // sound.setLoop(true);
-    // sound.setVolume(1);
-    sound.play();
-  });
-};
-
 let currentIntersectionMesh = null;
 function intersectPrediction(prediction) {
   const raycaster = new THREE.Raycaster();
@@ -309,9 +194,7 @@ function intersectPrediction(prediction) {
 
   raycaster.setFromCamera(input, camera);
 
-  let thisPlane = plane;
-  // const intersects = raycaster.intersectObject(plane);
-  const intersects = raycaster.intersectObject(reticle);
+  const intersects = raycaster.intersectObject(detectedPlane);
 
   if (intersects.length > 0) {
     const intersectPoint = intersects[0].point;
@@ -325,94 +208,67 @@ function intersectPrediction(prediction) {
     sphere.position.copy(intersectPoint);
 
     sound = new THREE.PositionalAudio(listener);
-
-    // render 2 seconds of the oscillator
-    Tone.Offline(() => {
-      // only nodes created in this callback will be recorded
-      const oscillator = new Tone.Oscillator({
-        frequency: 440,
-        type: "sine",
-      })
-        .toDestination()
-        .start(0);
-    }, 0.5).then((toneBuffer) => {
-      // Convert Tone.js buffer to AudioBuffer
-      const audioContext = listener.context;
-      const audioBuffer = audioContext.createBuffer(
-        // toneBuffer.numberOfChannels,
-        1,
-        toneBuffer.length,
-        toneBuffer.sampleRate
-      );
-
-      // Copy the data from Tone.js buffer to AudioBuffer
-      // for (let channel = 0; channel < toneBuffer.numberOfChannels; channel++) {
-      for (let channel = 0; channel < 1; channel++) {
-        const channelData = audioBuffer.getChannelData(channel);
-        channelData.set(toneBuffer.getChannelData(channel));
-      }
-
-      // Set the converted buffer to the PositionalAudio
-      sound.setBuffer(audioBuffer);
-      sound.setRefDistance(1);
-      sound.setRolloffFactor(1);
-      sound.setDistanceModel("exponential");
-      sound.setMaxDistance(50);
+    const audioLoader = new THREE.AudioLoader();
+    audioLoader.load("/sounds/strudel/simplebeat.mp3", function (buffer) {
+      sound.setBuffer(buffer);
+      sound.setRefDistance(1.0); // 1 meter reference distance
+      sound.setRolloffFactor(1.0); // Physically accurate rolloff
+      sound.setMaxDistance(10000); // Maximum distance for sound
+      sound.setDistanceModel("exponential"); // Most physically accurate model
       sound.setLoop(true);
       sound.setVolume(1);
+      sound.setPlaybackRate(1);
       sound.play();
-
-      setInterval(() => {
-        changeSound();
-      }, 50);
-
-      sounds.push(sound);
     });
 
-    // setTimeout(() => {
-    //   console.log("stopping sound", sound);
-    //   sound.stop();
-    // }, 2000);
-
+    sounds.push(sound);
     sphere.add(sound);
-
     if (currentIntersectionMesh) {
       scene.remove(currentIntersectionMesh);
     }
     currentIntersectionMesh = sphere;
     scene.add(currentIntersectionMesh);
     return intersectPoint;
-  } else {
-    return thisPlane;
   }
 }
 
-let isReady = false;
-let isPredicting = true;
-let prev_framebuffer;
-let frameCount = 0;
-let framebuffer;
 async function animate(timestamp, frame) {
   if (frame) {
     frameCount++;
     const referenceSpace = renderer.xr.getReferenceSpace();
     const session = renderer.xr.getSession();
+    const pose = frame.getViewerPose(referenceSpace);
 
-    if (hitTestSourceRequested === false) {
-      session.requestReferenceSpace("viewer").then(function (referenceSpace) {
-        session
-          .requestHitTestSource({ space: referenceSpace })
-          .then(function (source) {
-            hitTestSource = source;
-          });
-      });
+    // if (pose) {
+    //   const view = pose.views[0];
+    //   const orientation = view.transform.orientation;
+    //   const euler = new THREE.Euler().setFromQuaternion(
+    //     new THREE.Quaternion(
+    //       orientation.x,
+    //       orientation.y,
+    //       orientation.z,
+    //       orientation.w
+    //     )
+    //   );
+    //   const alphaDegrees = THREE.MathUtils.radToDeg(euler.z);
+    //   console.log("Phone orientation (alpha):", alphaDegrees);
+    // }
 
-      session.addEventListener("end", function () {
-        hitTestSourceRequested = false;
-        hitTestSource = null;
-      });
+    // update sound rate
+    if (currentIntersectionMesh && frameCount % 5 === 0) {
+      let distance = 0;
+      const cameraPosition = new THREE.Vector3();
+      camera.getWorldPosition(cameraPosition);
 
-      hitTestSourceRequested = true;
+      const meshPosition = new THREE.Vector3();
+      currentIntersectionMesh.getWorldPosition(meshPosition);
+
+      distance = cameraPosition.distanceTo(meshPosition);
+      let rate = map(distance, 0, 10, 4, 0.1);
+      if (distance < 1) {
+        rate = map(distance, 0, 1, 8, 4);
+      }
+      sound.setPlaybackRate(rate);
     }
 
     if (hitTestSource) {
@@ -421,17 +277,22 @@ async function animate(timestamp, frame) {
       if (hitTestResults.length) {
         const hit = hitTestResults[0];
 
-        reticle.visible = true;
-        reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
+        if (isFirstPlane.value) {
+          const synth = new Tone.Synth().toDestination();
+          Tone.start();
+          synth.triggerAttackRelease("C3", ".2s");
+          isFirstPlane.value = false;
+        }
 
-        // plane.position.set(
-        //   reticle.position.x,
-        //   reticle.position.y,
-        //   reticle.position.z
-        // );
+        detectedPlane.visible = true;
+        detectedPlane.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
 
-        const pose = frame.getViewerPose(referenceSpace);
-        if (pose && frameCount % 10 === 0 && isPredicting && isReady) {
+        if (
+          pose &&
+          frameCount % 10 === 0 &&
+          isPredicting.value &&
+          isReady.value
+        ) {
           const gl = renderer.getContext();
 
           gl.bindFramebuffer(
@@ -459,20 +320,33 @@ async function animate(timestamp, frame) {
             if (prediction.confidence > 0.85) {
               let intersectPoint = intersectPrediction(prediction);
               console.log("intersectPoint", intersectPoint);
-              isPredicting = false;
+              isPredicting.value = false;
             }
           });
           gl.deleteFramebuffer(framebuffer);
-          // gl.bindFramebuffer(gl.FRAMEBUFFER, prev_framebuffer);
         }
-        // plane.visible = true;
       } else {
-        reticle.visible = false;
-        plane.visible = false;
+        detectedPlane.visible = false;
       }
     }
 
-    // prev_framebuffer = framebuffer;
+    // setup hit test source
+    if (hitTestSourceRequested === false) {
+      session.requestReferenceSpace("viewer").then(function (referenceSpace) {
+        session
+          .requestHitTestSource({ space: referenceSpace })
+          .then(function (source) {
+            hitTestSource = source;
+          });
+      });
+
+      session.addEventListener("end", function () {
+        hitTestSourceRequested = false;
+        hitTestSource = null;
+      });
+
+      hitTestSourceRequested = true;
+    }
   }
 
   renderer.render(scene, camera);

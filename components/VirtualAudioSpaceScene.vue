@@ -26,13 +26,14 @@
     />
     <Audio3D
       v-if="checkSelectedBoules(index)"
+      :localPlaybackRate="1"
       :url="
         boule.player === 1
           ? store.currentSoundPlayer1
           : boule.player === 2
           ? store.currentSoundPlayer2
           : checkSelectedBoules(index)
-          ? '/sounds/shortdeep.mp3'
+          ? '/sounds/strudel/simplebeat.mp3'
           : '/strudel/still.mp3'
       "
     />
@@ -49,7 +50,7 @@
     :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
     :intensity="5"
   />
-  <Grid />
+  <GridComponent />
 </template>
 
 <script setup>

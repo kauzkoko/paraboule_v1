@@ -6,7 +6,7 @@
       <TresMeshBasicMaterial color="yellow" />
     </TresMesh>
     <KeyboardControls />
-    <Grid
+    <GridComponent
       :args="[10.5, 10.5]"
       cell-color="ff0000"
       :cell-size="1"
@@ -47,8 +47,8 @@ const start = async () => {
     },
   }).toDestination();
 
-  context.destination.channelCount = 1;
-  context.destination.channelCountMode = "explicit";
+  // context.destination.channelCount = 1;
+  // context.destination.channelCountMode = "explicit";
   const positionalAudio = new THREE.PositionalAudio(listener);
   const destination = Tone.context.createMediaStreamDestination();
   synth.connect(destination);
