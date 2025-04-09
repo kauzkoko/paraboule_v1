@@ -60,12 +60,18 @@ const cleanup = () => {
   sounds = [];
   meshes = [];
   currentSession = null;
+
+  isReady.value = false;
+  isFirstPlane.value = true;
+  isPredicting.value = false;
 };
+
 onMounted(async () => {
   if (!store.modelLoaded && !store.modelWorkerId) {
     await startWorker();
   }
 });
+
 onUnmounted(() => {
   cleanup();
 });
@@ -80,6 +86,7 @@ function toggleStartStop() {
 }
 
 async function start() {
+  isPredicting.value = true;
   arStarted.value = true;
   init();
   const synth = new Tone.Synth().toDestination();
@@ -104,6 +111,7 @@ async function start() {
 }
 
 function stop() {
+  isReady.value = false;
   arStarted.value = false;
   isFirstPlane.value = true;
   isPredicting.value = false;
@@ -184,6 +192,7 @@ function init() {
 }
 
 let sound;
+let sound2;
 let currentIntersectionMesh = null;
 function intersectPrediction(prediction) {
   const raycaster = new THREE.Raycaster();
@@ -221,8 +230,24 @@ function intersectPrediction(prediction) {
       sound.play();
     });
 
+    sound2 = new THREE.PositionalAudio(listener);
+    const audioLoader2 = new THREE.AudioLoader();
+    audioLoader2.load("/sounds/noise.mp3", function (buffer) {
+      sound2.setBuffer(buffer);
+      sound2.setRefDistance(1.0); // 1 meter reference distance
+      sound2.setRolloffFactor(1.0); // Physically accurate rolloff
+      sound2.setMaxDistance(10000); // Maximum distance for sound
+      sound2.setDistanceModel("exponential"); // Most physically accurate model
+      sound2.setLoop(true);
+      sound2.setVolume(0);
+      sound2.setPlaybackRate(1);
+      sound2.play();
+    });
+
     sounds.push(sound);
+    sounds.push(sound2);
     sphere.add(sound);
+    sphere.add(sound2);
     if (currentIntersectionMesh) {
       scene.remove(currentIntersectionMesh);
     }
@@ -256,19 +281,33 @@ async function animate(timestamp, frame) {
 
     // update sound rate
     if (currentIntersectionMesh && frameCount % 5 === 0) {
-      let distance = 0;
       const cameraPosition = new THREE.Vector3();
+      const cameraDirection = new THREE.Vector3();
       camera.getWorldPosition(cameraPosition);
+      camera.getWorldDirection(cameraDirection);
 
       const meshPosition = new THREE.Vector3();
       currentIntersectionMesh.getWorldPosition(meshPosition);
 
-      distance = cameraPosition.distanceTo(meshPosition);
+      const directionToMesh = meshPosition
+        .clone()
+        .sub(cameraPosition)
+        .normalize();
+
+      const angle = THREE.MathUtils.radToDeg(
+        cameraDirection.angleTo(directionToMesh)
+      );
+
+      let distance = cameraPosition.distanceTo(meshPosition);
       let rate = map(distance, 0, 10, 4, 0.1);
       if (distance < 1) {
         rate = map(distance, 0, 1, 8, 4);
       }
       sound.setPlaybackRate(rate);
+
+      let volume = Math.pow(2, -angle / 15);
+      volume = Math.min(Math.max(volume, 0), 1);
+      sound2.setVolume(volume);
     }
 
     if (hitTestSource) {
@@ -281,11 +320,14 @@ async function animate(timestamp, frame) {
           const synth = new Tone.Synth().toDestination();
           Tone.start();
           synth.triggerAttackRelease("C3", ".2s");
+          isReady.value = true;
           isFirstPlane.value = false;
         }
 
         detectedPlane.visible = true;
-        detectedPlane.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
+        detectedPlane.matrix.fromArray(
+          hit.getPose(referenceSpace).transform.matrix
+        );
 
         if (
           pose &&
