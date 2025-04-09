@@ -216,17 +216,40 @@ function intersectPrediction(prediction) {
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     sphere.position.copy(intersectPoint);
 
+    // sound = new THREE.PositionalAudio(listener);
+    // const audioLoader = new THREE.AudioLoader();
+    // audioLoader.load("/sounds/strudel/simplebeat.mp3", function (buffer) {
+    //   sound.setBuffer(buffer);
+    //   sound.setRefDistance(1.0); // 1 meter reference distance
+    //   sound.setRolloffFactor(1.0); // Physically accurate rolloff
+    //   sound.setMaxDistance(10000); // Maximum distance for sound
+    //   sound.setDistanceModel("exponential"); // Most physically accurate model
+    //   sound.setLoop(true);
+    //   sound.setVolume(1);
+    //   sound.setPlaybackRate(1);
+    //   sound.play();
+    // });
+
     sound = new THREE.PositionalAudio(listener);
     const audioLoader = new THREE.AudioLoader();
     audioLoader.load("/sounds/strudel/simplebeat.mp3", function (buffer) {
+      // Create low-pass filter
+      const lowpass = sound.context.createBiquadFilter();
+      lowpass.type = "lowpass";
+      lowpass.frequency.setValueAtTime(1000, sound.context.currentTime);
+
+      sound.setFilters([lowpass]);
+
+      // Connect audio nodes
       sound.setBuffer(buffer);
-      sound.setRefDistance(1.0); // 1 meter reference distance
-      sound.setRolloffFactor(1.0); // Physically accurate rolloff
-      sound.setMaxDistance(10000); // Maximum distance for sound
-      sound.setDistanceModel("exponential"); // Most physically accurate model
+      sound.setRefDistance(1.0);
+      sound.setRolloffFactor(1.0);
+      sound.setMaxDistance(10000);
+      sound.setDistanceModel("exponential");
       sound.setLoop(true);
       sound.setVolume(1);
       sound.setPlaybackRate(1);
+
       sound.play();
     });
 
@@ -293,21 +316,36 @@ async function animate(timestamp, frame) {
         .clone()
         .sub(cameraPosition)
         .normalize();
-
       const angle = THREE.MathUtils.radToDeg(
         cameraDirection.angleTo(directionToMesh)
       );
-
       let distance = cameraPosition.distanceTo(meshPosition);
-      let rate = map(distance, 0, 10, 4, 0.1);
+
+      // Update playback rate
+      let rate = map(distance, 0, 10, 2, 0.2);
       if (distance < 1) {
-        rate = map(distance, 0, 1, 8, 4);
+        rate = map(distance, 0, 1, 4, 2);
       }
       sound.setPlaybackRate(rate);
 
-      let volume = Math.pow(2, -angle / 15);
-      volume = Math.min(Math.max(volume, 0), 1);
-      sound2.setVolume(volume);
+      // Update noise volume
+      console.log("angle", angle);
+      let absoluteAngle = Math.abs(angle);
+      console.log("absoluteAngle", absoluteAngle);
+      let normalizedAngle =
+        absoluteAngle <= 45 ? map(absoluteAngle, 0, 45, 1, 0) : 0;
+      console.log("normalizedAngle", normalizedAngle);
+      let normalizedAnglePow = Math.pow(normalizedAngle, 4);
+      console.log("normalizedAnglePow", normalizedAnglePow);
+      let volume = normalizedAnglePow;
+      // sound2.setVolume(volume);
+      sound2.setVolume(0);
+
+      let freq = map(normalizedAnglePow, 0, 1, 200, 20000);
+      console.log("freq", freq);
+      sound
+        .getFilters()[0]
+        .frequency.setValueAtTime(freq, sound.context.currentTime);
     }
 
     if (hitTestSource) {
