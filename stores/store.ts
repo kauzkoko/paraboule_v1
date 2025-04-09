@@ -209,8 +209,8 @@ export const useProtoStore = defineStore("protoStore", () => {
     (model) => model.name === "bolobolo"
   );
 
-  const yoloModelCycler = useCycleList(baboucheModels, {
-    initialValue: baboucheModels[0],
+  const yoloModelCycler = useCycleList(boloboloModels, {
+    initialValue: boloboloModels[0],
   });
   const prevYoloModel = computed(() => {
     const currentIndex = yoloModelCycler.index.value;
