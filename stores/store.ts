@@ -169,38 +169,6 @@ export const useProtoStore = defineStore("protoStore", () => {
     //   await startWorker();
     // }
   };
-  const yoloModels = [
-    {
-      name: "bolobolo",
-      id: "24",
-      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
-    },
-    {
-      name: "bolobolo",
-      id: "25",
-      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
-    },
-    {
-      name: "bolobolo",
-      id: "26",
-      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
-    },
-    {
-      name: "bolobolo",
-      id: "27",
-      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
-    },
-    {
-      name: "babouche-hzhjy",
-      id: "2",
-      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
-    },
-    {
-      name: "babouche-hzhjy",
-      id: "1",
-      modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
-    },
-  ];
 
   const baboucheModels = yoloModels.filter(
     (model) => model.name === "babouche-hzhjy"

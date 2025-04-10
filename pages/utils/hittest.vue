@@ -34,6 +34,7 @@
         >
           Set startpoint at camera position
         </button>
+        <button @click="setBoulesAroundYou">Set boules around you</button>
       </div>
     </div>
   </div>
@@ -337,6 +338,7 @@ function setStartPointAtCameraPosition() {
   scene.add(marker);
 }
 
+let marker;
 function setStartPointByRay() {
   // Create a raycaster from the camera's position
   const raycaster = new THREE.Raycaster();
@@ -361,7 +363,7 @@ function setStartPointByRay() {
       transparent: true,
       opacity: 0.5,
     });
-    const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+    marker = new THREE.Mesh(markerGeometry, markerMaterial);
     marker.position.copy(intersectPoint);
     scene.add(marker);
   } else {
@@ -376,6 +378,96 @@ function getScreenPosition(object, camera) {
   return { x, y };
 }
 
+const mockBoules = [
+  {
+    x: 0.15217870875827644,
+    y: 0.11757755279540989,
+    z: -2.14242094133827,
+    class: "cochonet",
+  },
+  {
+    x: 0.3014103032020119,
+    y: 0.11757755279540989,
+    z: -2.3185530158534984,
+    class: "dark",
+  },
+  {
+    x: 0.019827494002689575,
+    y: 0.13757755279540984,
+    z: -1.873205403607142,
+    class: "light",
+  },
+  {
+    x: 0.35239538925638664,
+    y: 0.050841178894042934,
+    z: -2.040454871744344,
+    class: "dark",
+  },
+  {
+    x: 0.20640927469181287,
+    y: 0.10841178894042956,
+    z: -1.9825655394221926,
+    class: "light",
+  },
+];
+const setFromIntersections = (mockIntersections) => {
+  let cochonet = mockIntersections.find(
+    (item) => item.class === "cochonet" || item.class === "cochonette"
+  );
+  let offsetX = 0;
+  let offsetY = 0;
+  let scaler = 23;
+  if (cochonet) {
+    offsetX = cochonet.x * scaler;
+    offsetY = cochonet.z * scaler;
+  }
+  let tempBoules = [];
+  mockIntersections.forEach((item) => {
+    let scaledX = item.x * scaler - offsetX;
+    let scaledY = item.z * scaler - offsetY;
+    let distance = Math.sqrt(scaledX * scaledX + scaledY * scaledY);
+    let boule = {
+      x: scaledX,
+      y: scaledY,
+      color: "yellow",
+      size: 1,
+      player: 3,
+      class: item.class,
+      distance: distance,
+    };
+
+    if (item.class === "cochonet") {
+      boule.color = "orange";
+      boule.size = 0.4;
+      boule.player = 0;
+    } else if (item.class === "dark") {
+      boule.color = "#111";
+      boule.player = 1;
+    } else if (item.class === "light") {
+      boule.color = "#555";
+      boule.player = 2;
+    }
+
+    tempBoules.push(boule);
+  });
+  return tempBoules;
+};
+let boules = setFromIntersections(mockBoules);
+console.log("boules", boules);
+function setBoulesAroundYou() {
+  boules.forEach((boule) => {
+    const bouleGeometry = new THREE.SphereGeometry(boule.size, 32, 32);
+    const bouleMaterial = new THREE.MeshBasicMaterial({
+      color: boule.color,
+      transparent: true,
+      opacity: 0.8,
+    });
+    const tempBoule = new THREE.Mesh(bouleGeometry, bouleMaterial);
+    tempBoule.position.set(boule.x, 0, boule.y);
+    scene.add(tempBoule);
+    boules.push(tempBoule);
+  });
+}
 async function animate(timestamp, frame) {
   if (frame) {
     frameCount++;
@@ -397,6 +489,27 @@ async function animate(timestamp, frame) {
     //   const alphaDegrees = THREE.MathUtils.radToDeg(euler.z);
     //   console.log("Phone orientation (alpha):", alphaDegrees);
     // }
+    // yaw
+
+    if (marker) {
+      const markerPosition = new THREE.Vector3();
+      const cameraPosition = new THREE.Vector3();
+      camera.getWorldPosition(cameraPosition);
+      marker.getWorldPosition(markerPosition);
+      const direction = new THREE.Vector3();
+      direction.subVectors(markerPosition, cameraPosition); // Vector from camera to object
+      const targetYaw = Math.atan2(direction.x, direction.z) * (180 / Math.PI); // in degrees
+      console.log("targetYaw", targetYaw);
+
+      // pitch
+      const pitch =
+        Math.atan2(direction.y, direction.length()) * (180 / Math.PI); // in degrees
+      console.log("pitch", pitch);
+
+      // roll
+      const roll = Math.atan2(direction.x, direction.y) * (180 / Math.PI); // in degrees
+      console.log("roll", roll);
+    }
 
     // update sound rate
     if (currentIntersectionMesh && frameCount % 5 === 0 && !isMuted.value) {
@@ -419,9 +532,11 @@ async function animate(timestamp, frame) {
       //   console.log("left");
       // }
       if (inScreen) {
-        console.log("in screen");
-        useVibrate({ pattern: [10, 0] }).vibrate();
+        // console.log("in screen");
+        useVibrate({ pattern: [20, 0] }).vibrate();
       }
+
+      // pitch
 
       const directionToMesh = meshPosition
         .clone()
