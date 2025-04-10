@@ -1,8 +1,14 @@
 <template>
   <TresPerspectiveCamera ref="camera" />
-  <TresMesh ref="boxRef" @click="handleClick">
+  <TresMesh ref="boxRef"       @click="isSelected = !isSelected"
+  >
     <TresBoxGeometry />
     <TresMeshBasicMaterial color="yellow" />
+    <TestAudio
+      :parent="boxRef"
+      :listener="listener"
+      :isSelected="isSelected"
+    />
   </TresMesh>
   <!-- <KeyboardControls /> -->
   <Grid :args="[30, 30]" />
@@ -16,6 +22,7 @@ import { KeyboardControls, Grid } from "@tresjs/cientos";
 import * as THREE from "three";
 import { animate } from "animejs";
 
+const isSelected = ref(false);
 const boxRef = ref(null);
 const camera = ref(null);
 onKeyStroke("e", () => {
