@@ -1,48 +1,108 @@
+<style scoped>
+.container-grid {
+  @apply fixed w-full bottom-0 left-0 grid grid-cols-3 gap-2 items-center justify-center;
+  div {
+    @apply flexCenter w-full h-full;
+  }
+  button {
+    @apply w-full h-full;
+  }
+}
+</style>
+
 <template>
   <div ref="container" class="w-dvw h-dvh">
-    <div class="fixed bottom-0 left-0 children:w-100px children:p-5">
-      <div class="flex flex-row gap-5">
+    <div class="container-grid">
+      <div class="bg-yellow py-1 rounded flex items-center gap-1">
+        <div>
+          <button
+            @click="isReady = !isReady"
+            :class="{ 'bg-green-500': isReady, 'bg-red-500': !isReady }"
+          >
+            isReady
+          </button>
+        </div>
+        <div>
+          <button
+            @click="toggleMute"
+            :class="{ 'bg-green-500': isMuted, 'bg-red-500': !isMuted }"
+          >
+            isMuted
+          </button>
+        </div>
+      </div>
+      <div>
         <button
           @click="toggleStartStop"
           :class="{ 'bg-green-500': arStarted, 'bg-red-500': !arStarted }"
         >
           Toggle AR
         </button>
+      </div>
+      <div>
         <button
-          @click="isReady = !isReady"
+          @click="setBoulesAroundYou"
           :class="{ 'bg-green-500': isReady, 'bg-red-500': !isReady }"
         >
-          isReady
-        </button>
-        <button
-          @click="toggleMute"
-          :class="{ 'bg-green-500': isMuted, 'bg-red-500': !isMuted }"
-        >
-          isMuted
+          Set boules around you
         </button>
       </div>
-      <div class="flex flex-row gap-5">
+      <div>
         <button
           @click="setStartPointByRay"
           :class="{ 'bg-green-500': isReady, 'bg-red-500': !isReady }"
         >
           Set startpoint by ray
         </button>
+      </div>
+      <div>
         <button
-          @click="setStartPointAtCameraPosition"
+          @click="setNewStartpoint()"
           :class="{ 'bg-green-500': isReady, 'bg-red-500': !isReady }"
         >
-          Set startpoint at camera position
+          Set new startpoint at camera
         </button>
-        <button @click="setBoulesAroundYou">Set boules around you</button>
+      </div>
+      <div>
+        <button
+          @click="removeStartpoint()"
+          :class="{ 'bg-green-500': isReady, 'bg-red-500': !isReady }"
+        >
+          Remove startpoint
+        </button>
+      </div>
+      <div>
+        <button
+          @click="setFieldByRay"
+          :class="{ 'bg-green-500': isReady, 'bg-red-500': !isReady }"
+        >
+          Set startpoint by ray
+        </button>
+      </div>
+      <div>
+        <button
+          @click="setNewField()"
+          :class="{ 'bg-green-500': isReady, 'bg-red-500': !isReady }"
+        >
+          Set new field at camera
+        </button>
+      </div>
+      <div>
+        <button
+          @click="removeField()"
+          :class="{ 'bg-green-500': isReady, 'bg-red-500': !isReady }"
+        >
+          Remove field
+        </button>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import * as THREE from "three";
 import * as Tone from "tone";
+import type { Frequency } from "tone/build/esm/core/type/Units";
 
 const store = useProtoStore();
 const { predictFromImage, startWorker } = await useInference();
@@ -57,6 +117,7 @@ let controller;
 let meshes = [];
 let detectedPlane;
 
+let globalListener;
 let listener;
 let sounds = [];
 
@@ -201,6 +262,7 @@ function init() {
 
   // Create a positional audio listener
   listener = new THREE.AudioListener();
+  globalListener = listener;
   if (!camera.children.includes(listener)) {
     camera.add(listener);
   }
@@ -229,18 +291,17 @@ function init() {
 }
 
 let sound;
-let sound2;
 let currentIntersectionMesh = null;
 function intersectPrediction(prediction, type = "boule") {
   const raycaster = new THREE.Raycaster();
   const input = new THREE.Vector2();
 
-  (input.x = (prediction.bbox.x / 2 / window.innerWidth) * 2 - 1),
-    (input.y = -(prediction.bbox.y / 2 / window.innerHeight) * 2 + 1);
-
-  raycaster.setFromCamera(input, camera);
-
-  const intersects = raycaster.intersectObject(detectedPlane);
+  const intersects = intersectsWithPlane({
+    x: prediction.bbox.x,
+    y: prediction.bbox.y,
+    camera,
+    plane: detectedPlane,
+  });
 
   if (intersects.length > 0) {
     const intersectPoint = intersects[0].point;
@@ -256,31 +317,13 @@ function intersectPrediction(prediction, type = "boule") {
     const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
     sphere.position.copy(intersectPoint);
 
-    // sound = new THREE.PositionalAudio(listener);
-    // const audioLoader = new THREE.AudioLoader();
-    // audioLoader.load("/sounds/strudel/simplebeat.mp3", function (buffer) {
-    //   sound.setBuffer(buffer);
-    //   sound.setRefDistance(1.0); // 1 meter reference distance
-    //   sound.setRolloffFactor(1.0); // Physically accurate rolloff
-    //   sound.setMaxDistance(10000); // Maximum distance for sound
-    //   sound.setDistanceModel("exponential"); // Most physically accurate model
-    //   sound.setLoop(true);
-    //   sound.setVolume(1);
-    //   sound.setPlaybackRate(1);
-    //   sound.play();
-    // });
-
     sound = new THREE.PositionalAudio(listener);
     const audioLoader = new THREE.AudioLoader();
     audioLoader.load("/sounds/strudel/simplebeat.mp3", function (buffer) {
-      // Create low-pass filter
       const lowpass = sound.context.createBiquadFilter();
       lowpass.type = "lowpass";
       lowpass.frequency.setValueAtTime(1000, sound.context.currentTime);
-
       sound.setFilters([lowpass]);
-
-      // Connect audio nodes
       sound.setBuffer(buffer);
       sound.setRefDistance(1.0);
       sound.setRolloffFactor(1.0);
@@ -289,28 +332,11 @@ function intersectPrediction(prediction, type = "boule") {
       sound.setLoop(true);
       sound.setVolume(1);
       sound.setPlaybackRate(1);
-
       sound.play();
     });
-
-    sound2 = new THREE.PositionalAudio(listener);
-    const audioLoader2 = new THREE.AudioLoader();
-    audioLoader2.load("/sounds/noise.mp3", function (buffer) {
-      sound2.setBuffer(buffer);
-      sound2.setRefDistance(1.0); // 1 meter reference distance
-      sound2.setRolloffFactor(1.0); // Physically accurate rolloff
-      sound2.setMaxDistance(10000); // Maximum distance for sound
-      sound2.setDistanceModel("exponential"); // Most physically accurate model
-      sound2.setLoop(true);
-      sound2.setVolume(0);
-      sound2.setPlaybackRate(1);
-      // sound2.play();
-    });
-
     sounds.push(sound);
-    sounds.push(sound2);
     sphere.add(sound);
-    sphere.add(sound2);
+
     if (currentIntersectionMesh) {
       scene.remove(currentIntersectionMesh);
     }
@@ -320,26 +346,46 @@ function intersectPrediction(prediction, type = "boule") {
   }
 }
 
-function setStartPointAtCameraPosition() {
+let startpoint;
+let startpointSound;
+function setNewStartpoint() {
+  removeStartpoint();
+
   const cameraPosition = new THREE.Vector3();
   camera.getWorldPosition(cameraPosition);
 
   // Create marker at intersection point
   const markerGeometry = new THREE.CylinderGeometry(0.3, 0.3, 0.1, 32);
   const markerMaterial = new THREE.MeshBasicMaterial({
-    color: 0xff0000,
+    color: 0x00ff00,
     transparent: true,
     opacity: 0.5,
   });
-  const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-  marker.position.copy(cameraPosition);
+  startpoint = new THREE.Mesh(markerGeometry, markerMaterial);
+  startpoint.position.copy(cameraPosition);
+
+  startpointSound = setPositionalAudioToObject({
+    src: "/sounds/strudel/simplebeat.mp3",
+    object: startpoint,
+    listener,
+    sounds,
+    autoplay: true,
+  });
   // Set the y position to the floor (y=0)
-  marker.position.y = 0;
-  scene.add(marker);
+  startpoint.position.y = 0;
+  scene.add(startpoint);
+}
+
+function removeStartpoint() {
+  if (startpoint) {
+    scene.remove(startpoint);
+  }
+  if (startpointSound) startpointSound.stop();
 }
 
 let marker;
 function setStartPointByRay() {
+  removeStartpoint();
   // Create a raycaster from the camera's position
   const raycaster = new THREE.Raycaster();
   const cameraPosition = new THREE.Vector3();
@@ -356,16 +402,129 @@ function setStartPointByRay() {
     const intersectPoint = intersects[0].point;
     console.log("Start point set at:", intersectPoint);
 
-    // Create marker at intersection point
     const markerGeometry = new THREE.CylinderGeometry(0.3, 0.3, 0.1, 32);
     const markerMaterial = new THREE.MeshBasicMaterial({
-      color: 0xff0000,
+      color: 0x00ff00,
       transparent: true,
       opacity: 0.5,
     });
-    marker = new THREE.Mesh(markerGeometry, markerMaterial);
-    marker.position.copy(intersectPoint);
-    scene.add(marker);
+    startpoint = new THREE.Mesh(markerGeometry, markerMaterial);
+    startpoint.position.copy(intersectPoint);
+
+    startpointSound = setPositionalAudioToObject({
+      src: "/sounds/strudel/simplebeat.mp3",
+      object: startpoint,
+      listener,
+      sounds,
+      autoplay: true,
+    });
+    scene.add(startpoint);
+  } else {
+    console.log("No intersection with plane found");
+  }
+}
+
+let field;
+let fieldSound;
+function setNewField() {
+  removeField();
+
+  const cameraPosition = new THREE.Vector3();
+  camera.getWorldPosition(cameraPosition);
+
+  const sphereGeometry = new THREE.SphereGeometry(0.05, 32, 32);
+  const sphereMaterial = new THREE.MeshBasicMaterial({
+    color: 0xff0000,
+    transparent: true,
+    opacity: 0.7,
+  });
+  const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+  sphere.position.copy(cameraPosition);
+  sphere.position.y = 0;
+
+  sound = new THREE.PositionalAudio(listener);
+  const audioLoader = new THREE.AudioLoader();
+  audioLoader.load("/sounds/strudel/simplebeat.mp3", function (buffer) {
+    const lowpass = sound.context.createBiquadFilter();
+    lowpass.type = "lowpass";
+    lowpass.frequency.setValueAtTime(1000, sound.context.currentTime);
+    sound.setFilters([lowpass]);
+    sound.setBuffer(buffer);
+    sound.setRefDistance(1.0);
+    sound.setRolloffFactor(1.0);
+    sound.setMaxDistance(10000);
+    sound.setDistanceModel("exponential");
+    sound.setLoop(true);
+    sound.setVolume(1);
+    sound.setPlaybackRate(1);
+    sound.play();
+  });
+  sounds.push(sound);
+  fieldSound = sound;
+  sphere.add(sound);
+
+  currentIntersectionMesh = sphere;
+  scene.add(currentIntersectionMesh);
+
+  console.log("intersectPoint", intersectPoint);
+}
+
+function removeField() {
+  if (currentIntersectionMesh) {
+    scene.remove(currentIntersectionMesh);
+    currentIntersectionMesh = null;
+  }
+  if (fieldSound) {
+    fieldSound.stop();
+  }
+}
+
+function setFieldByRay() {
+  removeField();
+  // Create a raycaster from the camera's position
+  const raycaster = new THREE.Raycaster();
+  const cameraPosition = new THREE.Vector3();
+  const cameraDirection = new THREE.Vector3();
+  camera.getWorldPosition(cameraPosition);
+  camera.getWorldDirection(cameraDirection);
+
+  raycaster.set(cameraPosition, cameraDirection);
+
+  // Check intersection with the detected plane
+  const intersects = raycaster.intersectObject(detectedPlane);
+
+  if (intersects.length > 0) {
+    const intersectPoint = intersects[0].point;
+    const sphere = createSphere({
+      size: 0.05,
+      color: "red",
+      opacity: 0.7,
+    });
+    sphere.position.copy(intersectPoint);
+
+    sound = new THREE.PositionalAudio(listener);
+    const audioLoader = new THREE.AudioLoader();
+    audioLoader.load("/sounds/strudel/simplebeat.mp3", function (buffer) {
+      const lowpass = sound.context.createBiquadFilter();
+      lowpass.type = "lowpass";
+      lowpass.frequency.setValueAtTime(1000, sound.context.currentTime);
+      sound.setFilters([lowpass]);
+      sound.setBuffer(buffer);
+      sound.setRefDistance(1.0);
+      sound.setRolloffFactor(1.0);
+      sound.setMaxDistance(10000);
+      sound.setDistanceModel("exponential");
+      sound.setLoop(true);
+      sound.setVolume(1);
+      sound.setPlaybackRate(1);
+      sound.play();
+    });
+    sounds.push(sound);
+    fieldSound = sound;
+    sphere.add(sound);
+
+    currentIntersectionMesh = sphere;
+    scene.add(currentIntersectionMesh);
   } else {
     console.log("No intersection with plane found");
   }
@@ -453,21 +612,41 @@ const setFromIntersections = (mockIntersections) => {
   return tempBoules;
 };
 let boules = setFromIntersections(mockBoules);
-console.log("boules", boules);
+let boulesAroundYou = [];
 function setBoulesAroundYou() {
   boules.forEach((boule) => {
-    const bouleGeometry = new THREE.SphereGeometry(boule.size, 32, 32);
-    const bouleMaterial = new THREE.MeshBasicMaterial({
-      color: boule.color,
-      transparent: true,
-      opacity: 0.8,
+    const tempBoule = new Boule({
+      x: boule.x,
+      y: boule.y,
+      sound: {
+        src:
+          boule.player === 1
+            ? "/sounds/waterBigger.m4a"
+            : boule.player === 2
+            ? "/sounds/shortdeep.mp3"
+            : "/sounds/strudel/simplebeat.mp3",
+        listener: listener,
+        autoplay: false,
+      },
+      sounds,
+      scene,
     });
-    const tempBoule = new THREE.Mesh(bouleGeometry, bouleMaterial);
-    tempBoule.position.set(boule.x, 0, boule.y);
-    scene.add(tempBoule);
-    boules.push(tempBoule);
+    boulesAroundYou.push(tempBoule);
   });
 }
+
+function removeBoulesAroundYou() {
+  boulesAroundYou.forEach((boule) => {
+    boule.removeFromScene(scene);
+  });
+}
+
+const playSynth = (note: Frequency, duration: Time) => {
+  Tone.start();
+  const synth = new Tone.Synth().toDestination();
+  synth.triggerAttackRelease(note, duration);
+};
+
 async function animate(timestamp, frame) {
   if (frame) {
     frameCount++;
@@ -475,43 +654,6 @@ async function animate(timestamp, frame) {
     const session = renderer.xr.getSession();
     const pose = frame.getViewerPose(referenceSpace);
 
-    // if (pose) {
-    //   const view = pose.views[0];
-    //   const orientation = view.transform.orientation;
-    //   const euler = new THREE.Euler().setFromQuaternion(
-    //     new THREE.Quaternion(
-    //       orientation.x,
-    //       orientation.y,
-    //       orientation.z,
-    //       orientation.w
-    //     )
-    //   );
-    //   const alphaDegrees = THREE.MathUtils.radToDeg(euler.z);
-    //   console.log("Phone orientation (alpha):", alphaDegrees);
-    // }
-    // yaw
-
-    if (marker) {
-      const markerPosition = new THREE.Vector3();
-      const cameraPosition = new THREE.Vector3();
-      camera.getWorldPosition(cameraPosition);
-      marker.getWorldPosition(markerPosition);
-      const direction = new THREE.Vector3();
-      direction.subVectors(markerPosition, cameraPosition); // Vector from camera to object
-      const targetYaw = Math.atan2(direction.x, direction.z) * (180 / Math.PI); // in degrees
-      console.log("targetYaw", targetYaw);
-
-      // pitch
-      const pitch =
-        Math.atan2(direction.y, direction.length()) * (180 / Math.PI); // in degrees
-      console.log("pitch", pitch);
-
-      // roll
-      const roll = Math.atan2(direction.x, direction.y) * (180 / Math.PI); // in degrees
-      console.log("roll", roll);
-    }
-
-    // update sound rate
     if (currentIntersectionMesh && frameCount % 5 === 0 && !isMuted.value) {
       const cameraPosition = new THREE.Vector3();
       const cameraDirection = new THREE.Vector3();
@@ -524,20 +666,12 @@ async function animate(timestamp, frame) {
       const inXscreen = screenPosition.x > 0 && screenPosition.x < width.value;
       const inYscreen = screenPosition.y > 0 && screenPosition.y < height.value;
       const inScreen = inXscreen && inYscreen;
-      // const halfWidth = width.value / 2;
-      // if (inXscreen && inYscreen && screenPosition.x > halfWidth) {
-      //   console.log("right");
-      // }
-      // if (inXscreen && inYscreen && screenPosition.x < halfWidth) {
-      //   console.log("left");
-      // }
+
       if (inScreen) {
-        // console.log("in screen");
         useVibrate({ pattern: [20, 0] }).vibrate();
       }
 
       // pitch
-
       const directionToMesh = meshPosition
         .clone()
         .sub(cameraPosition)
@@ -583,8 +717,8 @@ async function animate(timestamp, frame) {
       isMuted.value &&
       frameCount % 5 === 0
     ) {
+      //TODO remove this and control all sounds over watcher
       sound.setVolume(0);
-      sound2.setVolume(0);
     }
 
     if (hitTestSource) {
@@ -594,9 +728,7 @@ async function animate(timestamp, frame) {
         const hit = hitTestResults[0];
 
         if (isFirstPlane.value) {
-          const synth = new Tone.Synth().toDestination();
-          Tone.start();
-          synth.triggerAttackRelease("C3", ".2s");
+          playSynth("C3", "2s");
           isReady.value = true;
           isFirstPlane.value = false;
         }
@@ -605,55 +737,6 @@ async function animate(timestamp, frame) {
         detectedPlane.matrix.fromArray(
           hit.getPose(referenceSpace).transform.matrix
         );
-
-        if (
-          pose &&
-          frameCount % 10 === 0 &&
-          isPredicting.value &&
-          isReady.value
-        ) {
-          const gl = renderer.getContext();
-
-          gl.bindFramebuffer(
-            gl.FRAMEBUFFER,
-            session.renderState.baseLayer.framebuffer
-          );
-
-          const view = pose.views[0];
-
-          const binding = new XRWebGLBinding(session, gl);
-          const cameraTexture = binding.getCameraImage(view.camera);
-          framebuffer = gl.createFramebuffer();
-
-          const bitmap = createImageFromTexture(
-            gl,
-            cameraTexture,
-            view.camera.width,
-            view.camera.height,
-            framebuffer
-          );
-
-          const newPredictions = await predictFromImage(bitmap);
-
-          newPredictions.forEach((prediction) => {
-            console.log("prediction", prediction);
-
-            if (prediction.class === "shoes" && prediction.confidence > 0.75) {
-              let intersectPoint = intersectPrediction(prediction, "shoes");
-              isPredicting.value = false;
-            } else if (
-              (prediction.class === "dark" ||
-                prediction.class === "light" ||
-                prediction.class === "cochonette") &&
-              prediction.confidence > 0.85
-            ) {
-              let intersectPoint = intersectPrediction(prediction, "boule");
-              console.log("intersectPoint", intersectPoint);
-              isPredicting.value = false;
-            }
-          });
-          gl.deleteFramebuffer(framebuffer);
-        }
       } else {
         detectedPlane.visible = false;
       }
