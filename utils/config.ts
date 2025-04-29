@@ -114,6 +114,7 @@ export const mockIntersections = [
 ];
 
 export const soundSrcs = [
+  "/sounds/strudel/simplebeat.mp3",
   "/sounds/noise.mp3",
   "/sounds/noisehigh.mp3",
   "/sounds/noiselow.mp3",
