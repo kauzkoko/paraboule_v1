@@ -44,12 +44,15 @@
     />
   </TresMesh>
   <StundenOrientation :startPoint="startPoint" />
-  <TresAmbientLight :intensity="230" />
+  <!-- <TresAmbientLight :intensity="230" /> -->
   <TresDirectionalLight
     :position="[cameraX, cameraY, cameraZ]"
     :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
     :intensity="5"
   />
+  <!-- <Suspense>
+    <GravelFloor />
+  </Suspense> -->
   <GridComponent />
 </template>
 

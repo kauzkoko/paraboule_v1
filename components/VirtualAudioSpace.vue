@@ -1,5 +1,5 @@
 <template>
-  <TresCanvas>
+  <TresCanvas shadows alpha window-size>
     <Suspense>
       <VirtualAudioSpaceScene />
     </Suspense>
