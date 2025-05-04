@@ -5,6 +5,19 @@ import process from "node:process";
 const sw = process.env.SW === "true";
 
 export default defineNuxtConfig({
+  app: {
+    head: {
+      // title: 'PARABOoOULES',
+      htmlAttrs: {
+        lang: 'en',
+      },
+      link: [
+        { rel: 'preconnect', href: 'https://cdn.fonts.net' },
+        { href: 'https://cdn.fonts.net/kit/b6404f4d-9ec8-4db4-b5d5-c631ce819028/b6404f4d-9ec8-4db4-b5d5-c631ce819028_enhanced.js', rel: 'stylesheet' },
+        { href: 'https://cdn.fonts.net/kit/b6404f4d-9ec8-4db4-b5d5-c631ce819028/b6404f4d-9ec8-4db4-b5d5-c631ce819028_enhanced.css', rel: 'stylesheet' }
+      ]
+    }
+  },
   compatibilityDate: "2024-11-01",
   devtools: { enabled: false },
   ssr: false,
@@ -65,8 +78,8 @@ export default defineNuxtConfig({
     filename: sw ? "sw.ts" : undefined,
     registerType: "autoUpdate",
     manifest: {
-      name: "Parab0o0ules",
-      short_name: "Parab0o0ules",
+      name: "PARABOoOULES",
+      short_name: "PARABOoOULES",
       theme_color: "#000000",
       background_color: "#000000",
       display: "standalone",

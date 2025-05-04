@@ -33,7 +33,8 @@
 }
 
 
-html, body {
+html,
+body {
   background-color: var(--background);
   margin: 0;
   padding: 0;
@@ -41,6 +42,11 @@ html, body {
   font-weight: 300;
   overflow: hidden;
   overscroll-behavior-y: contain;
+
+  font-family: "TwCenMTPro";
+  font-style: normal;
+  font-stretch: normal;
+  font-weight: 500;
 }
 
 button {

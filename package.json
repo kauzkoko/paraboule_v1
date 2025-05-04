@@ -9,11 +9,12 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "dev-sw": "SW=true nuxi dev",
-    "dev-sws": "SW=true nuxi dev --host",
+    "dev-sws": "SW=true nuxi dev --host --https",
     "build-sw": "SW=true nuxi build",
     "cloudflared": "cloudflared tunnel --url http://localhost:3000",
     "ngrok": "ngrok http --url=elephant-emerging-uniformly.ngrok-free.app 3000",
-    "bridge": "node bridge.cjs"
+    "bridge": "node bridge.cjs",
+    "generate-pwa-assets": "pwa-assets-generator"
   },
   "dependencies": {
     "@nuxt/scripts": "0.11.5",
