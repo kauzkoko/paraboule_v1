@@ -1,55 +1,29 @@
 <template>
-  <TresPerspectiveCamera
-    :position="[cameraX, cameraY, cameraZ]"
-    :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
-    ref="camera"
-  />
-  <TresMesh
-    v-for="(boule, index) in boulesToDisplay"
-    :key="index"
-    :iClass="boule.class"
-    ref="boulesRefs"
-    :position="[boule.x, 0, boule.y]"
-  >
+  <TresPerspectiveCamera :position="[cameraX, cameraY, cameraZ]" :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
+    ref="camera" />
+  <TresMesh v-for="(boule, index) in boulesToDisplay" :key="index" :iClass="boule.class" ref="boulesRefs"
+    :position="[boule.x, 0, boule.y]">
     <TresSphereGeometry :args="[boule.size, 24, 24]" />
-    <CustomShaderMaterial
-      v-bind="
-        boule.player === 1
-          ? materialPropsRed
-          : boule.player === 2
+    <CustomShaderMaterial v-bind="boule.player === 1
+        ? materialPropsRed
+        : boule.player === 2
           ? materialPropsBlue
           : materialPropsYellow
-      "
-      transparent
-      :opacity="checkSelectedBoules(index) ? 1 : 0"
-      v-if="checkSelectedBoules(index)"
-    />
-    <Audio3D
-      v-if="checkSelectedBoules(index)"
-      :localPlaybackRate="1"
-      :url="
-        boule.player === 1
-          ? store.currentSoundPlayer1
-          : boule.player === 2
+      " transparent :opacity="checkSelectedBoules(index) ? 1 : 0" v-if="checkSelectedBoules(index)" />
+    <Audio3D v-if="checkSelectedBoules(index)" :localPlaybackRate="1" :url="boule.player === 1
+        ? store.currentSoundPlayer1
+        : boule.player === 2
           ? store.currentSoundPlayer2
           : checkSelectedBoules(index)
-          ? '/sounds/strudel/simplebeat.mp3'
-          : '/strudel/still.mp3'
-      "
-    />
-    <TresMeshPhysicalMaterial
-      :roughness="0.4"
-      :metalness="1"
-      :emissive="boule.color"
-    />
+            ? '/sounds/strudel/simplebeat.mp3'
+            : '/strudel/still.mp3'
+      " />
+    <TresMeshPhysicalMaterial :roughness="0.4" :metalness="1" :emissive="boule.color" />
   </TresMesh>
   <StundenOrientation :startPoint="startPoint" />
   <!-- <TresAmbientLight :intensity="230" /> -->
-  <TresDirectionalLight
-    :position="[cameraX, cameraY, cameraZ]"
-    :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
-    :intensity="5"
-  />
+  <TresDirectionalLight :position="[cameraX, cameraY, cameraZ]" :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
+    :intensity="5" />
   <!-- <Suspense>
     <GravelFloor />
   </Suspense> -->
@@ -124,6 +98,9 @@ const checkSelectedBoules = (index) => {
   return store.selectedBoules.includes(index);
 };
 
+watchEffect(() => {
+  console.log(store.boulesToDisplay);
+});
 //interface controls
 let circleAroundCochonet = false;
 
@@ -493,8 +470,8 @@ watch(
         store.currentHapticGrid === "near"
           ? 30
           : store.currentHapticGrid === "medium"
-          ? 50
-          : 100;
+            ? 50
+            : 100;
       topCamera(height);
       setTimeout(() => {
         if (meshRefs.value.length < 1) return;

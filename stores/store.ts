@@ -1,5 +1,25 @@
 import { acceptHMRUpdate } from "pinia";
 
+interface Boule {
+  x: number;
+  y: number;
+  z?: number;
+  color: string;
+  size: number;
+  player: number;
+  class: string;
+  distance: number;
+  sortingIndex?: number;
+  rank?: number;
+}
+
+interface RawIntersection {
+  x: number;
+  y: number;
+  z: number;
+  class: string;
+}
+
 export const useProtoStore = defineStore("protoStore", () => {
   const { sendNewScore, sendPlayersShotsTaken } = useScoreController();
   const { sendSelectedBoules } = useFocusController();
@@ -7,7 +27,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const bus = useEventBus("protoboules");
 
   const modesCycler = useCycleList(modesList);
-  const initIndex = modesList.findIndex((mode) => mode.name === "All");
+  const initIndex = modesList.findIndex((mode) => mode.name === "SBV");
   modesCycler.go(initIndex);
 
   const prevMode = computed(() => {
@@ -42,7 +62,7 @@ export const useProtoStore = defineStore("protoStore", () => {
       shotsTaken: 0,
       class: "dark",
       audioCycler: useCycleList(soundSrcs, {
-        initialValue: soundSrcs[soundSrcs.length - 1],
+        initialValue: soundSrcs.find(src => src.includes("simplebeat")),
       }),
       score: 0,
       color: "#ff0000",
@@ -53,7 +73,7 @@ export const useProtoStore = defineStore("protoStore", () => {
       name: "Player 2",
       shotsTaken: 0,
       class: "light",
-      audioCycler: useCycleList(soundSrcs, { initialValue: soundSrcs[7] }),
+      audioCycler: useCycleList(soundSrcs, { initialValue: soundSrcs.find(src => src.includes("noz2")) }),
       score: 0,
       color: "#0000ff",
       colorCode: "#0000ff",
@@ -109,7 +129,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const reverseField = ref(false);
 
   const isSearching = ref(true);
-  const boules = ref([]);
+  const boules = ref<Boule[]>([]);
   const boulesCount = ref(0);
   const sortedBoules = useSorted(boules, (a, b) => a.distance - b.distance);
   const { history: sortedBoulesHistory } = useRefHistory(sortedBoules);
@@ -124,7 +144,28 @@ export const useProtoStore = defineStore("protoStore", () => {
         };
       });
     } else {
-      return sortedBoules.value;
+      // First, get all boules of each player class and sort them by distance
+      const player1Boules = sortedBoules.value
+        .filter(b => b.class === "dark")
+        .sort((a, b) => a.distance - b.distance);
+      const player2Boules = sortedBoules.value
+        .filter(b => b.class === "light")
+        .sort((a, b) => a.distance - b.distance);
+
+      return sortedBoules.value.map((boule, index) => {
+        let rank = 0;
+        if (boule.class === "dark") {
+          rank = player1Boules.findIndex(b => b === boule) + 1;
+        } else if (boule.class === "light") {
+          rank = player2Boules.findIndex(b => b === boule) + 1;
+        }
+
+        return {
+          ...boule,
+          sortingIndex: index,
+          rank: rank || 0, // 0 for cochonet
+        };
+      });
     }
   });
   const { history: filteredBoulesHistory } = useRefHistory(filteredBoules);
@@ -202,7 +243,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const isScanningForPoints = ref(false);
   const xrRunning = ref(false);
   const arSupported = ref(false);
-  const rawIntersections = ref([]);
+  const rawIntersections = ref<RawIntersection[]>([]);
   const mockIntersectionsCycler = useCycleList(mockIntersections);
   const predictions = ref([]);
   const planeDetected = ref(false);
@@ -395,7 +436,7 @@ export const useProtoStore = defineStore("protoStore", () => {
       offsetX = cochonet.x * scaler;
       offsetY = cochonet.z * scaler;
     }
-    let tempBoules = [];
+    let tempBoules: Boule[] = [];
     rawIntersections.value.forEach((item) => {
       let scaledX = item.x * scaler - offsetX;
       let scaledY = item.z * scaler - offsetY;

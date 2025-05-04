@@ -2,11 +2,7 @@
   <div class="absolute left-0 w-100dvw h-100dvh" @click="onFullscreenClick()">
     <VirtualAudioSpace :trigger="audioTrigger"></VirtualAudioSpace>
   </div>
-  <div
-    class="outer"
-    v-show="store.isTouchingSlider"
-    @click="onClickSliderComponent"
-  >
+  <div class="outer" v-show="store.isTouchingSlider" @click="onClickSliderComponent">
     <div class="container">
       <div class="big">
         <div v-show="!store.isTappingOnSlider">
@@ -18,11 +14,7 @@
       </div>
     </div>
   </div>
-  <div
-    class="outer"
-    v-show="store.isTouchingTopCameraSlider"
-    @click="onClickTopCameraSliderComponent"
-  >
+  <div class="outer" v-show="store.isTouchingTopCameraSlider" @click="onClickTopCameraSliderComponent">
     <div class="container">
       <div class="big">
         <div v-show="!store.isTappingOnTopCameraSlider">
@@ -34,11 +26,7 @@
       </div>
     </div>
   </div>
-  <div
-    class="outer"
-    v-show="store.isTouchingHaptic"
-    @click="onClickHapticGridComponent"
-  >
+  <div class="outer" v-show="store.isTouchingHaptic" @click="onClickHapticGridComponent">
     <div class="container">
       <div class="big">
         <div v-show="!store.isTappingOnHaptic">
@@ -58,30 +46,16 @@
       </div>
     </div>
   </div>
-  <div
-    class="outer"
-    ref="el"
-    v-show="
-      !store.isTouchingHaptic &&
-      !store.isTouchingSlider &&
-      !store.isTouchingTopCameraSlider &&
-      !store.predictionVisualiser
-    "
-  >
+  <div class="outer" ref="el" v-show="!store.isTouchingHaptic &&
+    !store.isTouchingSlider &&
+    !store.isTouchingTopCameraSlider &&
+    !store.predictionVisualiser
+    ">
     <div class="container">
-      <template
-        v-for="(item, index) in currentPage"
-        :key="'grid-item-' + index"
-      >
-        <div
-          :ref="refs.set"
-          class="grid-item"
-          :index="getIndex(item)"
-          @touchend="onTouchEnd"
-          v-touch:swipe="(dir, e) => onSwipe(dir, e, index, item)"
-          @click="onClick(item, index)"
-          @touchstart="onTouchStart(index)"
-          :style="{
+      <template v-for="(item, index) in currentPage" :key="'grid-item-' + index">
+        <div :ref="refs.set" class="grid-item" :index="getIndex(item)" @touchend="onTouchEnd"
+          v-touch:swipe="(dir, e) => onSwipe(dir, e, index, item)" @click="onClick(item, index)"
+          @touchstart="onTouchStart(index)" :style="{
             background:
               touchedIndex === index ? 'rgba(255,0,0,.25)' : 'transparent',
             transition:
@@ -91,31 +65,19 @@
                 ? 0.5
                 : 1
               : 1,
-          }"
-        >
-          <div
-            class="absolute text-hex-ff0000 text-12px px-2 py-2"
-            :class="{
-              'top-0 left-0': index === 0,
-              'top-0 right-0': index === 1,
-              'bottom-0 left-0': index === 2,
-              'bottom-0 right-0': index === 3,
-            }"
-          >
+          }">
+          <div class="absolute text-hex-ff0000 text-12px px-2 py-2" :class="{
+            'top-0 left-0': index === 0,
+            'top-0 right-0': index === 1,
+            'bottom-0 left-0': index === 2,
+            'bottom-0 right-0': index === 3,
+          }">
             {{ getItem(item).name }}
           </div>
           <div class="flex justify-center items-center w-full h-full">
-            <img
-              v-if="getItem(item).imgSrc"
-              :src="getItem(item).imgSrc.value ?? getItem(item).imgSrc"
-            />
-            <div
-              v-else-if="getItem(item).html"
-              class="text-hex-ff0000 text-20px text-center flexCenter max-w-80%"
-            >
-              <div
-                v-html="getItem(item).html.value ?? getItem(item).html"
-              ></div>
+            <img v-if="getItem(item).imgSrc" :src="getItem(item).imgSrc.value ?? getItem(item).imgSrc" />
+            <div v-else-if="getItem(item).html" class="text-hex-ff0000 text-20px text-center flexCenter max-w-80%">
+              <div v-html="getItem(item).html.value ?? getItem(item).html"></div>
             </div>
             <!-- <div
               class="text-hex-ff0000 text-20px text-center flexCenter max-w-80%"
@@ -126,14 +88,8 @@
         </div>
       </template>
     </div>
-    <div
-      class="center-circle"
-      ref="swiper"
-      :index="'pageAnnouncer'"
-      @click="onSingleClick"
-      @touchstart="onTouchStart('pageAnnouncer')"
-      @touchend="onTouchEnd"
-      :style="{
+    <div class="center-circle" ref="swiper" :index="'pageAnnouncer'" @click="onSingleClick"
+      @touchstart="onTouchStart('pageAnnouncer')" @touchend="onTouchEnd" :style="{
         background:
           touchedIndex === 'pageAnnouncer'
             ? 'rgba(255,0,0,.25)'
@@ -142,33 +98,18 @@
           touchedIndex === 'pageAnnouncer'
             ? 'background 50ms'
             : 'background 500ms',
-      }"
-    >
+      }">
       <div class="text-hex-ff0000 text-38px" :index="'pageAnnouncer'">
         {{ stepperIndex + 1 }}
       </div>
     </div>
-    <QrScanner
-      v-if="scanForQr"
-      :scanForQr="scanForQr"
-      @qrCodeFound="onQrCode"
-    ></QrScanner>
+    <QrScanner v-if="scanForQr" :scanForQr="scanForQr" @qrCodeFound="onQrCode"></QrScanner>
   </div>
-  <Slider
-    @click="onClickSliderComponent"
-    @touchstart="onTappingOnSlider"
-    @touchend="onTappingOnSlider"
-  />
-  <TopCameraSlider
-    @click="onClickToggleTopCameraSliderComponent"
-    @touchstart="onTappingOnTopCameraSlider"
-    @touchend="onTappingOnTopCameraSlider"
-  />
-  <VibrationGrid
-    @click="onClickHapticGridComponent"
-    @touchstart="onTappingOnHaptic"
-    @touchend="onTappingOnHaptic"
-  ></VibrationGrid>
+  <Slider @click="onClickSliderComponent" @touchstart="onTappingOnSlider" @touchend="onTappingOnSlider" />
+  <TopCameraSlider @click="onClickToggleTopCameraSliderComponent" @touchstart="onTappingOnTopCameraSlider"
+    @touchend="onTappingOnTopCameraSlider" />
+  <VibrationGrid @click="onClickHapticGridComponent" @touchstart="onTappingOnHaptic" @touchend="onTappingOnHaptic">
+  </VibrationGrid>
   <PredictionVisualiser></PredictionVisualiser>
 </template>
 
@@ -575,11 +516,9 @@ const computedScoreStandingsHtml = computed(() => {
 const text = ref("");
 const announceBallsPlayed = () => {
   console.log("announceBallsPlayed");
-  text.value = `Player 1 has played ${store.players.player1.shotsTaken} ${
-    store.players.player1.shotsTaken === 1 ? "ball" : "balls"
-  }. Player 2 has played ${store.players.player2.shotsTaken} ${
-    store.players.player2.shotsTaken === 1 ? "ball" : "balls"
-  }. `;
+  text.value = `Player 1 has played ${store.players.player1.shotsTaken} ${store.players.player1.shotsTaken === 1 ? "ball" : "balls"
+    }. Player 2 has played ${store.players.player2.shotsTaken} ${store.players.player2.shotsTaken === 1 ? "ball" : "balls"
+    }. `;
   if (isNextRound.value) {
     text.value +=
       "Current round is over. Please start a new round by pressing the plus button.";
@@ -775,7 +714,7 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_gyro.mp3",
       html: "Toggle Alpha Controller",
       cycler: useCycleList(["Alpha Controller", "Slider", "Fly to Cochonet"]),
-      modes: ["All", "Dev", "Testing", "Player", "Solo"],
+      modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo"],
     },
     {
       name: "Ping Cochonet",
@@ -792,7 +731,7 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_flyOnTheCochonet.mp3",
       html: "Fly to Cochonet",
       cycler: useCycleList(["Fly to Cochonet"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player"],
     },
     {
       name: "Slider",
@@ -801,7 +740,7 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_slider.mp3",
       html: "Slider",
       cycler: useCycleList(["Slider"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player"],
     },
   ],
   [
@@ -857,7 +796,7 @@ const pages = [
         "Haptic grid near",
         "Haptic grid far",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player"],
     },
     {
       name: "Toggle Lookalong",
@@ -928,7 +867,55 @@ const pages = [
       },
       html: "Quick Focuser",
       cycler: useCycleList(["Quick Focuser"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+    },
+  ],
+  [
+    {
+      name: "Focus Team Blue",
+      clickFunction: () => {
+        const blueBoules = store.boulesToDisplay
+          .map((boule, index) => ({ index, class: boule.class }))
+          .filter(boule => boule.class === "dark")
+          .map(boule => boule.index);
+        store.selectedBoules = blueBoules;
+        store.volumePulse++;
+      },
+      html: "Focus Team Blue",
+      cycler: useCycleList(["Focus Team Blue"]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+    },
+    {
+      name: "Focus Team Red",
+      clickFunction: () => {
+        const redBoules = store.boulesToDisplay
+          .map((boule, index) => ({ index, class: boule.class }))
+          .filter(boule => boule.class === "light")
+          .map(boule => boule.index);
+        store.selectedBoules = redBoules;
+        store.volumePulse++;
+      },
+      html: "Focus Team Red",
+      cycler: useCycleList(["Focus Team Red"]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+    },
+    {
+      name: "Focus All Boules",
+      deactivated: computed(() => store.boulesCount < 1),
+      clickFunction: () => click_bouleFocuser("all"),
+      imgSrc: "/icons/focusAll.svg",
+      html: "Focus all Boules",
+      cycler: useCycleList([
+        "Focus All Boules",
+        "Focus Cochonet",
+        "Focus Boule 1",
+        "Focus Boule 2",
+        "Focus Boule 3",
+        "Focus Boule 4",
+        "Focus Boule 5",
+        "Focus Boule 6",
+      ]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player"],
     },
   ],
   [
@@ -1047,24 +1034,6 @@ const pages = [
       ]),
       modes: ["All", "Dev", "Testing", "Player"],
     },
-    {
-      name: "Focus All Boules",
-      deactivated: computed(() => store.boulesCount < 1),
-      clickFunction: () => click_bouleFocuser("all"),
-      imgSrc: "/icons/focusAll.svg",
-      html: "Focus all Boules",
-      cycler: useCycleList([
-        "Focus All Boules",
-        "Focus Cochonet",
-        "Focus Boule 1",
-        "Focus Boule 2",
-        "Focus Boule 3",
-        "Focus Boule 4",
-        "Focus Boule 5",
-        "Focus Boule 6",
-      ]),
-      modes: ["All", "Dev", "Testing", "Player"],
-    },
   ],
   [
     {
@@ -1078,7 +1047,7 @@ const pages = [
         "Look along 3 o'clock",
         "Look along 6 o'clock",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player"],
     },
     {
       name: "Look along 3 o'clock",
@@ -1091,7 +1060,7 @@ const pages = [
         "Look along 12 o'clock",
         "Look along 6 o'clock",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player"],
     },
     {
       name: "Look along 9 o'clock",
@@ -1104,7 +1073,7 @@ const pages = [
         "Look along 12 o'clock",
         "Look along 6 o'clock",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player"],
     },
     {
       name: "Look along 6 o'clock",
@@ -1117,7 +1086,7 @@ const pages = [
         "Look along 9 o'clock",
         "Look along 3 o'clock",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player"],
     },
   ],
   [
@@ -1389,7 +1358,7 @@ const pages = [
       ),
       explanationSrc: "/sounds/elevenlabs/explanation_player1AudioCycler.mp3",
       cycler: useCycleList(["Change player 1 audio"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player"],
     },
     {
       name: "Change player 2 audio",
@@ -1402,7 +1371,7 @@ const pages = [
       ),
       explanationSrc: "/sounds/elevenlabs/explanation_player2AudioCycler.mp3",
       cycler: useCycleList(["Change player 2 audio"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player"],
     },
     {
       name: "Change YOLO model",
@@ -1428,7 +1397,7 @@ const pages = [
     },
     {
       name: "Default",
-      clickFunction: () => {},
+      clickFunction: () => { },
       html: "Placeholder",
       imgSrc: "/icons/watch.svg",
       cycler: useCycleList(["Default"]),
@@ -1797,12 +1766,14 @@ onKeyStroke(["v"], (e) => {
   grid-row: span 2;
   grid-column: span 2;
   border-radius: 5px;
-  > div {
+
+  >div {
     width: 100%;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: top;
+
     div {
       margin-top: 10px;
       text-align: center;
@@ -1822,6 +1793,7 @@ onKeyStroke(["v"], (e) => {
   overflow: hidden;
   transition: all 50ms;
   position: relative;
+
   div {
     pointer-events: none;
   }
@@ -1855,7 +1827,8 @@ onKeyStroke(["v"], (e) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  > div {
+
+  >div {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1864,7 +1837,8 @@ onKeyStroke(["v"], (e) => {
     width: 100%;
     border: 3px solid red;
   }
-  > * {
+
+  >* {
     pointer-events: none;
   }
 }
