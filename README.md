@@ -1,5 +1,10 @@
-# Nuxt Minimal Starter
+# PARABOULE V1 – Work in progress
 
+----------------------------
+
+Dev Installation Guide
+
+# Nuxt Minimal Starter
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
 ## Setup
