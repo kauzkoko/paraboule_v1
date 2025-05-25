@@ -38,12 +38,12 @@ body {
   background-color: var(--background);
   margin: 0;
   padding: 0;
-  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, "Trebuchet MS", Verdana, sans-serif;
+  /* font-family: "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, "Trebuchet MS", Verdana, sans-serif; */
   font-weight: 300;
   overflow: hidden;
   overscroll-behavior-y: contain;
-
-  font-family: "TwCenMTPro";
+  /* font-family: "TwCenMTPro"; */
+  font-family: 'Atkinson Hyperlegible Next', sans-serif;
   font-style: normal;
   font-stretch: normal;
   font-weight: 500;
