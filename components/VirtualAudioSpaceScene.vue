@@ -88,6 +88,10 @@ bus.on((message, payload) => {
   if (message === "toggleTopCamera") {
     toggleTopCamera(payload.height);
   }
+
+  if (message === "shootFilmBoule") {
+    console.log("shootFilmBoule");
+  }
 });
 
 const store = useProtoStore();

@@ -35,7 +35,49 @@ export function useAnimationController() {
     })
     .on("broadcast", { event: "toggleTopCamera" }, (event) => {
       toggleTopCamera({ broadcast: false, height: event.payload.height ?? 80 });
+    })
+    .on("broadcast", { event: "playFilm" }, (event) => {
+      playFilm(false);
+    })
+    .on("broadcast", { event: "stopFilm" }, (event) => {
+      stopFilm(false);
+    })
+    .on("broadcast", { event: "shootFilmBoule" }, (event) => {
+      shootFilmBoule(false);
     });
+
+  function playFilm(broadcast = true) {
+    bus.emit("playFilm");
+    if (broadcast) {
+      animationController.send({
+        type: "broadcast",
+        event: "playFilm",
+        payload: {},
+      });
+    }
+  }
+
+  function stopFilm(broadcast = true) {
+    bus.emit("stopFilm");
+    if (broadcast) {
+      animationController.send({
+        type: "broadcast",
+        event: "stopFilm",
+        payload: {},
+      });
+    }
+  }
+
+  function shootFilmBoule(broadcast = true) {
+    bus.emit("shootFilmBoule");
+    if (broadcast) {
+      animationController.send({
+        type: "broadcast",
+        event: "shootFilmBoule",
+        payload: {},
+      });
+    }
+  }
 
   function flyToStart(broadcast = true) {
     bus.emit("flyToStart");
@@ -161,5 +203,8 @@ export function useAnimationController() {
     lookAlongNegativeZAxis,
     flyToCochonet,
     toggleTopCamera,
+    playFilm,
+    stopFilm,
+    shootFilmBoule,
   };
 }
