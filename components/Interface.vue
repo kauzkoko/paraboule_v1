@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute left-0 w-100dvw h-100dvh" @click="onFullscreenClick()">
+  <div class="fixed left-0 transform-gpu translate-y--15px w-100dvw h-100dvh" @click="onFullscreenClick()">
     <VirtualAudioSpace :trigger="audioTrigger"></VirtualAudioSpace>
   </div>
   <div class="outer" v-show="store.isTouchingSlider" @click="onClickSliderComponent">
@@ -57,16 +57,17 @@
           v-touch:swipe="(dir, e) => onSwipe(dir, e, index, item)" @click="onClick(item, index)"
           @touchstart="onTouchStart(index)" :style="{
             background:
-              touchedIndex === index ? 'rgba(255,0,0,.25)' : 'transparent',
+              touchedIndex === index ? 'transparent' : 'transparent',
             transition:
-              touchedIndex === index ? 'background 50ms' : 'background 500ms',
+              touchedIndex === index ? 'all 100ms' : 'all 500ms',
             opacity: getItem(item).deactivated
               ? getItem(item).deactivated.value
                 ? 0.5
                 : 1
               : 1,
+            boxShadow: touchedIndex === index ? '0px 0px 35px 14px var(--blue) inset' : 'none',
           }">
-          <div class="absolute text-hex-ff0000 text-12px px-2 py-2" :class="{
+          <div class="absolute text-[var(--border-color)] text-12px px-2 py-2" :class="{
             'top-0 left-0': index === 0,
             'top-0 right-0': index === 1,
             'bottom-0 left-0': index === 2,
@@ -74,9 +75,16 @@
           }">
             {{ getItem(item).name }}
           </div>
-          <div class="flex justify-center items-center w-full h-full">
-            <img v-if="getItem(item).imgSrc" :src="getItem(item).imgSrc.value ?? getItem(item).imgSrc" />
-            <div v-else-if="getItem(item).html" class="text-hex-ff0000 text-20px text-center flexCenter max-w-80%">
+          <div class="flex justify-center items-center w-full h-full children:w-70% children:h-70%">
+            <SvgIcon 
+              v-if="getItem(item).imgSrc && getItem(item).imgSrc.includes('.svg')" 
+              :name="getIconName(getItem(item).imgSrc)" 
+            />
+            <img 
+              v-else-if="getItem(item).imgSrc" 
+              :src="getItem(item).imgSrc.value ?? getItem(item).imgSrc" 
+            />
+            <div v-else-if="getItem(item).html" class="text-[var(--border-color)] text-20px text-center flexCenter max-w-80%">
               <div v-html="getItem(item).html.value ?? getItem(item).html"></div>
             </div>
             <!-- <div
@@ -99,7 +107,7 @@
             ? 'background 50ms'
             : 'background 500ms',
       }">
-      <div class="text-hex-ff0000 text-38px" :index="'pageAnnouncer'">
+      <div class="text-[var(--border-color)] text-38px" :index="'pageAnnouncer'">
         {{ stepperIndex + 1 }}
       </div>
     </div>
@@ -117,6 +125,8 @@
 import { Howler } from "howler";
 import { useQRCode } from "@vueuse/integrations/useQRCode";
 import { gsap } from "gsap";
+
+await preloadComponents(['SvgIcon'])
 
 const store = useProtoStore();
 const { speak } = useSpeech();
@@ -705,6 +715,26 @@ const onTouchEnd = () => {
   }, 300);
 };
 
+const getSvgIcon = (iconName) => {
+  const svgIcons = {
+    gyros: `<svg class="custom-svg-icon" width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="75" cy="75" r="23.5" stroke="currentColor" stroke-width="3"/>
+      <path d="M108.178 92.3553C108.178 93.1838 108.849 93.8553 109.678 93.8553H123.178C124.006 93.8553 124.678 93.1838 124.678 92.3553C124.678 91.5269 124.006 90.8553 123.178 90.8553L111.178 90.8553L111.178 78.8553C111.178 78.0269 110.506 77.3553 109.678 77.3553C108.849 77.3553 108.178 78.0269 108.178 78.8553V92.3553ZM117 74.6777L118.5 74.6777V74.6777H117ZM115.097 65.1106L116.483 64.5366L116.483 64.5366L115.097 65.1106ZM110.738 93.416C113.199 90.9552 115.151 88.0339 116.483 84.8188L113.711 83.6707C112.53 86.5219 110.799 89.1125 108.617 91.2947L110.738 93.416ZM116.483 84.8188C117.815 81.6037 118.5 78.1577 118.5 74.6777L115.5 74.6777C115.5 77.7637 114.892 80.8196 113.711 83.6707L116.483 84.8188ZM118.5 74.6777C118.5 71.1976 117.815 67.7517 116.483 64.5366L113.711 65.6846C114.892 68.5358 115.5 71.5916 115.5 74.6777H118.5ZM116.483 64.5366C115.151 61.3214 113.199 58.4001 110.738 55.9393L108.617 58.0607C110.799 60.2428 112.53 62.8335 113.711 65.6846L116.483 64.5366Z" fill="currentColor"/>
+      <path d="M42.1777 57.0001C42.1777 56.1717 41.5062 55.5001 40.6777 55.5001H27.1777C26.3493 55.5001 25.6777 56.1717 25.6777 57.0001C25.6777 57.8286 26.3493 58.5001 27.1777 58.5001H39.1777V70.5001C39.1777 71.3286 39.8493 72.0001 40.6777 72.0001C41.5062 72.0001 42.1777 71.3286 42.1777 70.5001V57.0001ZM33.3554 74.6778L31.8554 74.6778L31.8554 74.6778H33.3554ZM35.2584 84.2449L33.8726 84.8189L33.8726 84.8189L35.2584 84.2449ZM39.6171 55.9395C37.1563 58.4002 35.2043 61.3216 33.8726 64.5367L36.6442 65.6847C37.8252 62.8336 39.5562 60.243 41.7384 58.0608L39.6171 55.9395ZM33.8726 64.5367C32.5408 67.7518 31.8554 71.1978 31.8554 74.6778L34.8554 74.6778C34.8554 71.5917 35.4632 68.5359 36.6442 65.6847L33.8726 64.5367ZM31.8554 74.6778C31.8554 78.1578 32.5408 81.6038 33.8726 84.8189L36.6442 83.6709C35.4632 80.8197 34.8554 77.7639 34.8554 74.6778H31.8554ZM33.8726 84.8189C35.2043 88.034 37.1563 90.9554 39.6171 93.4161L41.7384 91.2948C39.5562 89.1126 37.8252 86.522 36.6442 83.6709L33.8726 84.8189Z" fill="currentColor"/>
+      <path d="M0 75H10H20M150 75H140H130" stroke="currentColor" stroke-width="3"/>
+      <path d="M10 113L18.6603 108M139.904 38L131.244 43" stroke="currentColor" stroke-width="3"/>
+      <path d="M10 38L18.6603 43M139.904 113L131.244 108" stroke="currentColor" stroke-width="3"/>
+      <path d="M37 139.904L42 131.244M112 10L107 18.6603" stroke="currentColor" stroke-width="3"/>
+      <path d="M37 10L42 18.6603M112 139.904L107 131.244" stroke="currentColor" stroke-width="3"/>
+      <path d="M75 150V140V130M75 0V10V20" stroke="currentColor" stroke-width="3"/>
+      <rect x="51.5" y="24.5" width="47" height="100" rx="6.5" stroke="currentColor" stroke-width="3"/>
+    </svg>`,
+    // Add more icons as needed
+  };
+  
+  return svgIcons[iconName] || '';
+};
+
 const pages = [
   [
     {
@@ -714,7 +744,7 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_gyro.mp3",
       html: "Toggle Alpha Controller",
       cycler: useCycleList(["Alpha Controller", "Slider", "Fly to Cochonet"]),
-      modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo"],
+      modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo", "S1", "Exhibition"],
     },
     {
       name: "Ping Cochonet",
@@ -722,7 +752,7 @@ const pages = [
       imgSrc: "/icons/cocho.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pingCocho.mp3",
       cycler: useCycleList(["Ping Cochonet", "Ping Startpoint"]),
-      modes: ["All", "Dev", "Testing", "Player", "Solo"],
+      modes: ["All", "Dev", "Testing", "Player", "Solo", "S1", "Exhibition"],
     },
     {
       name: "Fly to Cochonet",
@@ -731,7 +761,7 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_flyOnTheCochonet.mp3",
       html: "Fly to Cochonet",
       cycler: useCycleList(["Fly to Cochonet"]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
       name: "Slider",
@@ -740,7 +770,7 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_slider.mp3",
       html: "Slider",
       cycler: useCycleList(["Slider"]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
   ],
   [
@@ -765,7 +795,7 @@ const pages = [
       imgSrc: "/icons/hoolahoop.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_hoolaPinger.mp3",
       cycler: useCycleList(["Ping Startpoint", "Ping Cochonet"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "S2", "S1", "S3", "Exhibition"],
     },
     {
       name: "Toggle Boule Focuser",
@@ -784,7 +814,7 @@ const pages = [
       html: "Toggle Boule Focuser",
       explanationSrc: "/sounds/elevenlabs/explanation_toggleBouleFocuser.mp3",
       cycler: useCycleList(["Toggle Boule Focuser"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
     {
       name: "Haptic grid medium",
@@ -796,7 +826,7 @@ const pages = [
         "Haptic grid near",
         "Haptic grid far",
       ]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
       name: "Toggle Lookalong",
@@ -811,7 +841,7 @@ const pages = [
       html: "Toggle Lookalong",
       explanationSrc: "/sounds/elevenlabs/explanation_ocklocktoggler.mp3",
       cycler: useCycleList(["Toggle Lookalong"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
   ],
   [
@@ -821,7 +851,7 @@ const pages = [
       imgSrc: "/icons/around.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pirateRadar.mp3",
       cycler: useCycleList(["Pirate Radar", "Boomerang", "Stalefish 180"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
     {
       name: "Show Stunden Orientation",
@@ -830,14 +860,14 @@ const pages = [
       },
       html: "Toggle watch orientation",
       cycler: useCycleList(["Show Stunden Orientation"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
     {
       name: "Toggle Top Camera Slider",
       clickFunction: click_toggleTopCameraSlider,
       html: "Toggle Top Camera Slider",
       cycler: useCycleList(["Toggle Top Camera Slider"]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
     {
       name: "Quick Focuser",
@@ -867,7 +897,7 @@ const pages = [
       },
       html: "Quick Focuser",
       cycler: useCycleList(["Quick Focuser"]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
   ],
   [
@@ -876,28 +906,30 @@ const pages = [
       clickFunction: () => {
         const blueBoules = store.boulesToDisplay
           .map((boule, index) => ({ index, class: boule.class }))
-          .filter(boule => boule.class === "dark")
+          .filter(boule => boule.class === "light")
           .map(boule => boule.index);
         store.selectedBoules = blueBoules;
         store.volumePulse++;
       },
+      imgSrc: "/icons/focusBlue.svg",
       html: "Focus Team Blue",
       cycler: useCycleList(["Focus Team Blue"]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
       name: "Focus Team Red",
       clickFunction: () => {
         const redBoules = store.boulesToDisplay
           .map((boule, index) => ({ index, class: boule.class }))
-          .filter(boule => boule.class === "light")
+          .filter(boule => boule.class === "dark")
           .map(boule => boule.index);
         store.selectedBoules = redBoules;
         store.volumePulse++;
       },
+      imgSrc: "/icons/focusRed.svg",
       html: "Focus Team Red",
       cycler: useCycleList(["Focus Team Red"]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
       name: "Focus All Boules",
@@ -915,7 +947,7 @@ const pages = [
         "Focus Boule 5",
         "Focus Boule 6",
       ]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
   ],
   [
@@ -934,7 +966,7 @@ const pages = [
         "Focus Boule 6",
         "Focus All Boules",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
     {
       name: "Focus Boule 2",
@@ -950,7 +982,7 @@ const pages = [
         "Focus Boule 6",
         "Focus Boule 1",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
     {
       name: "Focus Boule 3",
@@ -965,7 +997,7 @@ const pages = [
         "Focus Boule 6",
         "Focus Boule 1",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
     {
       name: "Focus Cochonet",
@@ -982,7 +1014,7 @@ const pages = [
         "Focus Boule 5",
         "Focus Boule 6",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
   ],
   [
@@ -1001,7 +1033,7 @@ const pages = [
         "Focus Boule 3",
         "Focus All Boules",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
     {
       name: "Focus Boule 5",
@@ -1018,7 +1050,7 @@ const pages = [
         "Focus Boule 4",
         "Focus All Boules",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
     {
       name: "Focus Boule 6",
@@ -1032,7 +1064,7 @@ const pages = [
         "Focus Boule 5",
         "Focus All Boules",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
   ],
   [
@@ -1047,7 +1079,7 @@ const pages = [
         "Look along 3 o'clock",
         "Look along 6 o'clock",
       ]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
       name: "Look along 3 o'clock",
@@ -1060,7 +1092,7 @@ const pages = [
         "Look along 12 o'clock",
         "Look along 6 o'clock",
       ]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
       name: "Look along 9 o'clock",
@@ -1073,7 +1105,7 @@ const pages = [
         "Look along 12 o'clock",
         "Look along 6 o'clock",
       ]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
       name: "Look along 6 o'clock",
@@ -1086,7 +1118,7 @@ const pages = [
         "Look along 9 o'clock",
         "Look along 3 o'clock",
       ]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
   ],
   [
@@ -1103,7 +1135,7 @@ const pages = [
         "Player 1 Score Incrementer",
         "Player 2 Score Incrementer",
       ]),
-      modes: ["All", "Dev", "Testing", "Referee"],
+      modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
     },
   ],
   [
@@ -1144,7 +1176,7 @@ const pages = [
           : "Reset shots taken"
       ),
       cycler: useCycleList(["Increment shots taken"]),
-      modes: ["All", "Dev", "Testing", "Referee"],
+      modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
     },
   ],
   [
@@ -1158,7 +1190,7 @@ const pages = [
         "Player 2 Shot Incrementer",
         "Increment shots taken",
       ]),
-      modes: ["All", "Dev", "Testing", "Referee"],
+      modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
     },
     {
       name: "Player 2 Shot Incrementer",
@@ -1169,7 +1201,7 @@ const pages = [
         "Player 2 Shot Incrementer",
         "Player 1 Shot Incrementer",
       ]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
     {
       name: "Announce Balls Played",
@@ -1177,7 +1209,7 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_ballsShotAnnouncer.mp3",
       html: computedAnnounceBallsPlayedHtml,
       cycler: useCycleList(["Announce Balls Played", "Rewind"]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
     {
       name: "Rewind",
@@ -1185,7 +1217,7 @@ const pages = [
       imgSrc: "/icons/rewind.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
       cycler: useCycleList(["Rewind", "Announce Balls Played"]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
   ],
   [
@@ -1195,7 +1227,7 @@ const pages = [
       imgSrc: "/icons/boomerang1.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_boomerang.mp3",
       cycler: useCycleList(["Boomerang", "Pirate Radar"]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
     },
     {
       name: "Look along 12 o'clock",
@@ -1220,7 +1252,7 @@ const pages = [
         "Haptic grid medium",
         "Haptic grid near",
       ]),
-      modes: ["All", "Dev", "Testing", "Player"],
+      modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
   ],
   [
@@ -1233,7 +1265,7 @@ const pages = [
         "Player 1 Score Incrementer",
         "Player 2 Score Incrementer",
       ]),
-      modes: ["All", "Dev", "Testing", "Solo"],
+      modes: ["All", "Dev", "Testing", "Solo", "S3", "Exhibition"],
     },
     {
       name: "Player 2 Score Incrementer",
@@ -1244,7 +1276,7 @@ const pages = [
         "Player 2 Score Incrementer",
         "Player 1 Score Incrementer",
       ]),
-      modes: ["All", "Dev", "Testing", "Solo"],
+      modes: ["All", "Dev", "Testing", "Solo", "S3", "Exhibition"],
     },
   ],
   [
@@ -1255,7 +1287,7 @@ const pages = [
         "/sounds/elevenlabs/explanation_pairingStatusAnnouncer.mp3",
       html: "Pairing-Status:<br />Connected to 3wasds3w2.",
       cycler: useCycleList(["Pairing Status", "Ping Phone"]),
-      modes: ["All", "Dev", "Testing", "QR"],
+      modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
     {
       name: "Ping Phone",
@@ -1263,7 +1295,7 @@ const pages = [
       imgSrc: "/icons/pingPhone.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_phonePinger.mp3",
       cycler: useCycleList(["Ping Phone", "Pairing Status"]),
-      modes: ["All", "Dev", "Testing", "QR"],
+      modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
     {
       name: "Scan QR",
@@ -1271,7 +1303,7 @@ const pages = [
       imgSrc: "/icons/scanQr1.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_qrScanner.mp3",
       cycler: useCycleList(["Scan QR", "Unique QR"]),
-      modes: ["All", "Dev", "Testing", "QR"],
+      modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
     {
       name: "Unique QR",
@@ -1280,7 +1312,7 @@ const pages = [
       // html: computedUniqueQrHtml",
       explanationSrc: "/sounds/elevenlabs/explanation_uniqueQr.mp3",
       cycler: useCycleList(["Unique QR", "Scan QR"]),
-      modes: ["All", "Dev", "Testing", "QR"],
+      modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
   ],
   [
@@ -1298,7 +1330,7 @@ const pages = [
       html: "F5",
       explanationSrc: "/sounds/elevenlabs/explanation_pageRefresher.mp3",
       cycler: useCycleList(["Refresh page", "Raw Intersections"]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "Exhibition"],
     },
     {
       name: "Toss Coin",
@@ -1307,7 +1339,7 @@ const pages = [
       html: "Toss a coin and get heads or tails",
       explanationSrc: "/sounds/elevenlabs/explanation_tossCoin.mp3",
       cycler: useCycleList(["Toss Coin"]),
-      modes: ["All", "Dev", "Testing"],
+      modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
   ],
   [
@@ -1358,7 +1390,7 @@ const pages = [
       ),
       explanationSrc: "/sounds/elevenlabs/explanation_player1AudioCycler.mp3",
       cycler: useCycleList(["Change player 1 audio"]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
       name: "Change player 2 audio",
@@ -1371,7 +1403,7 @@ const pages = [
       ),
       explanationSrc: "/sounds/elevenlabs/explanation_player2AudioCycler.mp3",
       cycler: useCycleList(["Change player 2 audio"]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
       name: "Change YOLO model",
@@ -1408,7 +1440,7 @@ const pages = [
       clickFunction: click_toggleMute,
       html: "Toggle mute",
       cycler: useCycleList(["Toggle mute"]),
-      modes: ["All", "Dev", "Testing", "Referee"],
+      modes: ["All", "Dev", "Testing", "Referee", "S1", "Exhibition"],
     },
     {
       name: "Prediction Visualiser",
@@ -1417,7 +1449,7 @@ const pages = [
       },
       html: "Prediction Visualiser",
       cycler: useCycleList(["Prediction Visualiser"]),
-      modes: ["All", "Dev", "Testing", "Referee"],
+      modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
     },
   ],
   [
@@ -1433,7 +1465,7 @@ const pages = [
         () => `Toggle Reverse Field: ${store.reverseField ? "ON" : "OFF"}`
       ),
       cycler: useCycleList(["Toggle Reverse Field"]),
-      modes: ["All", "Dev", "Testing", "Referee"],
+      modes: ["All", "Dev", "Testing", "Referee", "S1", "S3", "Exhibition"],
     },
     {
       name: "Referee Mode",
@@ -1472,7 +1504,61 @@ const pages = [
       },
       html: "Activate All Mode",
       cycler: useCycleList(["All Mode"]),
-      modes: ["Dev", "Testing", "Player", "Referee", "Solo", "All"],
+      modes: ["Dev", "Testing", "Player", "Referee", "Solo", "All", "Exhibition", "S1", "S2", "S3"],
+    },
+  ],
+  [
+  {
+      name: "S1 Mode",
+      clickFunction: () => {
+        const findPlayerModeIndex = modesList.findIndex(
+          (mode) => mode.name === "S1"
+        );
+        store.modesCycler.go(findPlayerModeIndex);
+        speak("S1 mode activated");
+      },
+      html: "Activate S1 Mode",
+      cycler: useCycleList(["S1 Mode"]),
+      modes: ["All", "Dev", "Testing", "Referee", "S1", "Exhibition"],
+    },
+  {
+      name: "S2 Mode",
+      clickFunction: () => {
+        const findS2ModeIndex = modesList.findIndex(
+          (mode) => mode.name === "S2"
+        );
+        store.modesCycler.go(findS2ModeIndex);
+        speak("S2 mode activated");
+      },
+      html: "Activate S2 Mode",
+      cycler: useCycleList(["S2 Mode"]),
+      modes: ["All", "Dev", "Testing", "Referee", "S2", "Exhibition"],
+    },
+    {
+      name: "S3 Mode",
+      clickFunction: () => {
+        const findS3ModeIndex = modesList.findIndex(
+          (mode) => mode.name === "S3"
+        );
+        store.modesCycler.go(findS3ModeIndex);
+        speak("S3 mode activated");
+      },
+      html: "Activate S3 Mode",
+      cycler: useCycleList(["S3 Mode"]),
+      modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
+    },
+  {
+      name: "Exhibition Mode",
+      clickFunction: () => {
+        const findExhibitionModeIndex = modesList.findIndex(
+          (mode) => mode.name === "Exhibition"
+        );
+        store.modesCycler.go(findExhibitionModeIndex);
+        speak("Exhibition mode activated");
+      },
+      html: "Activate Exhibition Mode",
+      cycler: useCycleList(["Exhibition Mode"]),
+      modes: ["All", "Dev", "Testing", "Referee", "Exhibition", "S1", "S2", "S3"],
     },
   ],
   [
@@ -1591,6 +1677,12 @@ const getIndex = (item) => {
 
 const getItem = (item) => {
   return flatPages.find((entry) => entry.name === item.cycler.state);
+};
+
+const getIconName = (imgSrc) => {
+  const src = imgSrc.value ?? imgSrc;
+  // Extract filename without extension from path like "/icons/gyros.svg"
+  return src.split('/').pop().replace('.svg', '');
 };
 
 const onClick = (item, index) => {
@@ -1745,13 +1837,13 @@ onKeyStroke(["v"], (e) => {
 }
 
 .container {
-  height: 98dvh;
+  height: 98.9dvh;
   width: 100%;
   padding: 5px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 5px 5px;
+  gap: 5px;
   grid-auto-flow: row;
   grid-template-areas:
     ". ."
@@ -1762,7 +1854,7 @@ onKeyStroke(["v"], (e) => {
 .big {
   width: calc(100% - 6px);
   height: calc(100% - 6px);
-  border: 3px solid #ff0000;
+  border: 3px solid var(--border-color);
   grid-row: span 2;
   grid-column: span 2;
   border-radius: 5px;
@@ -1786,13 +1878,14 @@ onKeyStroke(["v"], (e) => {
 }
 
 .grid-item {
-  border: 3px solid #ff0000;
+  border: 3px solid var(--border-color);
   border-radius: 5px;
   user-select: none;
   pointer-events: auto;
   overflow: hidden;
   transition: all 50ms;
   position: relative;
+
 
   div {
     pointer-events: none;
@@ -1808,15 +1901,17 @@ onKeyStroke(["v"], (e) => {
 
   &:nth-child(3) {
     border-top-right-radius: 60px;
+    /* border-bottom-right-radius: 105px; */
   }
 
   &:nth-child(4) {
     border-top-left-radius: 60px;
+    /* border-bottom-left-radius: 105px; */
   }
 }
 
 .center-circle {
-  width: 160px;
+  width: 180px;
   aspect-ratio: 1;
   border-radius: 50%;
   position: absolute;
@@ -1827,6 +1922,8 @@ onKeyStroke(["v"], (e) => {
   display: flex;
   justify-content: center;
   align-items: center;
+  box-shadow: 0px 0px 35px 14px var(--center-circle-shadow) inset;
+  /* background-color: var(--center-circle-background); */
 
   >div {
     display: flex;
@@ -1835,7 +1932,11 @@ onKeyStroke(["v"], (e) => {
     aspect-ratio: 1;
     border-radius: 50%;
     width: 100%;
-    border: 3px solid red;
+    border: 3px solid var(--center-circle-border);
+    background-color: var(--center-circle-background);
+    mix-blend-mode: difference;
+    color: var(--center-circle-border);
+    opacity: 0.5;
   }
 
   >* {

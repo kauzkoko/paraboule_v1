@@ -110,11 +110,13 @@ let circleAroundCochonet = false;
 
 // camera controls / animations
 
+let startCameraY = .4;
 let startPoint = 30;
+
 const alpha = ref(0);
 const rotationX = ref(0);
 const cameraX = ref(0);
-const cameraY = ref(1);
+const cameraY = ref(startCameraY);
 const cameraZ = ref(startPoint);
 
 const screenPositions = ref([]);
@@ -144,7 +146,7 @@ function goToZero() {
     ease: "power2.out",
   });
   gsap.to(cameraY, {
-    value: 1,
+    value: startCameraY,
     duration: 1,
     ease: "power2.out",
   });
@@ -277,7 +279,7 @@ function frontCamera() {
     ease: "power2.out",
   });
   gsap.to(cameraY, {
-    value: 1,
+    value: startCameraY,
     duration: 1,
     ease: "power2.out",
   });

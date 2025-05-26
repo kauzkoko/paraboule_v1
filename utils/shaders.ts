@@ -9,7 +9,7 @@ export const materialPropsRed = {
 
     void main() {
       float wobble = vWobble * 0.5 + 0.5;
-      csm_FragColor = mix(vec4(1.5, 0.0, 0.0, 1.0), vec4(1.2, 0.6, 0.8, 1.0), wobble);
+      csm_FragColor = mix(vec4(1.0, 0.0, 0.0, 1.0), vec4(1.0, 1.0, 1.0, 1.0), wobble);
     }
   `,
   vertexShader: `
@@ -30,8 +30,8 @@ export const materialPropsRed = {
   uniforms: {
     u_Time: { value: 0 },
     u_WobbleSpeed: { value: 2 },
-    u_WobbleAmplitude: { value: 0.01 },
-    u_WobbleFrequency: { value: 1 },
+    u_WobbleAmplitude: { value: 0.02 },
+    u_WobbleFrequency: { value: 4 },
   },
 };
 
@@ -44,7 +44,7 @@ export const materialPropsBlue = {
 
     void main() {
       float wobble = vWobble * 0.5 + 0.5;
-      csm_FragColor = mix(vec4(0.0, 0.0, 1.5, 1.0), vec4(0.0, 0.6, 1.0, 1.0), wobble);
+      csm_FragColor = mix(vec4(0.38, 0.42, 1.0, 1.0), vec4(1.0, 1.0, 1.0, 1.0), wobble);
     }
   `,
   vertexShader: `
@@ -65,8 +65,8 @@ export const materialPropsBlue = {
   uniforms: {
     u_Time: { value: 0 },
     u_WobbleSpeed: { value: 2 },
-    u_WobbleAmplitude: { value: 0.01 },
-    u_WobbleFrequency: { value: 1 },
+    u_WobbleAmplitude: { value: 0.02 },
+    u_WobbleFrequency: { value: 4 },
   },
 };
 

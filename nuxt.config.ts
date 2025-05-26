@@ -11,11 +11,11 @@ export default defineNuxtConfig({
       htmlAttrs: {
         lang: 'en',
       },
-      link: [
-        { rel: 'preconnect', href: 'https://cdn.fonts.net' },
-        { href: 'https://cdn.fonts.net/kit/b6404f4d-9ec8-4db4-b5d5-c631ce819028/b6404f4d-9ec8-4db4-b5d5-c631ce819028_enhanced.js', rel: 'stylesheet' },
-        { href: 'https://cdn.fonts.net/kit/b6404f4d-9ec8-4db4-b5d5-c631ce819028/b6404f4d-9ec8-4db4-b5d5-c631ce819028_enhanced.css', rel: 'stylesheet' }
-      ]
+      // link: [
+      //   { rel: 'preconnect', href: 'https://cdn.fonts.net' },
+      //   { href: 'https://cdn.fonts.net/kit/b6404f4d-9ec8-4db4-b5d5-c631ce819028/b6404f4d-9ec8-4db4-b5d5-c631ce819028_enhanced.js', rel: 'stylesheet' },
+      //   { href: 'https://cdn.fonts.net/kit/b6404f4d-9ec8-4db4-b5d5-c631ce819028/b6404f4d-9ec8-4db4-b5d5-c631ce819028_enhanced.css', rel: 'stylesheet' }
+      // ]
     }
   },
   compatibilityDate: "2024-11-01",
@@ -29,7 +29,8 @@ export default defineNuxtConfig({
     "@unocss/nuxt",
     "@vite-pwa/nuxt",
     "@vueuse/sound/nuxt",
-    "@nuxt/scripts"
+    "@nuxt/scripts",
+    "@nuxt/fonts"
   ],
   supabase: {
     redirect: false,

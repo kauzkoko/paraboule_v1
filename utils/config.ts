@@ -31,6 +31,22 @@ export const modesList = [
     name: "SBV",
     description: "SBV mode",
   },
+  {
+    name: "Exhibition",
+    description: "Exhibition mode",
+  },
+  {
+    name: "S1",
+    description: "S1 mode",
+  },
+  {
+    name: "S2",
+    description: "S2 mode",
+  },
+  {
+    name: "S3",
+    description: "S3 mode",
+  },
 ];
 
 // {
@@ -146,6 +162,8 @@ export const soundSrcs = [
   "/sounds/elevenlabs/red1.mp3",
   "/sounds/elevenlabs/red2.mp3",
   "/sounds/elevenlabs/red3.mp3",
+  "/sounds/raman1.mp3",
+  "/sounds/raman2.mp3",
 ];
 
 export const yoloModels = [

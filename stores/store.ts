@@ -27,7 +27,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const bus = useEventBus("protoboules");
 
   const modesCycler = useCycleList(modesList);
-  const initIndex = modesList.findIndex((mode) => mode.name === "All");
+  const initIndex = modesList.findIndex((mode) => mode.name === "Exhibition");
   modesCycler.go(initIndex);
 
   const prevMode = computed(() => {
@@ -62,7 +62,7 @@ export const useProtoStore = defineStore("protoStore", () => {
       shotsTaken: 0,
       class: "dark",
       audioCycler: useCycleList(soundSrcs, {
-        initialValue: soundSrcs.find(src => src.includes("simplebeat")),
+        initialValue: soundSrcs.find(src => src.includes("raman1")),
       }),
       score: 0,
       color: "#ff0000",
@@ -73,7 +73,7 @@ export const useProtoStore = defineStore("protoStore", () => {
       name: "Player 2",
       shotsTaken: 0,
       class: "light",
-      audioCycler: useCycleList(soundSrcs, { initialValue: soundSrcs.find(src => src.includes("noz2")) }),
+      audioCycler: useCycleList(soundSrcs, { initialValue: soundSrcs.find(src => src.includes("raman2")) }),
       score: 0,
       color: "#0000ff",
       colorCode: "#0000ff",
