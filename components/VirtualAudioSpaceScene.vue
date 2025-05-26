@@ -5,22 +5,27 @@
     :position="[boule.x, 0, boule.y]">
     <TresSphereGeometry :args="[boule.size, 24, 24]" />
     <CustomShaderMaterial v-bind="boule.player === 1
-        ? materialPropsRed
-        : boule.player === 2
-          ? materialPropsBlue
-          : materialPropsYellow
+      ? materialPropsRed
+      : boule.player === 2
+        ? materialPropsBlue
+        : materialPropsYellow
       " transparent :opacity="checkSelectedBoules(index) ? 1 : 0" v-if="checkSelectedBoules(index)" />
     <Audio3D v-if="checkSelectedBoules(index)" :localPlaybackRate="1" :url="boule.player === 1
-        ? store.currentSoundPlayer1
-        : boule.player === 2
-          ? store.currentSoundPlayer2
-          : checkSelectedBoules(index)
-            ? '/sounds/strudel/simplebeat.mp3'
-            : '/strudel/still.mp3'
+      ? store.currentSoundPlayer1
+      : boule.player === 2
+        ? store.currentSoundPlayer2
+        : checkSelectedBoules(index)
+          ? '/sounds/strudel/simplebeat.mp3'
+          : '/strudel/still.mp3'
       " />
-    <TresMeshPhysicalMaterial :roughness="0.4" :metalness="1" :emissive="boule.color" />
+    <TresMeshPhysicalMaterial :roughness=".2" :metalness="1" :emissive="boule.color" />
   </TresMesh>
   <StundenOrientation :startPoint="startPoint" />
+  <!-- <Sky /> -->
+  <Environment preset="sunset" />
+  <!-- <Ocean>
+    <TresCircleGeometry :args="[50, 16]" />
+  </Ocean> -->
   <!-- <TresAmbientLight :intensity="230" /> -->
   <TresDirectionalLight :position="[cameraX, cameraY, cameraZ]" :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
     :intensity="5" />
@@ -28,12 +33,26 @@
     <GravelFloor />
   </Suspense> -->
   <GridComponent />
+
+  <Suspense>
+      <EffectComposerPmndrs>
+        <ChromaticAberrationPmndrs v-bind="effectProps" />
+      </EffectComposerPmndrs>
+    </Suspense>
 </template>
 
 <script setup>
 import { useLoop, useRenderLoop } from "@tresjs/core";
-import { CustomShaderMaterial } from "@tresjs/cientos";
+import { CustomShaderMaterial, Sky, Environment } from "@tresjs/cientos";
 import { gsap } from "gsap";
+import { EffectComposerPmndrs, ChromaticAberrationPmndrs } from '@tresjs/post-processing'
+import { Vector2 } from 'three'
+
+const effectProps = {
+  offset: new Vector2(0.02, 0.01),
+  radialModulation: true,
+  modulationOffset: 0
+}
 
 const { onLoop } = useRenderLoop();
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed left-0 transform-gpu translate-y--15px w-100dvw h-100dvh" @click="onFullscreenClick()">
+  <div class="outer fixed left-0 transform-gpu translate-y--15px w-100dvw h-100dvh" @click="onFullscreenClick()">
     <VirtualAudioSpace :trigger="audioTrigger"></VirtualAudioSpace>
   </div>
   <div class="outer" v-show="store.isTouchingSlider" @click="onClickSliderComponent">
@@ -57,7 +57,7 @@
           v-touch:swipe="(dir, e) => onSwipe(dir, e, index, item)" @click="onClick(item, index)"
           @touchstart="onTouchStart(index)" :style="{
             background:
-              touchedIndex === index ? 'transparent' : 'transparent',
+              touchedIndex === index ? 'red' : 'transparent',
             transition:
               touchedIndex === index ? 'all 100ms' : 'all 500ms',
             opacity: getItem(item).deactivated
@@ -65,7 +65,7 @@
                 ? 0.5
                 : 1
               : 1,
-            boxShadow: touchedIndex === index ? '0px 0px 35px 14px var(--blue) inset' : 'none',
+            boxShadow: touchedIndex === index ? '0px 4px 38.4px 22px #616BFF inset, 6px 20px 119.6px 52px #FFF inset' : 'none',
           }">
           <div class="absolute text-[var(--border-color)] text-12px px-2 py-2" :class="{
             'top-0 left-0': index === 0,
@@ -87,29 +87,27 @@
             <div v-else-if="getItem(item).html" class="text-[var(--border-color)] text-20px text-center flexCenter max-w-80%">
               <div v-html="getItem(item).html.value ?? getItem(item).html"></div>
             </div>
-            <!-- <div
-              class="text-hex-ff0000 text-20px text-center flexCenter max-w-80%"
-            >
-              {{ getItem(item).name }}
-            </div> -->
           </div>
         </div>
       </template>
-    </div>
-    <div class="center-circle" ref="swiper" :index="'pageAnnouncer'" @click="onSingleClick"
+      <div class="center-circle" ref="swiper" :index="'pageAnnouncer'" @click="onSingleClick"
       @touchstart="onTouchStart('pageAnnouncer')" @touchend="onTouchEnd" :style="{
         background:
           touchedIndex === 'pageAnnouncer'
-            ? 'rgba(255,0,0,.25)'
-            : 'transparent',
+            ? 'transparent'
+            : 'black',
         transition:
           touchedIndex === 'pageAnnouncer'
-            ? 'background 50ms'
-            : 'background 500ms',
+            ? 'all 500ms'
+            : 'all 500ms',
+        boxShadow: touchedIndex === 'pageAnnouncer' ? '0px 0px 50px 50px var(--border-color) inset' : 'none',
+        border: touchedIndex === 'pageAnnouncer' ? 'solid 10px black' : 'solid 10px black',
+
       }">
       <div class="text-[var(--border-color)] text-38px" :index="'pageAnnouncer'">
         {{ stepperIndex + 1 }}
       </div>
+    </div>
     </div>
     <QrScanner v-if="scanForQr" :scanForQr="scanForQr" @qrCodeFound="onQrCode"></QrScanner>
   </div>
@@ -1834,16 +1832,18 @@ onKeyStroke(["v"], (e) => {
   left: 0;
   bottom: 0;
   z-index: 1000;
+  mix-blend-mode: difference;
 }
 
 .container {
+  mix-blend-mode: difference;
   height: 98.9dvh;
   width: 100%;
   padding: 5px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 5px;
+  gap: 1px 1px;
   grid-auto-flow: row;
   grid-template-areas:
     ". ."
@@ -1878,21 +1878,24 @@ onKeyStroke(["v"], (e) => {
 }
 
 .grid-item {
-  border: 3px solid var(--border-color);
+  border: var(--border-width) solid var(--border-color);
   border-radius: 5px;
   user-select: none;
   pointer-events: auto;
   overflow: hidden;
   transition: all 50ms;
   position: relative;
+  mix-blend-mode: difference;
 
 
   div {
     pointer-events: none;
+    mix-blend-mode: difference;
   }
 
   &:first-child {
     border-bottom-right-radius: 60px;
+    /* padding-left: 10px; */
   }
 
   &:nth-child(2) {
@@ -1922,7 +1925,9 @@ onKeyStroke(["v"], (e) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0px 0px 35px 14px var(--center-circle-shadow) inset;
+  mix-blend-mode: difference;
+
+  /* box-shadow: 0px 0px 35px 14px var(--center-circle-shadow) inset; */
   /* background-color: var(--center-circle-background); */
 
   >div {
@@ -1932,15 +1937,29 @@ onKeyStroke(["v"], (e) => {
     aspect-ratio: 1;
     border-radius: 50%;
     width: 100%;
-    border: 3px solid var(--center-circle-border);
-    background-color: var(--center-circle-background);
+    border: var(--border-width) solid var(--center-circle-border);
+    /* background-color: var(--center-circle-background); */
     mix-blend-mode: difference;
     color: var(--center-circle-border);
-    opacity: 0.5;
+    /* opacity: 0.5; */
+    mix-blend-mode: exclusion;
+    background-color: red;
+    background: linear-gradient(180deg, #F00 0%, #900 100%);
   }
 
   >* {
     pointer-events: none;
   }
+}
+
+.test {
+  width: 100px;
+  aspect-ratio: 1;
+  background-color: red;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: difference;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <TresCanvas shadows alpha window-size>
+  <TresCanvas shadows alpha window-size v-bind="gl">
     <Suspense>
       <VirtualAudioSpaceScene />
     </Suspense>
@@ -8,5 +8,9 @@
 
 <script setup>
 import { TresCanvas } from "@tresjs/core";
+import { NoToneMapping } from 'three'
+const gl = {
+  toneMapping: NoToneMapping,
+}
 </script>
 

@@ -1,6 +1,6 @@
 <template>
     <div class="info-container" :class="{ 'pointer-events-none': infoButton }">
-        <div class="info-button" v-if="infoButton" @click="infoButton = !infoButton">
+        <div class="info-button" v-if="infoButton" @click="infoButton = !infoButton" :class="{ 'info-button-glow': infoButtonGlow }">
             <h1>i</h1>
         </div>
         <div class="info-large" v-else @click="infoButton = !infoButton">
@@ -13,6 +13,14 @@
 
 <script setup lang="ts">
 const infoButton = ref(true);
+const infoButtonGlow = ref(false);
+
+setInterval(() => {
+    infoButtonGlow.value = !infoButtonGlow.value;
+    setTimeout(() => {
+        infoButtonGlow.value = !infoButtonGlow.value;
+    }, 2000);
+}, 5000);
 </script>
 
 <style scoped>
@@ -33,6 +41,7 @@ const infoButton = ref(true);
     left: 50%;
     transform: translateX(-50%);
     width: 100px;
+    height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -44,7 +53,19 @@ const infoButton = ref(true);
     box-shadow: 0px 0px 20px 3px #F00 inset;
     z-index: 1000;
     pointer-events: auto;
-    /* mix-blend-mode: difference; */
+    background: linear-gradient(180deg, #F00 0%, #900 100%);
+    /* border: var(--border-width) solid var(--white); */
+    mix-blend-mode: difference;
+    color: black;
+    font-weight: bold;
+    font-size: 2rem;
+    transition: color 2s ease, box-shadow 2s ease;
+}
+
+.info-button-glow {
+    box-shadow: 0px 0px 20px 3px #FFF inset;
+    color: white;
+    transition: color 2s ease, box-shadow 2s ease;
 }
 
 .info-large {
@@ -64,8 +85,10 @@ const infoButton = ref(true);
     line-height: 1.2;
     padding: 2rem;
     z-index: 1000;
-    box-shadow: 0px 0px 35px 14px #F00 inset;
     pointer-events: auto;
+    box-shadow: 0px 4px 38.4px 22px #616BFF inset, 6px 20px 119.6px 52px #FFF inset;
+    border: var(--border-width) solid var(--white);
+    mix-blend-mode: exclusion;
 
     h1 {
         font-size: 4rem;

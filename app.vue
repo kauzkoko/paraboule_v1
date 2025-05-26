@@ -15,6 +15,7 @@
 :root {
   --info-background: white;
   --red: #ff0000;
+  --red-light: #ff4b4b;
   --blue: #616BFF;
   --green: #00ff00;
   --yellow: #ffff00;
@@ -24,21 +25,27 @@
   --gray: #808080;
   --white: #ffffff;
   --black: #000000;
-  --background: var(--white);
+
   --foreground: var(--white);
   --primary: var(--red);
   --stroke: var(--white);
   --light: var(--#696969);
   --dark: var(--#bebebe);
   --cochonet: var(--yellow);
-  --border-color: var(--black);
+
+  --background: var(--black);
+  --border-color: var(--red);
+  --svg-color: var(--red);
+
+
   --grid-cell: #ff0000;
   --grid-section: #ff0000;
   --grid-isTouchingHaptic: blue;
-  --border-color-light: rgba(255, 255, 255, 0.25);
+  --border-color-light: rgba(255, 255, 255, 1);
   --center-circle-shadow: var(--black);
   --center-circle-border: var(--black);
   --center-circle-background: var(--white);
+  --border-width: 5px;
 }
 
 
