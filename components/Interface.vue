@@ -1472,7 +1472,7 @@ const pages = [
       },
       html: "Activate All Mode",
       cycler: useCycleList(["All Mode"]),
-      modes: ["Dev", "Testing", "Player", "Referee", "Solo"],
+      modes: ["Dev", "Testing", "Player", "Referee", "Solo", "All"],
     },
   ],
   [
