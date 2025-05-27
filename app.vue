@@ -45,7 +45,7 @@
   --center-circle-shadow: var(--black);
   --center-circle-border: var(--black);
   --center-circle-background: var(--white);
-  --border-width: 5px;
+  --border-width: 3px;
 }
 
 

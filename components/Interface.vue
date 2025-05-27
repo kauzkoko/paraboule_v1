@@ -1,5 +1,5 @@
 <template>
-  <div class="outer fixed left-0 transform-gpu translate-y--15px w-100dvw h-100dvh" @click="onFullscreenClick()">
+  <div class="outer fixed left-0 transform-gpu translate-y--11px w-100dvw h-100dvh" @click="onFullscreenClick()">
     <VirtualAudioSpace :trigger="audioTrigger"></VirtualAudioSpace>
   </div>
   <div class="outer" v-show="store.isTouchingSlider" @click="onClickSliderComponent">
@@ -76,38 +76,36 @@
             {{ getItem(item).name }}
           </div>
           <div class="flex justify-center items-center w-full h-full children:w-70% children:h-70%">
-            <SvgIcon 
-              v-if="getItem(item).imgSrc && getItem(item).imgSrc.includes('.svg')" 
-              :name="getIconName(getItem(item).imgSrc)" 
-            />
-            <img 
-              v-else-if="getItem(item).imgSrc" 
-              :src="getItem(item).imgSrc.value ?? getItem(item).imgSrc" 
-            />
-            <div v-else-if="getItem(item).html" class="text-[var(--border-color)] text-20px text-center flexCenter max-w-80%">
+            <SvgIcon v-if="getItem(item).imgSrc && !getItem(item).imgSrc.value && getItem(item).imgSrc.includes('.svg')"
+              :name="getIconName(getItem(item).imgSrc)" />
+            <img
+              :class="getItem(item).imgSrc.value ?? getItem(item).imgSrc.startsWith('data') ? 'h-initial' : 'initial'"
+              v-else-if="getItem(item).imgSrc" :src="getItem(item).imgSrc.value ?? getItem(item).imgSrc" />
+            <div v-else-if="getItem(item).html"
+              class="text-[var(--border-color)] text-24px font-bold text-center flexCenter max-w-80%">
               <div v-html="getItem(item).html.value ?? getItem(item).html"></div>
             </div>
           </div>
         </div>
       </template>
       <div class="center-circle" ref="swiper" :index="'pageAnnouncer'" @click="onSingleClick"
-      @touchstart="onTouchStart('pageAnnouncer')" @touchend="onTouchEnd" :style="{
-        background:
-          touchedIndex === 'pageAnnouncer'
-            ? 'transparent'
-            : 'black',
-        transition:
-          touchedIndex === 'pageAnnouncer'
-            ? 'all 500ms'
-            : 'all 500ms',
-        boxShadow: touchedIndex === 'pageAnnouncer' ? '0px 0px 50px 50px var(--border-color) inset' : 'none',
-        border: touchedIndex === 'pageAnnouncer' ? 'solid 10px black' : 'solid 10px black',
+        @touchstart="onTouchStart('pageAnnouncer')" @touchend="onTouchEnd" :style="{
+          background:
+            touchedIndex === 'pageAnnouncer'
+              ? 'transparent'
+              : 'black',
+          transition:
+            touchedIndex === 'pageAnnouncer'
+              ? 'all 500ms'
+              : 'all 500ms',
+          boxShadow: touchedIndex === 'pageAnnouncer' ? '0px 0px 50px 50px var(--border-color) inset' : 'none',
+          border: touchedIndex === 'pageAnnouncer' ? 'solid 10px black' : 'solid 10px black',
 
-      }">
-      <div class="text-[var(--border-color)] text-38px" :index="'pageAnnouncer'">
-        {{ stepperIndex + 1 }}
+        }">
+        <div class="text-[var(--border-color)] text-38px" :index="'pageAnnouncer'">
+          <span> {{ stepperIndex + 1 }}</span>
+        </div>
       </div>
-    </div>
     </div>
     <QrScanner v-if="scanForQr" :scanForQr="scanForQr" @qrCodeFound="onQrCode"></QrScanner>
   </div>
@@ -729,7 +727,7 @@ const getSvgIcon = (iconName) => {
     </svg>`,
     // Add more icons as needed
   };
-  
+
   return svgIcons[iconName] || '';
 };
 
@@ -1263,6 +1261,7 @@ const pages = [
       name: "Player 1 Score Incrementer",
       clickFunction: store.incrementPlayer1score,
       imgSrc: "/icons/plus.svg",
+      html: "Player 1 Score Incrementer",
       // explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
       cycler: useCycleList([
         "Player 1 Score Incrementer",
@@ -1274,6 +1273,7 @@ const pages = [
       name: "Player 2 Score Incrementer",
       clickFunction: store.incrementPlayer2score,
       imgSrc: "/icons/plus.svg",
+      html: "Player 2 Score Incrementer",
       // explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
       cycler: useCycleList([
         "Player 2 Score Incrementer",
@@ -1296,6 +1296,7 @@ const pages = [
       name: "Ping Phone",
       clickFunction: pingPhone,
       imgSrc: "/icons/pingPhone.svg",
+      html: "Ping Phone",
       explanationSrc: "/sounds/elevenlabs/explanation_phonePinger.mp3",
       cycler: useCycleList(["Ping Phone", "Pairing Status"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
@@ -1304,6 +1305,7 @@ const pages = [
       name: "Scan QR",
       clickFunction: scanqr,
       imgSrc: "/icons/scanQr1.svg",
+      html: "Scan QR",
       explanationSrc: "/sounds/elevenlabs/explanation_qrScanner.mp3",
       cycler: useCycleList(["Scan QR", "Unique QR"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
@@ -1312,6 +1314,7 @@ const pages = [
       name: "Unique QR",
       clickFunction: qr,
       imgSrc: qrcode,
+      html: "Unique QR",
       // html: computedUniqueQrHtml",
       explanationSrc: "/sounds/elevenlabs/explanation_uniqueQr.mp3",
       cycler: useCycleList(["Unique QR", "Scan QR"]),
@@ -1320,26 +1323,18 @@ const pages = [
   ],
   [
     {
-      name: "Raw Intersections",
-      clickFunction: sendRawIntersections,
-      html: "Send scan results to other device",
-      explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
-      cycler: useCycleList(["Raw Intersections", "Refresh page"]),
-      modes: ["All", "Dev", "Testing", "Referee"],
-    },
-    {
       name: "Refresh page",
       clickFunction: refreshPage,
       html: "F5",
       explanationSrc: "/sounds/elevenlabs/explanation_pageRefresher.mp3",
-      cycler: useCycleList(["Refresh page", "Raw Intersections"]),
+      cycler: useCycleList(["Refresh page"]),
       modes: ["All", "Dev", "Testing", "Exhibition"],
     },
     {
       name: "Toss Coin",
       clickFunction: tossCoin,
       imgSrc: coinImgSrc,
-      html: "Toss a coin and get heads or tails",
+      // html: "Toss a coin and get heads or tails",
       explanationSrc: "/sounds/elevenlabs/explanation_tossCoin.mp3",
       cycler: useCycleList(["Toss Coin"]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
@@ -1381,7 +1376,7 @@ const pages = [
         () =>
           `<div class='text-14px opacity-50'>${store.prevYoloModel}</div><div class='text-16px'>${store.yoloModelCycler.state.id}</div><div class='text-14px opacity-50'>${store.nextYoloModel}</div>`
       ),
-      cycler: useCycleList(["Change YOLO model", "Add function"]),
+      cycler: useCycleList(["Change YOLO model"]),
       modes: ["All", "Dev", "Testing"],
     },
   ],
@@ -1484,7 +1479,7 @@ const pages = [
     },
   ],
   [
-  {
+    {
       name: "S1 Mode",
       clickFunction: () => {
         const findPlayerModeIndex = modesList.findIndex(
@@ -1497,7 +1492,7 @@ const pages = [
       cycler: useCycleList(["S1 Mode"]),
       modes: ["All", "Dev", "Testing", "Referee", "S1", "Exhibition"],
     },
-  {
+    {
       name: "S2 Mode",
       clickFunction: () => {
         const findS2ModeIndex = modesList.findIndex(
@@ -1523,7 +1518,7 @@ const pages = [
       cycler: useCycleList(["S3 Mode"]),
       modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
     },
-  {
+    {
       name: "Exhibition Mode",
       clickFunction: () => {
         const findExhibitionModeIndex = modesList.findIndex(
@@ -1587,13 +1582,21 @@ const pages = [
       ]),
       modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
     },
-        {
+    {
       name: "Stalefish 180",
       clickFunction: click_stalefish180,
-      imgSrc: "/icons/stalefish180.svg",
+      imgSrc: "/icons/stalefish.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_throughTurnAndBack.mp3",
       cycler: useCycleList(["Stalefish 180"]),
       modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
+    },
+    {
+      name: "Raw Intersections",
+      clickFunction: sendRawIntersections,
+      html: "Send scan results to other device",
+      explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
+      cycler: useCycleList(["Raw Intersections"]),
+      modes: ["All", "Dev", "Testing", "Referee"],
     },
   ],
 ];
@@ -1926,7 +1929,7 @@ onKeyStroke(["v"], (e) => {
 }
 
 .center-circle {
-  width: 180px;
+  width: 200px;
   aspect-ratio: 1;
   border-radius: 50%;
   position: absolute;
@@ -1950,13 +1953,22 @@ onKeyStroke(["v"], (e) => {
     border-radius: 50%;
     width: 100%;
     border: var(--border-width) solid var(--center-circle-border);
+    overflow: hidden;
     /* background-color: var(--center-circle-background); */
-    mix-blend-mode: difference;
     color: var(--center-circle-border);
+    /* color: transparent; */
+    /* span {
+      background-color: black;
+      color: black;
+      text-align: center;
+      margin-top: -130px;
+      height: 1000px;
+      width: 2000px;
+    } */
     /* opacity: 0.5; */
-    mix-blend-mode: exclusion;
     background-color: red;
     background: linear-gradient(180deg, #F00 0%, #900 100%);
+    background: transparent;
   }
 
   >* {

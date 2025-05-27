@@ -4,9 +4,13 @@
             <h1>i</h1>
         </div>
         <div class="info-large" v-else @click="infoButton = !infoButton">
-            <h1>Info</h1>
-            <p>Irgend ein text</p>
-            <div class="info-close">CLOSE</div>
+            <h1>{{ current.title }}</h1>
+            <img v-if="current.img" :src="current.img" class="w-90dvw" />
+            <p>{{ current.text }}</p>
+            <div class="info-buttons"></div>
+
+            <div v-if="isLast" class="info-close" @click="infoButton = !infoButton">CLOSE</div>
+            <div v-else class="info-next" @click="goToNext">NEXT</div>
         </div>
     </div>
 </template>
@@ -21,6 +25,43 @@ setInterval(() => {
         infoButtonGlow.value = !infoButtonGlow.value;
     }, 2000);
 }, 5000);
+
+const {
+  steps,
+  stepNames,
+  index,
+  current,
+  next,
+  previous,
+  isFirst,
+  isLast,
+  goTo,
+  goToNext,
+  goToPrevious,
+  goBackTo,
+  isNext,
+  isPrevious,
+  isCurrent,
+  isBefore,
+  isAfter,
+} = useStepper({
+  'welcome': {
+    title: 'Welcome to',
+    img: '/icons/parabouleBlackScript.svg',
+    text: 'PARABOULE assists you in playing Pétanque by providing spatial audio and haptic feedback and is built to be used blindly.',
+  },
+  'center-circle': {
+    title: 'Center Circle',
+    text: 'Use the center circle to navigate in the app. Swipe left and right to change the page. Swipe up to mute/unmute the audio. Swipe down to return to the startpoint camera perspective.',
+  },
+  'functions': {
+    title: 'Buttons',
+    text: 'Use the buttons to run functions in the app. Tap and hold to listen to the explanation of the function. Tap once to run the function.',
+  },
+  'payment': {
+    title: 'Payment',
+  },
+})
 </script>
 
 <style scoped>
@@ -77,7 +118,7 @@ setInterval(() => {
     color: var(--black);
     display: flex;
     align-items: center;
-    justify-content: center;
+    /* justify-content: center; */
     flex-direction: column;
     font-size: 2rem;
     font-weight: 600;
@@ -91,8 +132,14 @@ setInterval(() => {
     mix-blend-mode: exclusion;
 
     h1 {
-        font-size: 4rem;
+        font-size: 36px;
+        font-weight: 700;
         margin: 0;
+        text-transform: uppercase;
+    }
+
+    img {
+        /* margin-top: 10px; */
     }
 
     p {
@@ -100,6 +147,7 @@ setInterval(() => {
         padding: 1rem;
         font-size: 2rem;
         padding-bottom: 2rem;
+        max-width: 85dvw;
     }
 
     /* mix-blend-mode: difference; */
