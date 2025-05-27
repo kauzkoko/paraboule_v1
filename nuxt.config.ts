@@ -7,7 +7,7 @@ const sw = process.env.SW === "true";
 export default defineNuxtConfig({
   app: {
     head: {
-      // title: 'PARABOoOULES',
+      title: 'PARABOULE',
       htmlAttrs: {
         lang: 'en',
       },
@@ -79,8 +79,8 @@ export default defineNuxtConfig({
     filename: sw ? "sw.ts" : undefined,
     registerType: "autoUpdate",
     manifest: {
-      name: "PARABOoOULES",
-      short_name: "PARABOoOULES",
+      name: "PARABOULE",
+      short_name: "PARABOULE",
       theme_color: "#000000",
       background_color: "#000000",
       display: "standalone",
@@ -144,9 +144,9 @@ export default defineNuxtConfig({
   pinia: {
     storesDirs: ["./stores/**"],
   },
-  scripts: {
-    globals: {
-      strudel: 'https://unpkg.com/@strudel/web@1.0.3',
-    }
-  }
+  // scripts: {
+  //   globals: {
+  //     strudel: 'https://unpkg.com/@strudel/web@1.0.3',
+  //   }
+  // }
 });
