@@ -2,7 +2,7 @@ export function useSoundController(options: { listen: boolean }) {
   const supabase = useSupabaseClient();
   let channel = supabase.channel("sound-controller");
 
-  const { sendCochonetMqtt, sendHoolaMqtt } = useMqtt();
+  const { sendCochonnetMqtt, sendHoolaMqtt } = useMqtt();
   const { play } = useSoundComposable("/sounds/noz.mp3", 5);
 
   channel.subscribe();
@@ -17,14 +17,14 @@ export function useSoundController(options: { listen: boolean }) {
     }
   });
 
-  function sendPlayCochonet(duration = 5000) {
-    console.log("sending playCochonet event to sound controller: ", duration);
+  function sendPlayCochonnet(duration = 5000) {
+    console.log("sending playCochonnet event to sound controller: ", duration);
     channel.send({
       type: "broadcast",
-      event: "playCochonet",
+      event: "playCochonnet",
       payload: { duration },
     });
-    // sendCochonetMqtt((duration / 1000).toString());
+    // sendCochonnetMqtt((duration / 1000).toString());
   }
 
   function sendPlayHoola(duration = 5000) {
@@ -44,5 +44,5 @@ export function useSoundController(options: { listen: boolean }) {
     });
   }
 
-  return { sendPlayCochonet, sendPlayHoola, sendPlayPhone };
+  return { sendPlayCochonnet, sendPlayHoola, sendPlayPhone };
 }

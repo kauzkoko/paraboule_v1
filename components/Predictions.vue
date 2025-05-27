@@ -10,8 +10,8 @@
         left: prediction.bbox.x / 2 + 'px',
         top: prediction.bbox.y / 2 + 'px',
         borderColor:
-          prediction.class === 'cochonet'
-            ? 'var(--cochonet)'
+          prediction.class === 'cochonnet'
+            ? 'var(--cochonnet)'
             : prediction.class === 'dark'
             ? 'var(--light)'
             : 'var(--dark)',

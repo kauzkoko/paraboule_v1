@@ -89,12 +89,22 @@ watchEffect(() => {
   }
 });
 
+onMounted(() => {
+  if (positionalAudioRef.value) {
+    gsap.to(positionalAudioRef.value.instance.gain.gain, {
+      value: 1,
+      duration: 1,
+      ease: "power2.out"
+    });
+  }
+});
+
 onUnmounted(() => {
   if (positionalAudioRef.value) {
     gsap.to(positionalAudioRef.value.instance.gain.gain, {
       value: 0,
-      duration: 0.5,
-      ease: "power2.out"
+      duration: 1,
+      ease: "power2.in"
     });
   }
 });

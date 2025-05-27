@@ -368,7 +368,7 @@ const mockBoules = [
     x: 0.15217870875827644,
     y: 0.11757755279540989,
     z: -2.14242094133827,
-    class: "cochonet",
+    class: "cochonnet",
   },
   {
     x: 0.3014103032020119,
@@ -396,15 +396,15 @@ const mockBoules = [
   },
 ];
 const setFromIntersections = (mockIntersections) => {
-  let cochonet = mockIntersections.find(
-    (item) => item.class === "cochonet" || item.class === "cochonette"
+  let cochonnet = mockIntersections.find(
+    (item) => item.class === "cochonnet" || item.class === "cochonnette"
   );
   let offsetX = 0;
   let offsetY = 0;
   let scaler = 23;
-  if (cochonet) {
-    offsetX = cochonet.x * scaler;
-    offsetY = cochonet.z * scaler;
+  if (cochonnet) {
+    offsetX = cochonnet.x * scaler;
+    offsetY = cochonnet.z * scaler;
   }
   let tempBoules = [];
   mockIntersections.forEach((item) => {
@@ -421,7 +421,7 @@ const setFromIntersections = (mockIntersections) => {
       distance: distance,
     };
 
-    if (item.class === "cochonet") {
+    if (item.class === "cochonnet") {
       boule.color = "orange";
       boule.size = 0.4;
       boule.player = 0;
@@ -628,7 +628,7 @@ async function animate(timestamp, frame) {
             } else if (
               (prediction.class === "dark" ||
                 prediction.class === "light" ||
-                prediction.class === "cochonette") &&
+                prediction.class === "cochonnette") &&
               prediction.confidence > 0.85
             ) {
               let intersectPoint = intersectPrediction(prediction, "boule");

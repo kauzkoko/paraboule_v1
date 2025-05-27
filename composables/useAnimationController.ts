@@ -9,8 +9,8 @@ export function useAnimationController() {
     .on("broadcast", { event: "flyToStart" }, (event) => {
       flyToStart(false);
     })
-    .on("broadcast", { event: "flyToCochonetAndBack" }, (event) => {
-      flyToCochonetAndBack(false);
+    .on("broadcast", { event: "flyToCochonnetAndBack" }, (event) => {
+      flyToCochonnetAndBack(false);
     })
     .on("broadcast", { event: "startCircularRotation" }, (event) => {
       startCircularRotation(false);
@@ -30,8 +30,8 @@ export function useAnimationController() {
     .on("broadcast", { event: "lookAlongNegativeZAxis" }, (event) => {
       lookAlongNegativeZAxis(false);
     })
-    .on("broadcast", { event: "flyToCochonet" }, (event) => {
-      flyToCochonet(false);
+    .on("broadcast", { event: "flyToCochonnet" }, (event) => {
+      flyToCochonnet(false);
     })
     .on("broadcast", { event: "toggleTopCamera" }, (event) => {
       toggleTopCamera({ broadcast: false, height: event.payload.height ?? 80 });
@@ -90,12 +90,12 @@ export function useAnimationController() {
     }
   }
 
-  function flyToCochonetAndBack(broadcast = true) {
-    bus.emit("flyToCochonetAndBack");
+  function flyToCochonnetAndBack(broadcast = true) {
+    bus.emit("flyToCochonnetAndBack");
     if (broadcast) {
       animationController.send({
         type: "broadcast",
-        event: "flyToCochonetAndBack",
+        event: "flyToCochonnetAndBack",
         payload: {},
       });
     }
@@ -167,12 +167,12 @@ export function useAnimationController() {
     }
   }
 
-  function flyToCochonet(broadcast = true) {
-    bus.emit("flyToCochonet");
+  function flyToCochonnet(broadcast = true) {
+    bus.emit("flyToCochonnet");
     if (broadcast) {
       animationController.send({
         type: "broadcast",
-        event: "flyToCochonet",
+        event: "flyToCochonnet",
         payload: {},
       });
     }
@@ -194,14 +194,14 @@ export function useAnimationController() {
 
   return {
     flyToStart,
-    flyToCochonetAndBack,
+    flyToCochonnetAndBack,
     startCircularRotation,
     stalefish180,
     lookAlongNegativeXAxis,
     lookAlongPositiveXAxis,
     lookAlongPositiveZAxis,
     lookAlongNegativeZAxis,
-    flyToCochonet,
+    flyToCochonnet,
     toggleTopCamera,
     playFilm,
     stopFilm,

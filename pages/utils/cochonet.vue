@@ -57,9 +57,9 @@ const nextSound = computed(() => {
 const localDuration = ref(5);
 let lastTimeout = null;
 soundController
-  .on("broadcast", { event: "playCochonet" }, (event) => {
+  .on("broadcast", { event: "playCochonnet" }, (event) => {
     console.log(
-      "receeiving  playCochonet event in sound controller: ",
+      "receeiving  playCochonnet event in sound controller: ",
       event.payload.duration
     );
     loadedSounds[soundsCycler.index.value].play();
@@ -77,7 +77,7 @@ let sendPlay = () => {
   setTimeout(() => {
     loadedSounds[soundsCycler.index.value].stop();
   }, localDuration.value * 1000 ?? 5000);
-  soundController.sendPlayCochonet(localDuration.value * 1000 ?? 5000);
+  soundController.sendPlayCochonnet(localDuration.value * 1000 ?? 5000);
 };
 
 const onSwipe = (direction) => {

@@ -20,12 +20,9 @@
       " />
     <TresMeshPhysicalMaterial :roughness=".2" :metalness="1" :emissive="boule.color" />
   </TresMesh>
-  <StundenOrientation :startPoint="startPoint" />
-  <!-- <Sky /> -->
-  <Environment preset="sunset" />
-  <!-- <Ocean>
-    <TresCircleGeometry :args="[50, 16]" />
-  </Ocean> -->
+  <StundenOrientation :startPoint="startPoint" /> 
+  <Sky v-if="store.isSky" :elevation="5" :distance="10" />
+  <!-- <Environment preset="sunset" /> -->
   <!-- <TresAmbientLight :intensity="230" /> -->
   <TresDirectionalLight :position="[cameraX, cameraY, cameraZ]" :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
     :intensity="5" />
@@ -64,6 +61,8 @@ onMounted(async () => {
       0.01 * materialPropsRed.uniforms.u_WobbleSpeed.value;
     materialPropsBlue.uniforms.u_Time.value +=
       0.01 * materialPropsBlue.uniforms.u_WobbleSpeed.value;
+    materialPropsYellow.uniforms.u_Time.value +=
+      0.01 * materialPropsYellow.uniforms.u_WobbleSpeed.value;
   });
 });
 
@@ -77,8 +76,8 @@ const meshRefs = useTemplateRef("boulesRefs");
 const bus = useEventBus("protoboules");
 
 bus.on((message, payload) => {
-  if (message === "flyToCochonetAndBack") {
-    flyToCochonetAndBack();
+  if (message === "flyToCochonnetAndBack") {
+    flyToCochonnetAndBack();
   }
   if (message === "flyToStart") {
     flyToStart();
@@ -101,8 +100,8 @@ bus.on((message, payload) => {
   if (message === "lookAlongNegativeZAxis") {
     lookAlongNegativeZAxis();
   }
-  if (message === "flyToCochonet") {
-    flyToCochonet();
+  if (message === "flyToCochonnet") {
+    flyToCochonnet();
   }
   if (message === "toggleTopCamera") {
     toggleTopCamera(payload.height);
@@ -125,7 +124,7 @@ watchEffect(() => {
   console.log(store.boulesToDisplay);
 });
 //interface controls
-let circleAroundCochonet = false;
+let circleAroundCochonnet = false;
 
 // camera controls / animations
 
@@ -154,7 +153,7 @@ sounds.colors = {
 };
 
 function killTweens() {
-  circleAroundCochonet = false;
+  circleAroundCochonnet = false;
   gsap.killTweensOf([alpha, cameraX, cameraY, cameraZ]);
 }
 
@@ -336,7 +335,7 @@ function flyToStart() {
   });
 }
 
-function flyToCochonetAndBack() {
+function flyToCochonnetAndBack() {
   killTweens();
   gsap.to(cameraZ, {
     value: 0,
@@ -351,7 +350,7 @@ function flyToCochonetAndBack() {
   });
 }
 
-function flyToCochonet() {
+function flyToCochonnet() {
   killTweens();
   gsap.to(cameraZ, {
     value: 0,
@@ -393,7 +392,7 @@ function stalefish180() {
 function startCircularRotation() {
   killTweens();
   let counter = 0;
-  circleAroundCochonet = true;
+  circleAroundCochonnet = true;
   const targetX = 0;
   const targetZ = 0;
   gsap.to(cameraX, {
@@ -420,17 +419,17 @@ function startCircularRotation() {
     ease: "none",
     onStart: () => {
       gsap.delayedCall(duration / 4 - 0.3, () => {
-        if (circleAroundCochonet) {
+        if (circleAroundCochonnet) {
           hihatTriggers.value[1]++;
         }
       });
       gsap.delayedCall(duration / 2 - 0.3, () => {
-        if (circleAroundCochonet) {
+        if (circleAroundCochonnet) {
           hihatTriggers.value[2]++;
         }
       });
       gsap.delayedCall((duration / 4) * 3 - 0.3, () => {
-        if (circleAroundCochonet) {
+        if (circleAroundCochonnet) {
           hihatTriggers.value[3]++;
         }
       });
@@ -439,22 +438,22 @@ function startCircularRotation() {
       if (counter > 0) {
         hihatTriggers.value[0]++;
         flyToStart();
-        circleAroundCochonet = false;
+        circleAroundCochonnet = false;
         return;
       }
       hihatTriggers.value[0]++;
       gsap.delayedCall(duration / 4 - 0.3, () => {
-        if (circleAroundCochonet) {
+        if (circleAroundCochonnet) {
           hihatTriggers.value[1]++;
         }
       });
       gsap.delayedCall(duration / 2 - 0.3, () => {
-        if (circleAroundCochonet) {
+        if (circleAroundCochonnet) {
           hihatTriggers.value[2]++;
         }
       });
       gsap.delayedCall((duration / 4) * 3 - 0.3, () => {
-        if (circleAroundCochonet) {
+        if (circleAroundCochonnet) {
           hihatTriggers.value[3]++;
         }
       });
@@ -468,7 +467,7 @@ function startCircularRotation() {
         duration: 1,
         ease: "power2.out",
       });
-      circleAroundCochonet = false;
+      circleAroundCochonnet = false;
       return;
     },
   });

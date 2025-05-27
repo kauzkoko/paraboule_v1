@@ -31,7 +31,7 @@
   --stroke: var(--white);
   --light: var(--#696969);
   --dark: var(--#bebebe);
-  --cochonet: var(--yellow);
+  --cochonnet: var(--yellow);
 
   --background: var(--black);
   --border-color: var(--red);

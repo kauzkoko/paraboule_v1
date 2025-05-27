@@ -16,8 +16,8 @@ export function useMqtt() {
     // client.end();
   };
 
-  const sendCochonetMqtt = (message: string) => {
-    const topic = "cochonet";
+  const sendCochonnetMqtt = (message: string) => {
+    const topic = "cochonnet";
     // client.publish(topic, message, {}, (err) => {
     //   if (err) {
     //     console.error("Publish error:", err);
@@ -34,5 +34,5 @@ export function useMqtt() {
     // });
   };
 
-  return { sendCochonetMqtt, sendHoolaMqtt };
+  return { sendCochonnetMqtt, sendHoolaMqtt };
 }

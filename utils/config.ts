@@ -72,7 +72,7 @@ export const mockIntersections = [
       x: 0.15217870875827644,
       y: 0.11757755279540989,
       z: -2.14242094133827,
-      class: "cochonet",
+      class: "cochonnet",
     },
     {
       x: 0.3014103032020119,
@@ -104,7 +104,7 @@ export const mockIntersections = [
       x: 0.25217870875827644,
       y: 0.11757755279540989,
       z: -2.34242094133827,
-      class: "cochonet",
+      class: "cochonnet",
     },
     {
       x: 0.1014103032020119,

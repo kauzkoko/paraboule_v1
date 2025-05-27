@@ -163,16 +163,16 @@ export const useProtoStore = defineStore("protoStore", () => {
         return {
           ...boule,
           sortingIndex: index,
-          rank: rank || 0, // 0 for cochonet
+          rank: rank || 0, // 0 for cochonnet
         };
       });
     }
   });
   const { history: filteredBoulesHistory } = useRefHistory(filteredBoules);
   const boulesToDisplay = computed(() => {
-    const amountBoulesAndCochonet = filteredBoules.value.length;
-    boulesCount.value = amountBoulesAndCochonet;
-    const amountOnlyBoules = amountBoulesAndCochonet - 1;
+    const amountBoulesAndCochonnet = filteredBoules.value.length;
+    boulesCount.value = amountBoulesAndCochonnet;
+    const amountOnlyBoules = amountBoulesAndCochonnet - 1;
     const maxBoulesAmount = globalShotsTaken.value;
     if (amountOnlyBoules <= maxBoulesAmount) {
       console.log(
@@ -186,7 +186,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   });
 
   const bouleFocuserCycler = useCycleList([
-    "Focus Cochonet",
+    "Focus Cochonnet",
     "Focus All Boules",
     "Focus Boule 1",
     "Focus Boule 2",
@@ -398,6 +398,9 @@ export const useProtoStore = defineStore("protoStore", () => {
   const hihatTriggers = ref([0, 0, 0, 0]);
   const showStundenOrientation = ref(false);
 
+  // sky
+  const isSky = ref(false);
+
   // positional audio
   const trigger = ref(0);
   const helpers = ref(false);
@@ -426,15 +429,15 @@ export const useProtoStore = defineStore("protoStore", () => {
   };
 
   const setFromIntersections = () => {
-    let cochonet = rawIntersections.value.find(
-      (item) => item.class === "cochonet" || item.class === "cochonette"
+    let cochonnet = rawIntersections.value.find(
+      (item) => item.class === "cochonnet" || item.class === "cochonnette"
     );
     let offsetX = 0;
     let offsetY = 0;
     let scaler = 23;
-    if (cochonet) {
-      offsetX = cochonet.x * scaler;
-      offsetY = cochonet.z * scaler;
+    if (cochonnet) {
+      offsetX = cochonnet.x * scaler;
+      offsetY = cochonnet.z * scaler;
     }
     let tempBoules: Boule[] = [];
     rawIntersections.value.forEach((item) => {
@@ -451,7 +454,7 @@ export const useProtoStore = defineStore("protoStore", () => {
         distance: distance,
       };
 
-      if (item.class === "cochonet") {
+      if (item.class === "cochonnet") {
         boule.color = "orange";
         boule.size = 0.4;
         boule.player = 0;
@@ -554,6 +557,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     lookAlongCycler,
     bouleFocuserCycler,
     isSearching,
+    isSky,
   };
 });
 

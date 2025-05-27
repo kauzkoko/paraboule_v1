@@ -67,7 +67,7 @@
               : 1,
             boxShadow: touchedIndex === index ? '0px 4px 38.4px 22px #616BFF inset, 6px 20px 119.6px 52px #FFF inset' : 'none',
           }">
-          <div class="absolute text-[var(--border-color)] text-12px px-2 py-2" :class="{
+          <div class="absolute text-[var(--border-color)] text-14px font-bold px-7px py-4px" :class="{
             'top-0 left-0': index === 0,
             'top-0 right-0': index === 1,
             'bottom-0 left-0': index === 2,
@@ -131,7 +131,7 @@ const { speak } = useSpeech();
 const bus = useEventBus("protoboules");
 const { sendReverseField } = useScanController();
 const { sendRawIntersections } = useXrController();
-const { sendPlayCochonet, sendPlayHoola, sendPlayPhone } = useSoundController({
+const { sendPlayCochonnet, sendPlayHoola, sendPlayPhone } = useSoundController({
   listen: true,
 });
 const { sendMute, sendUnmute } = useAssistantController();
@@ -174,13 +174,13 @@ const {
 
 const {
   startCircularRotation,
-  flyToCochonetAndBack,
+  flyToCochonnetAndBack,
   stalefish180,
   lookAlongNegativeXAxis,
   lookAlongPositiveXAxis,
   lookAlongPositiveZAxis,
   lookAlongNegativeZAxis,
-  flyToCochonet,
+  flyToCochonnet,
   flyToStart,
   toggleTopCamera,
 } = useAnimationController();
@@ -205,7 +205,7 @@ const onSwipe = (direction, e, index, item) => {
   } else if (direction === "left") {
     currentPage.value[index].cycler.prev();
   } else if (direction === "bottom") {
-    if (currentPage.value[index].name === "Ping Cochonet") refreshPage();
+    if (currentPage.value[index].name === "Ping Cochonnet") refreshPage();
     else if (currentPage.value[index].name === "Change player 1 audio") {
       store.players.player1.audioCycler.prev();
     } else if (currentPage.value[index].name === "Change player 2 audio") {
@@ -278,9 +278,9 @@ const setPointsFromLatestScan = () => {
   store.setScoreFromPoints();
 };
 
-const click_pingCochonet = () => {
+const click_pingCochonnet = () => {
   if (!afterLongPress) {
-    sendPlayCochonet(5000);
+    sendPlayCochonnet(5000);
   }
 };
 
@@ -292,13 +292,13 @@ const startCocho = () => {
 
 const flyCochoBack = () => {
   if (!afterLongPress) {
-    flyToCochonetAndBack();
+    flyToCochonnetAndBack();
   }
 };
 
-const click_flyToCochonet = () => {
+const click_flyToCochonnet = () => {
   if (!afterLongPress) {
-    flyToCochonet();
+    flyToCochonnet();
   }
 };
 
@@ -447,7 +447,7 @@ watch(isListening, () => {
         break;
       case "fly to center and back":
       case "fly to center":
-        flyToCochonetAndBack();
+        flyToCochonnetAndBack();
         break;
       case "fly to other side and back":
       case "fly to other side":
@@ -741,24 +741,24 @@ const pages = [
       imgSrc: "/icons/gyros.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_gyro.mp3",
       html: "Toggle Alpha Controller",
-      cycler: useCycleList(["Alpha Controller", "Slider", "Fly to Cochonet"]),
+      cycler: useCycleList(["Alpha Controller", "Slider", "Fly to Cochonnet"]),
       modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo", "S1", "Exhibition"],
     },
     {
-      name: "Ping Cochonet",
-      clickFunction: click_pingCochonet,
+      name: "Ping Cochonnet",
+      clickFunction: click_pingCochonnet,
       imgSrc: "/icons/cocho.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pingCocho.mp3",
-      cycler: useCycleList(["Ping Cochonet", "Ping Startpoint"]),
+      cycler: useCycleList(["Ping Cochonnet", "Ping Startpoint"]),
       modes: ["All", "Dev", "Testing", "Player", "Solo", "S1", "Exhibition"],
     },
     {
-      name: "Fly to Cochonet",
-      clickFunction: click_flyToCochonet,
-      imgSrc: "/icons/flyToCochonet.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_flyOnTheCochonet.mp3",
-      html: "Fly to Cochonet",
-      cycler: useCycleList(["Fly to Cochonet"]),
+      name: "Fly to Cochonnet",
+      clickFunction: click_flyToCochonnet,
+      imgSrc: "/icons/flyToCochonnet.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_flyOnTheCochonnet.mp3",
+      html: "Fly to Cochonnet",
+      cycler: useCycleList(["Fly to Cochonnet"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
@@ -792,7 +792,7 @@ const pages = [
       clickFunction: pingShoes,
       imgSrc: "/icons/hoolahoop.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_hoolaPinger.mp3",
-      cycler: useCycleList(["Ping Startpoint", "Ping Cochonet"]),
+      cycler: useCycleList(["Ping Startpoint", "Ping Cochonnet"]),
       modes: ["All", "Dev", "Testing", "Player", "S2", "S1", "S3", "Exhibition"],
     },
     {
@@ -872,12 +872,13 @@ const pages = [
       clickFunction: () => {
         if (store.volume === 0) {
           store.volume = 1;
+          let timeout = 2000;
           const prevSelectedBoules = store.selectedBoules;
           const amountOfBoulesToDisplay = store.boulesToDisplay.length;
           for (let i = 0; i < amountOfBoulesToDisplay; i++) {
             setTimeout(() => {
               store.focusBoules(i);
-            }, i * 800);
+            }, i * timeout);
             if (i === amountOfBoulesToDisplay - 1) {
               setTimeout(() => {
                 if (prevSelectedBoules.length > 1) {
@@ -888,11 +889,12 @@ const pages = [
                   console.log("no boules were selected");
                 }
                 store.volume = 0;
-              }, i * 800 + 800);
+              }, i * timeout + timeout);
             }
           }
         }
       },
+      imgSrc: "/icons/focusLoop.svg",
       html: "Quick Focuser",
       cycler: useCycleList(["Quick Focuser"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
@@ -937,7 +939,7 @@ const pages = [
       html: "Focus all Boules",
       cycler: useCycleList([
         "Focus All Boules",
-        "Focus Cochonet",
+        "Focus Cochonnet",
         "Focus Boule 1",
         "Focus Boule 2",
         "Focus Boule 3",
@@ -946,6 +948,24 @@ const pages = [
         "Focus Boule 6",
       ]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
+    },
+    {
+      name: "Focus Cochonnet",
+      deactivated: computed(() => store.boulesCount < 1),
+      clickFunction: () => click_bouleFocuser(0),
+      imgSrc: "/icons/focusCochonnet.svg",
+      html: "Focus Cochonnet",
+      cycler: useCycleList([
+        "Focus Cochonnet",
+        "Focus All Boules",
+        "Focus Boule 1",
+        "Focus Boule 2",
+        "Focus Boule 3",
+        "Focus Boule 4",
+        "Focus Boule 5",
+        "Focus Boule 6",
+      ]),
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
   ],
   [
@@ -998,25 +1018,6 @@ const pages = [
       modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
     {
-      name: "Focus Cochonet",
-      deactivated: computed(() => store.boulesCount < 1),
-      clickFunction: () => click_bouleFocuser(0),
-      html: "Focus Cochonet",
-      cycler: useCycleList([
-        "Focus Cochonet",
-        "Focus All Boules",
-        "Focus Boule 1",
-        "Focus Boule 2",
-        "Focus Boule 3",
-        "Focus Boule 4",
-        "Focus Boule 5",
-        "Focus Boule 6",
-      ]),
-      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
-    },
-  ],
-  [
-    {
       name: "Focus Boule 4",
       deactivated: computed(() => store.boulesCount < 5),
       clickFunction: () => click_bouleFocuser(4),
@@ -1033,6 +1034,9 @@ const pages = [
       ]),
       modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
+  ],
+  [
+
     {
       name: "Focus Boule 5",
       deactivated: computed(() => store.boulesCount < 6),
@@ -1064,6 +1068,7 @@ const pages = [
       ]),
       modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
+
   ],
   [
     {
@@ -1342,42 +1347,6 @@ const pages = [
   ],
   [
     {
-      name: "Haptic grid near",
-      clickFunction: click_hapticGridNear,
-      html: "Haptic grid near",
-      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
-      cycler: useCycleList([
-        "Haptic grid near",
-        "Haptic grid medium",
-        "Haptic grid far",
-      ]),
-      modes: ["All", "Dev", "Testing"],
-    },
-    {
-      name: "Haptic grid far",
-      clickFunction: click_hapticGridFar,
-      html: "Haptic grid far",
-      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
-      cycler: useCycleList([
-        "Haptic grid far",
-        "Haptic grid medium",
-        "Haptic grid near",
-      ]),
-      modes: ["All", "Dev", "Testing"],
-    },
-  ],
-  [
-    {
-      name: "Stalefish 180",
-      clickFunction: click_stalefish180,
-      imgSrc: "/icons/stalefish180.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_throughTurnAndBack.mp3",
-      cycler: useCycleList(["Stalefish 180"]),
-      modes: ["All", "Dev", "Testing"],
-    },
-  ],
-  [
-    {
       name: "Change player 1 audio",
       clickFunction: () => {
         store.playSoundBySrc(store.currentSoundPlayer1);
@@ -1418,13 +1387,22 @@ const pages = [
   ],
   [
     {
-      name: "Add function",
-      clickFunction: addFunction,
-      // imgSrc: "/icons/referenz.svg",
-      html: "<div>+ Add</div>",
-      cycler: useCycleList(["Add function"]),
-      modes: ["All"],
+      name: "Toggle Sky",
+      clickFunction: () => {
+        store.isSky = !store.isSky;
+      },
+      html: "Toggle Sky",
+      cycler: useCycleList(["Toggle Sky"]),
+      modes: ["All", "Dev", "Testing", "Exhibition", "S1", "S2", "S3"],
     },
+    // {
+    //   name: "Add function",
+    //   clickFunction: addFunction,
+    //   // imgSrc: "/icons/referenz.svg",
+    //   html: "<div>+ Add</div>",
+    //   cycler: useCycleList(["Add function"]),
+    //   modes: ["All"],
+    // },
     {
       name: "Default",
       clickFunction: () => { },
@@ -1443,7 +1421,7 @@ const pages = [
     {
       name: "Prediction Visualiser",
       clickFunction: () => {
-        store.predictionVisualiser = !store.predictionVisualiser;
+        // store.predictionVisualiser = !store.predictionVisualiser;
       },
       html: "Prediction Visualiser",
       cycler: useCycleList(["Prediction Visualiser"]),
@@ -1582,6 +1560,40 @@ const pages = [
       ),
       cycler: useCycleList(["Change Mode"]),
       modes: ["All"],
+    },
+  ],
+  [
+    {
+      name: "Haptic grid near",
+      clickFunction: click_hapticGridNear,
+      html: "Haptic grid near",
+      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      cycler: useCycleList([
+        "Haptic grid near",
+        "Haptic grid medium",
+        "Haptic grid far",
+      ]),
+      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
+    },
+    {
+      name: "Haptic grid far",
+      clickFunction: click_hapticGridFar,
+      html: "Haptic grid far",
+      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      cycler: useCycleList([
+        "Haptic grid far",
+        "Haptic grid medium",
+        "Haptic grid near",
+      ]),
+      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
+    },
+        {
+      name: "Stalefish 180",
+      clickFunction: click_stalefish180,
+      imgSrc: "/icons/stalefish180.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_throughTurnAndBack.mp3",
+      cycler: useCycleList(["Stalefish 180"]),
+      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
     },
   ],
 ];

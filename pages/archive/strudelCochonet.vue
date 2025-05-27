@@ -43,7 +43,7 @@ onMounted(() => {
 
 const isPlaying = ref(false);
 channel
-  .on("broadcast", { event: "playCochonet" }, (event) => {
+  .on("broadcast", { event: "playCochonnet" }, (event) => {
     const duration = event.payload.duration ?? 3000;
     if (isPlaying.value) {
       evaluate("hush()");
@@ -62,7 +62,7 @@ channel
 let sendPlay = () => {
   channel.send({
     type: "broadcast",
-    event: "playCochonet",
+    event: "playCochonnet",
     payload: { duration: 5000 },
   });
 };

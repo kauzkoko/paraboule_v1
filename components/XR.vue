@@ -168,10 +168,10 @@ const startXR = async () => {
                 item.class === "dark" ||
                 (item.class === "light" && item.confidence > 0.5)
             );
-            const hasCochonet = newPredictions.some(
-              (item) => item.class === "cochonette" && item.confidence > 0.5
+            const hasCochonnet = newPredictions.some(
+              (item) => item.class === "cochonnette" && item.confidence > 0.5
             );
-            if (hasCochonet) {
+            if (hasCochonnet) {
               let tempIntersections = [];
               // console.log("newPredictions", newPredictions);
               newPredictions.forEach((newPrediction, index) => {
@@ -181,8 +181,8 @@ const startXR = async () => {
                   // console.log("intersectPoint", intersectPoint);
                   tempIntersections.push({
                     class:
-                      newPrediction.class === "cochonette"
-                        ? "cochonet"
+                      newPrediction.class === "cochonnette"
+                        ? "cochonnet"
                         : newPrediction.class,
                     ...intersectPoint,
                   });

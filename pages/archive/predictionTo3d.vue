@@ -29,7 +29,7 @@
         width: index === 0 ? '30px' : '15px',
         height: index === 0 ? '30px' : '15px',
         borderColor:
-          prediction.class === 'cochonet'
+          prediction.class === 'cochonnet'
             ? 'red'
             : prediction.class === 'dark'
             ? '#999'
