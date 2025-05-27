@@ -65,7 +65,7 @@
                 ? 0.5
                 : 1
               : 1,
-            boxShadow: touchedIndex === index ? '0px 4px 38.4px 22px #616BFF inset, 6px 20px 119.6px 52px #FFF inset' : 'none',
+            boxShadow: touchedIndex === index || (store.infoStepper.isCurrent('functions') && index === 0) ? '0px 4px 38.4px 22px #616BFF inset, 6px 20px 119.6px 52px #FFF inset' : 'none',
           }">
           <div class="absolute text-[var(--border-color)] text-14px font-bold px-7px py-4px" :class="{
             'top-0 left-0': index === 0,
@@ -83,12 +83,13 @@
               v-else-if="getItem(item).imgSrc" :src="getItem(item).imgSrc.value ?? getItem(item).imgSrc" />
             <div v-else-if="getItem(item).html"
               class="text-[var(--border-color)] text-24px font-bold text-center flexCenter max-w-80%">
-              <div v-html="getItem(item).html.value ?? getItem(item).html"></div>
+              <div v-html="getItem(item).html.value ?? ''"></div>
+              <!-- <div v-html="getItem(item).html.value ?? getItem(item).html"></div> -->
             </div>
           </div>
         </div>
       </template>
-      <div class="center-circle" ref="swiper" :index="'pageAnnouncer'" @click="onSingleClick"
+      <div class="center-circle aspect-1" ref="swiper" :index="'pageAnnouncer'" @click="onSingleClick"
         @touchstart="onTouchStart('pageAnnouncer')" @touchend="onTouchEnd" :style="{
           background:
             touchedIndex === 'pageAnnouncer'
@@ -98,11 +99,13 @@
             touchedIndex === 'pageAnnouncer'
               ? 'all 500ms'
               : 'all 500ms',
-          boxShadow: touchedIndex === 'pageAnnouncer' ? '0px 0px 50px 50px var(--border-color) inset' : 'none',
-          border: touchedIndex === 'pageAnnouncer' ? 'solid 10px black' : 'solid 10px black',
+          boxShadow: touchedIndex === 'pageAnnouncer' || store.infoStepper.isCurrent('center-circle') ? '0px 0px 50px 50px var(--border-color) inset' : 'none',
+          border: touchedIndex === 'pageAnnouncer' || !infoButton ? 'solid 10px black' : 'solid 10px black',
 
         }">
-        <div class="text-[var(--border-color)] text-38px" :index="'pageAnnouncer'">
+        <div class="text-[var(--border-color)] text-38px aspect-1" :style="{
+          width: store.infoStepper.isCurrent('center-circle') ? '130px' : '200px',
+        }" :index="'pageAnnouncer'">
           <span> {{ stepperIndex + 1 }}</span>
         </div>
       </div>
@@ -1974,16 +1977,5 @@ onKeyStroke(["v"], (e) => {
   >* {
     pointer-events: none;
   }
-}
-
-.test {
-  width: 100px;
-  aspect-ratio: 1;
-  background-color: red;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  mix-blend-mode: difference;
 }
 </style>

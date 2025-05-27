@@ -59,10 +59,7 @@ body {
   overflow: hidden;
   overscroll-behavior-y: contain;
   /* font-family: "TwCenMTPro"; */
-  font-family: 'Atkinson Hyperlegible Next', 'AtkinsonHyperlegibleNext', 'Atkinson Hyperlegible', sans-serif;
-  font-style: normal;
-  font-stretch: normal;
-  font-weight: 500;
+  font-family: 'Atkinson Hyperlegible Next', sans-serif;
 }
 
 button {

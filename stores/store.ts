@@ -482,6 +482,22 @@ export const useProtoStore = defineStore("protoStore", () => {
   };
   setMockIntersections();
 
+  const infoStepper = useStepper({
+    'welcome': {
+      title: 'Welcome to',
+      img: '/icons/paraboule_black.svg',
+      text: 'Tap NEXT to learn more on how<br> to use PARABOULE.<br><br> Tap CLOSE to return to the game.',
+    },
+    'center-circle': {
+      title: 'Invisible<br> Center Circle',
+      // text: '<Up></Up>Swipe up to toggle audio.<br><br>Swipe left and right <br>to switch pages. <br><br>Swipe down to return to the start.',
+    },
+    'functions': {
+      title: '2x2 Buttons',
+      // text: 'Use the buttons to run functions in the app. Tap and hold to listen to the explanation of the function. Tap once to run the function.',
+    },
+  })
+
   return {
     yoloModelCycler,
     prevYoloModel,
@@ -558,6 +574,8 @@ export const useProtoStore = defineStore("protoStore", () => {
     bouleFocuserCycler,
     isSearching,
     isSky,
+    infoStepper,
+
   };
 });
 

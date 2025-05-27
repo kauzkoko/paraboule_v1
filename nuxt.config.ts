@@ -149,4 +149,12 @@ export default defineNuxtConfig({
   //     strudel: 'https://unpkg.com/@strudel/web@1.0.3',
   //   }
   // }
+  fonts: {
+    defaults: {
+      weights: [100, 200, 300, 400, 500, 600, 700, 800, 900],
+    },
+    families: [
+      { name: 'Test', provider: 'none' },
+    ]
+  }
 });
