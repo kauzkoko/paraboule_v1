@@ -53,7 +53,7 @@
     ">
     <div class="container">
       <template v-for="(item, index) in currentPage" :key="'grid-item-' + index">
-        <div :ref="refs.set" class="grid-item" :index="getIndex(item)" @touchend="onTouchEnd"
+        <div :ref="refs.set" class="grid-item" :index="getIndex(item)" @touchend="onTouchEnd" v-show="getItem(item).name !== 'Placeholder'"
           v-touch:swipe="(dir, e) => onSwipe(dir, e, index, item)" @click="onClick(item, index)"
           @touchstart="onTouchStart(index)" :style="{
             background:
@@ -810,6 +810,7 @@ const pages = [
           store.bouleFocuserCycler.next();
         }
       },
+      imgSrc: "/icons/quickFocusserFull.svg",
       html: "Toggle Boule Focuser",
       explanationSrc: "/sounds/elevenlabs/explanation_toggleBouleFocuser.mp3",
       cycler: useCycleList(["Toggle Boule Focuser"]),
@@ -819,6 +820,7 @@ const pages = [
       name: "Haptic grid medium",
       clickFunction: click_hapticGridMedium,
       html: "Haptic grid medium",
+      imgSrc: "/icons/hapticGridMedium.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
       cycler: useCycleList([
         "Haptic grid medium",
@@ -838,36 +840,13 @@ const pages = [
         store.lookAlongCycler.next();
       },
       html: "Toggle Lookalong",
+      imgSrc: "/icons/toggleLookalong.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_ocklocktoggler.mp3",
       cycler: useCycleList(["Toggle Lookalong"]),
       modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
   ],
   [
-    {
-      name: "Pirate Radar",
-      clickFunction: startCocho,
-      imgSrc: "/icons/around.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_pirateRadar.mp3",
-      cycler: useCycleList(["Pirate Radar", "Boomerang", "Stalefish 180"]),
-      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
-    },
-    {
-      name: "Show Stunden Orientation",
-      clickFunction: () => {
-        store.showStundenOrientation = !store.showStundenOrientation;
-      },
-      html: "Toggle watch orientation",
-      cycler: useCycleList(["Show Stunden Orientation"]),
-      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
-    },
-    {
-      name: "Toggle Top Camera Slider",
-      clickFunction: click_toggleTopCameraSlider,
-      html: "Toggle Top Camera Slider",
-      cycler: useCycleList(["Toggle Top Camera Slider"]),
-      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
-    },
     {
       name: "Quick Focuser",
       clickFunction: () => {
@@ -895,13 +874,29 @@ const pages = [
           }
         }
       },
-      imgSrc: "/icons/focusLoop.svg",
+      imgSrc: "/icons/focusLoopGross.svg",
       html: "Quick Focuser",
       cycler: useCycleList(["Quick Focuser"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
-  ],
-  [
+    {
+      name: "Focus All Boules",
+      deactivated: computed(() => store.boulesCount < 1),
+      clickFunction: () => click_bouleFocuser("all"),
+      imgSrc: "/icons/focusAll.svg",
+      html: "Focus all Boules",
+      cycler: useCycleList([
+        "Focus All Boules",
+        "Focus Cochonnet",
+        "Focus Boule 1",
+        "Focus Boule 2",
+        "Focus Boule 3",
+        "Focus Boule 4",
+        "Focus Boule 5",
+        "Focus Boule 6",
+      ]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
+    },
     {
       name: "Focus Team Blue",
       clickFunction: () => {
@@ -932,24 +927,8 @@ const pages = [
       cycler: useCycleList(["Focus Team Red"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
-    {
-      name: "Focus All Boules",
-      deactivated: computed(() => store.boulesCount < 1),
-      clickFunction: () => click_bouleFocuser("all"),
-      imgSrc: "/icons/focusAll.svg",
-      html: "Focus all Boules",
-      cycler: useCycleList([
-        "Focus All Boules",
-        "Focus Cochonnet",
-        "Focus Boule 1",
-        "Focus Boule 2",
-        "Focus Boule 3",
-        "Focus Boule 4",
-        "Focus Boule 5",
-        "Focus Boule 6",
-      ]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
-    },
+  ],
+  [
     {
       name: "Focus Cochonnet",
       deactivated: computed(() => store.boulesCount < 1),
@@ -968,8 +947,6 @@ const pages = [
       ]),
       modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
-  ],
-  [
     {
       name: "Focus Boule 1",
       deactivated: computed(() => store.boulesCount < 2),
@@ -1018,58 +995,6 @@ const pages = [
       ]),
       modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
-    {
-      name: "Focus Boule 4",
-      deactivated: computed(() => store.boulesCount < 5),
-      clickFunction: () => click_bouleFocuser(4),
-      imgSrc: "/icons/focus4.svg",
-      html: "Focus on Boule 4",
-      cycler: useCycleList([
-        "Focus Boule 4",
-        "Focus Boule 5",
-        "Focus Boule 6",
-        "Focus Boule 1",
-        "Focus Boule 2",
-        "Focus Boule 3",
-        "Focus All Boules",
-      ]),
-      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
-    },
-  ],
-  [
-
-    {
-      name: "Focus Boule 5",
-      deactivated: computed(() => store.boulesCount < 6),
-      clickFunction: () => click_bouleFocuser(5),
-      imgSrc: "/icons/focus5.svg",
-      html: "Focus on Boule 5",
-      cycler: useCycleList([
-        "Focus Boule 5",
-        "Focus Boule 6",
-        "Focus Boule 1",
-        "Focus Boule 2",
-        "Focus Boule 3",
-        "Focus Boule 4",
-        "Focus All Boules",
-      ]),
-      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
-    },
-    {
-      name: "Focus Boule 6",
-      deactivated: computed(() => store.boulesCount < 7),
-      clickFunction: () => click_bouleFocuser(6),
-      imgSrc: "/icons/focus6.svg",
-      html: "Focus on Boule 6",
-      cycler: useCycleList([
-        "Focus Boule 6",
-        "Focus Boule 4",
-        "Focus Boule 5",
-        "Focus All Boules",
-      ]),
-      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
-    },
-
   ],
   [
     {
@@ -1127,6 +1052,173 @@ const pages = [
   ],
   [
     {
+      name: "Pirate Radar",
+      clickFunction: startCocho,
+      imgSrc: "/icons/around.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_pirateRadar.mp3",
+      cycler: useCycleList(["Pirate Radar", "Boomerang", "Stalefish 180"]),
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
+    },
+    {
+      name: "Boomerang",
+      clickFunction: flyCochoBack,
+      imgSrc: "/icons/boomerang1.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_boomerang.mp3",
+      cycler: useCycleList(["Boomerang", "Pirate Radar"]),
+      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
+    },
+    {
+      name: "Stalefish 180",
+      clickFunction: click_stalefish180,
+      imgSrc: "/icons/stalefish.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_throughTurnAndBack.mp3",
+      cycler: useCycleList(["Stalefish 180"]),
+      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
+    },
+    {
+      name: "Placeholder",
+      clickFunction: () => { },
+      html: "Placeholder",
+      cycler: useCycleList(["Placeholder"]),
+      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
+    },
+  ],
+  [
+    {
+      name: "Change player 1 audio",
+      clickFunction: () => {
+        store.playSoundBySrc(store.currentSoundPlayer1);
+      },
+      html: computed(
+        () =>
+          `<div class='text-14px opacity-50'>${store.prevSoundPlayer1}</div><div class='text-16px'>${store.currentSoundPlayer1}</div><div class='text-14px opacity-50'>${store.nextSoundPlayer1}</div>`
+      ),
+      explanationSrc: "/sounds/elevenlabs/explanation_player1AudioCycler.mp3",
+      cycler: useCycleList(["Change player 1 audio"]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
+    },
+    {
+      name: "Change player 2 audio",
+      clickFunction: () => {
+        store.playSoundBySrc(store.currentSoundPlayer2);
+      },
+      html: computed(
+        () =>
+          `<div class='text-14px opacity-50'>${store.prevSoundPlayer2}</div><div class='text-16px'>${store.currentSoundPlayer2}</div><div class='text-14px opacity-50'>${store.nextSoundPlayer2}</div>`
+      ),
+      explanationSrc: "/sounds/elevenlabs/explanation_player2AudioCycler.mp3",
+      cycler: useCycleList(["Change player 2 audio"]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
+    },
+    {
+      name: "Toggle mute",
+      clickFunction: click_toggleMute,
+      html: "Toggle mute",
+      cycler: useCycleList(["Toggle mute"]),
+      modes: ["All", "Dev", "Testing", "Referee", "S1", "Exhibition"],
+    },
+    {
+      name: "Refresh page",
+      clickFunction: refreshPage,
+      html: "F5",
+      explanationSrc: "/sounds/elevenlabs/explanation_pageRefresher.mp3",
+      cycler: useCycleList(["Refresh page"]),
+      modes: ["All", "Dev", "Testing", "Exhibition"],
+    },
+  ],
+  [
+    {
+      name: "Show Stunden Orientation",
+      clickFunction: () => {
+        store.showStundenOrientation = !store.showStundenOrientation;
+      },
+      html: "Toggle watch orientation",
+      cycler: useCycleList(["Show Stunden Orientation"]),
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
+    },
+    {
+      name: "Toggle Top Camera Slider",
+      clickFunction: click_toggleTopCameraSlider,
+      html: "Toggle Top Camera Slider",
+      cycler: useCycleList(["Toggle Top Camera Slider"]),
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
+    },
+    {
+      name: "Toggle Sky",
+      clickFunction: () => {
+        store.isSky = !store.isSky;
+      },
+      html: "Toggle Sky",
+      cycler: useCycleList(["Toggle Sky"]),
+      modes: ["All", "Dev", "Testing", "Exhibition", "S1", "S2", "S3"],
+    },
+    {
+      name: "Placeholder",
+      clickFunction: () => { },
+      html: "Placeholder",
+      cycler: useCycleList(["Placeholder"]),
+      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
+    },
+  ],
+  [
+    {
+      name: "Focus Boule 4",
+      deactivated: computed(() => store.boulesCount < 5),
+      clickFunction: () => click_bouleFocuser(4),
+      imgSrc: "/icons/focus4.svg",
+      html: "Focus on Boule 4",
+      cycler: useCycleList([
+        "Focus Boule 4",
+        "Focus Boule 5",
+        "Focus Boule 6",
+        "Focus Boule 1",
+        "Focus Boule 2",
+        "Focus Boule 3",
+        "Focus All Boules",
+      ]),
+      modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
+    },
+    {
+      name: "Focus Boule 5",
+      deactivated: computed(() => store.boulesCount < 6),
+      clickFunction: () => click_bouleFocuser(5),
+      imgSrc: "/icons/focus5.svg",
+      html: "Focus on Boule 5",
+      cycler: useCycleList([
+        "Focus Boule 5",
+        "Focus Boule 6",
+        "Focus Boule 1",
+        "Focus Boule 2",
+        "Focus Boule 3",
+        "Focus Boule 4",
+        "Focus All Boules",
+      ]),
+      modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
+    },
+    {
+      name: "Focus Boule 6",
+      deactivated: computed(() => store.boulesCount < 7),
+      clickFunction: () => click_bouleFocuser(6),
+      imgSrc: "/icons/focus6.svg",
+      html: "Focus on Boule 6",
+      cycler: useCycleList([
+        "Focus Boule 6",
+        "Focus Boule 4",
+        "Focus Boule 5",
+        "Focus All Boules",
+      ]),
+      modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
+    },
+    {
+      name: "Placeholder",
+      clickFunction: () => { },
+      html: "Placeholder",
+      cycler: useCycleList(["Placeholder"]),
+      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
+    },
+  ],
+  [
+    {
       name: "Score Standings",
       clickFunction: scoreStandings,
       html: computedScoreStandingsHtml,
@@ -1141,8 +1233,6 @@ const pages = [
       ]),
       modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
     },
-  ],
-  [
     {
       name: "Scan and count points",
       clickFunction: scanForPoints,
@@ -1226,41 +1316,6 @@ const pages = [
   ],
   [
     {
-      name: "Boomerang",
-      clickFunction: flyCochoBack,
-      imgSrc: "/icons/boomerang1.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_boomerang.mp3",
-      cycler: useCycleList(["Boomerang", "Pirate Radar"]),
-      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
-    },
-    {
-      name: "Look along 12 o'clock",
-      clickFunction: lookAlongNegativeZAxis,
-      html: "Look along 12 o'clock",
-      imgSrc: "/icons/12oclock.svg",
-      cycler: useCycleList([
-        "Look along 12 o'clock",
-        "Look along 9 o'clock",
-        "Look along 3 o'clock",
-        "Look along 6 o'clock",
-      ]),
-      modes: ["All", "Dev", "Testing"],
-    },
-    {
-      name: "Haptic grid far",
-      clickFunction: click_hapticGridFar,
-      html: "Haptic grid far",
-      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
-      cycler: useCycleList([
-        "Haptic grid far",
-        "Haptic grid medium",
-        "Haptic grid near",
-      ]),
-      modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
-    },
-  ],
-  [
-    {
       name: "Player 1 Score Incrementer",
       clickFunction: store.incrementPlayer1score,
       imgSrc: "/icons/plus.svg",
@@ -1326,14 +1381,6 @@ const pages = [
   ],
   [
     {
-      name: "Refresh page",
-      clickFunction: refreshPage,
-      html: "F5",
-      explanationSrc: "/sounds/elevenlabs/explanation_pageRefresher.mp3",
-      cycler: useCycleList(["Refresh page"]),
-      modes: ["All", "Dev", "Testing", "Exhibition"],
-    },
-    {
       name: "Toss Coin",
       clickFunction: tossCoin,
       imgSrc: coinImgSrc,
@@ -1342,105 +1389,29 @@ const pages = [
       cycler: useCycleList(["Toss Coin"]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
-  ],
-  [
     {
-      name: "Change player 1 audio",
-      clickFunction: () => {
-        store.playSoundBySrc(store.currentSoundPlayer1);
-      },
-      html: computed(
-        () =>
-          `<div class='text-14px opacity-50'>${store.prevSoundPlayer1}</div><div class='text-16px'>${store.currentSoundPlayer1}</div><div class='text-14px opacity-50'>${store.nextSoundPlayer1}</div>`
-      ),
-      explanationSrc: "/sounds/elevenlabs/explanation_player1AudioCycler.mp3",
-      cycler: useCycleList(["Change player 1 audio"]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
-    },
-    {
-      name: "Change player 2 audio",
-      clickFunction: () => {
-        store.playSoundBySrc(store.currentSoundPlayer2);
-      },
-      html: computed(
-        () =>
-          `<div class='text-14px opacity-50'>${store.prevSoundPlayer2}</div><div class='text-16px'>${store.currentSoundPlayer2}</div><div class='text-14px opacity-50'>${store.nextSoundPlayer2}</div>`
-      ),
-      explanationSrc: "/sounds/elevenlabs/explanation_player2AudioCycler.mp3",
-      cycler: useCycleList(["Change player 2 audio"]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
-    },
-    {
-      name: "Change YOLO model",
-      clickFunction: () => {
-        speak(`YOLO model is ${store.yoloModelCycler.state.id}.`);
-      },
-      html: computed(
-        () =>
-          `<div class='text-14px opacity-50'>${store.prevYoloModel}</div><div class='text-16px'>${store.yoloModelCycler.state.id}</div><div class='text-14px opacity-50'>${store.nextYoloModel}</div>`
-      ),
-      cycler: useCycleList(["Change YOLO model"]),
-      modes: ["All", "Dev", "Testing"],
-    },
-  ],
-  [
-    {
-      name: "Toggle Sky",
-      clickFunction: () => {
-        store.isSky = !store.isSky;
-      },
-      html: "Toggle Sky",
-      cycler: useCycleList(["Toggle Sky"]),
-      modes: ["All", "Dev", "Testing", "Exhibition", "S1", "S2", "S3"],
-    },
-    // {
-    //   name: "Add function",
-    //   clickFunction: addFunction,
-    //   // imgSrc: "/icons/referenz.svg",
-    //   html: "<div>+ Add</div>",
-    //   cycler: useCycleList(["Add function"]),
-    //   modes: ["All"],
-    // },
-    {
-      name: "Default",
+      name: "Placeholder",
       clickFunction: () => { },
       html: "Placeholder",
-      imgSrc: "/icons/watch.svg",
-      cycler: useCycleList(["Default"]),
-      modes: ["All"],
+      cycler: useCycleList(["Placeholder"]),
+      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
     },
     {
-      name: "Toggle mute",
-      clickFunction: click_toggleMute,
-      html: "Toggle mute",
-      cycler: useCycleList(["Toggle mute"]),
-      modes: ["All", "Dev", "Testing", "Referee", "S1", "Exhibition"],
+      name: "Placeholder",
+      clickFunction: () => { },
+      html: "Placeholder",
+      cycler: useCycleList(["Placeholder"]),
+      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
     },
     {
-      name: "Prediction Visualiser",
-      clickFunction: () => {
-        // store.predictionVisualiser = !store.predictionVisualiser;
-      },
-      html: "Prediction Visualiser",
-      cycler: useCycleList(["Prediction Visualiser"]),
-      modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
+      name: "Placeholder",
+      clickFunction: () => { },
+      html: "Placeholder",
+      cycler: useCycleList(["Placeholder"]),
+      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
     },
   ],
   [
-    {
-      name: "Toggle Reverse Field",
-      deactivated: computed(() => !store.reverseField),
-      clickFunction: () => {
-        store.reverseField = !store.reverseField;
-        sendReverseField();
-        speak(`Field ${store.reverseField ? "reversed" : "normal"}`);
-      },
-      html: computed(
-        () => `Toggle Reverse Field: ${store.reverseField ? "ON" : "OFF"}`
-      ),
-      cycler: useCycleList(["Toggle Reverse Field"]),
-      modes: ["All", "Dev", "Testing", "Referee", "S1", "S3", "Exhibition"],
-    },
     {
       name: "Referee Mode",
       clickFunction: () => {
@@ -1479,6 +1450,18 @@ const pages = [
       html: "Activate All Mode",
       cycler: useCycleList(["All Mode"]),
       modes: ["Dev", "Testing", "Player", "Referee", "Solo", "All", "Exhibition", "S1", "S2", "S3"],
+    },
+    {
+      name: "Change Mode",
+      clickFunction: () => {
+        speak(`Current mode is ${store.modesCycler.state.name}`);
+      },
+      html: computed(
+        () =>
+          `<div class='text-14px opacity-50'>${store.prevMode}</div><div class='text-16px'>${store.modesCycler.state.name}</div><div class='text-14px opacity-50'>${store.nextMode}</div>`
+      ),
+      cycler: useCycleList(["Change Mode"]),
+      modes: ["All"],
     },
   ],
   [
@@ -1548,16 +1531,65 @@ const pages = [
       modes: ["All", "Dev", "Testing", "Referee", "Assistant"],
     },
     {
-      name: "Change Mode",
+      name: "Raw Intersections",
+      clickFunction: sendRawIntersections,
+      html: "Send scan results to other device",
+      explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
+      cycler: useCycleList(["Raw Intersections"]),
+      modes: ["All", "Dev", "Testing", "Referee"],
+    },
+    {
+      name: "Toggle Reverse Field",
+      deactivated: computed(() => !store.reverseField),
       clickFunction: () => {
-        speak(`Current mode is ${store.modesCycler.state.name}`);
+        store.reverseField = !store.reverseField;
+        sendReverseField();
+        speak(`Field ${store.reverseField ? "reversed" : "normal"}`);
+      },
+      html: computed(
+        () => `Toggle Reverse Field: ${store.reverseField ? "ON" : "OFF"}`
+      ),
+      cycler: useCycleList(["Toggle Reverse Field"]),
+      modes: ["All", "Dev", "Testing", "Referee", "S1", "S3", "Exhibition"],
+    },
+  ],
+  [
+    // {
+    //   name: "Add function",
+    //   clickFunction: addFunction,
+    //   // imgSrc: "/icons/referenz.svg",
+    //   html: "<div>+ Add</div>",
+    //   cycler: useCycleList(["Add function"]),
+    //   modes: ["All"],
+    // },
+    {
+      name: "Default",
+      clickFunction: () => { },
+      html: "Placeholder",
+      imgSrc: "/icons/watch.svg",
+      cycler: useCycleList(["Default"]),
+      modes: ["All"],
+    },
+    {
+      name: "Prediction Visualiser",
+      clickFunction: () => {
+        // store.predictionVisualiser = !store.predictionVisualiser;
+      },
+      html: "Prediction Visualiser",
+      cycler: useCycleList(["Prediction Visualiser"]),
+      modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
+    },
+    {
+      name: "Change YOLO model",
+      clickFunction: () => {
+        speak(`YOLO model is ${store.yoloModelCycler.state.id}.`);
       },
       html: computed(
         () =>
-          `<div class='text-14px opacity-50'>${store.prevMode}</div><div class='text-16px'>${store.modesCycler.state.name}</div><div class='text-14px opacity-50'>${store.nextMode}</div>`
+          `<div class='text-14px opacity-50'>${store.prevYoloModel}</div><div class='text-16px'>${store.yoloModelCycler.state.id}</div><div class='text-14px opacity-50'>${store.nextYoloModel}</div>`
       ),
-      cycler: useCycleList(["Change Mode"]),
-      modes: ["All"],
+      cycler: useCycleList(["Change YOLO model"]),
+      modes: ["All", "Dev", "Testing"],
     },
   ],
   [
@@ -1571,7 +1603,7 @@ const pages = [
         "Haptic grid medium",
         "Haptic grid far",
       ]),
-      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Exhibition"],
     },
     {
       name: "Haptic grid far",
@@ -1583,23 +1615,7 @@ const pages = [
         "Haptic grid medium",
         "Haptic grid near",
       ]),
-      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
-    },
-    {
-      name: "Stalefish 180",
-      clickFunction: click_stalefish180,
-      imgSrc: "/icons/stalefish.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_throughTurnAndBack.mp3",
-      cycler: useCycleList(["Stalefish 180"]),
-      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
-    },
-    {
-      name: "Raw Intersections",
-      clickFunction: sendRawIntersections,
-      html: "Send scan results to other device",
-      explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
-      cycler: useCycleList(["Raw Intersections"]),
-      modes: ["All", "Dev", "Testing", "Referee"],
+      modes: ["All", "Dev", "Testing", "Exhibition"],
     },
   ],
 ];

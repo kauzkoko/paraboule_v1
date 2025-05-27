@@ -1,0 +1,69 @@
+<svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 75H10H20M150 75H140H130" stroke="#FF0000" stroke-width="3"/>
+<path d="M10 113L18.6603 108M139.904 38L131.244 43" stroke="#FF0000" stroke-width="3"/>
+<path d="M10 38L18.6603 43M139.904 113L131.244 108" stroke="#FF0000" stroke-width="3"/>
+<path d="M37 139.904L42 131.244M112 10L107 18.6603" stroke="#FF0000" stroke-width="3"/>
+<path d="M37 10L42 18.6603M112 139.904L107 131.244" stroke="#FF0000" stroke-width="3"/>
+<path d="M75 150V140V130M75 0V10V20" stroke="#FF0000" stroke-width="3"/>
+<line x1="28.6538" y1="29.703" x2="51.6124" y2="23.5512" stroke="#FF0000" stroke-width="3"/>
+<line x1="28.6118" y1="54.3387" x2="51.5704" y2="48.187" stroke="#FF0000" stroke-width="3"/>
+<line x1="28.6118" y1="42.0052" x2="51.5704" y2="35.8535" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 51.959 37.335)" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 51.959 49.5728)" stroke="#FF0000" stroke-width="3"/>
+<line x1="51.6547" y1="29.703" x2="74.6134" y2="23.5512" stroke="#FF0000" stroke-width="3"/>
+<line x1="51.6127" y1="54.3387" x2="74.5714" y2="48.187" stroke="#FF0000" stroke-width="3"/>
+<line x1="51.6127" y1="42.0052" x2="74.5714" y2="35.8535" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 74.96 37.335)" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 74.96 49.5728)" stroke="#FF0000" stroke-width="3"/>
+<line x1="74.6547" y1="29.703" x2="97.6134" y2="23.5512" stroke="#FF0000" stroke-width="3"/>
+<line x1="74.6127" y1="54.3387" x2="97.5714" y2="48.187" stroke="#FF0000" stroke-width="3"/>
+<line x1="74.6127" y1="42.0052" x2="97.5714" y2="35.8535" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 97.96 37.335)" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 97.96 49.5728)" stroke="#FF0000" stroke-width="3"/>
+<line x1="28.6538" y1="64.4906" x2="51.6124" y2="58.3388" stroke="#FF0000" stroke-width="3"/>
+<line x1="28.6118" y1="89.1263" x2="51.5704" y2="82.9746" stroke="#FF0000" stroke-width="3"/>
+<line x1="28.6118" y1="76.7928" x2="51.5704" y2="70.6411" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 51.959 72.1226)" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 51.959 84.3604)" stroke="#FF0000" stroke-width="3"/>
+<line x1="51.6547" y1="64.4906" x2="74.6134" y2="58.3388" stroke="#FF0000" stroke-width="3"/>
+<line x1="51.6127" y1="89.1263" x2="74.5714" y2="82.9746" stroke="#FF0000" stroke-width="3"/>
+<line x1="51.6127" y1="76.7928" x2="74.5714" y2="70.6411" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 74.96 72.1226)" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 74.96 84.3604)" stroke="#FF0000" stroke-width="3"/>
+<line x1="74.6547" y1="64.4906" x2="97.6134" y2="58.3388" stroke="#FF0000" stroke-width="3"/>
+<line x1="74.6127" y1="89.1263" x2="97.5714" y2="82.9746" stroke="#FF0000" stroke-width="3"/>
+<line x1="74.6127" y1="76.7928" x2="97.5714" y2="70.6411" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 97.96 72.1226)" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 97.96 84.3604)" stroke="#FF0000" stroke-width="3"/>
+<line x1="28.6538" y1="99.2782" x2="51.6124" y2="93.1264" stroke="#FF0000" stroke-width="3"/>
+<line x1="28.6118" y1="123.914" x2="51.5704" y2="117.762" stroke="#FF0000" stroke-width="3"/>
+<line x1="28.6118" y1="111.58" x2="51.5704" y2="105.429" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 51.959 106.91)" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 51.959 119.148)" stroke="#FF0000" stroke-width="3"/>
+<line x1="51.6547" y1="99.2782" x2="74.6134" y2="93.1264" stroke="#FF0000" stroke-width="3"/>
+<line x1="51.6127" y1="123.914" x2="74.5714" y2="117.762" stroke="#FF0000" stroke-width="3"/>
+<line x1="51.6127" y1="111.58" x2="74.5714" y2="105.429" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 74.96 106.91)" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 74.96 119.148)" stroke="#FF0000" stroke-width="3"/>
+<line x1="74.6547" y1="99.2782" x2="97.6134" y2="93.1264" stroke="#FF0000" stroke-width="3"/>
+<line x1="74.6127" y1="123.914" x2="97.5714" y2="117.762" stroke="#FF0000" stroke-width="3"/>
+<line x1="74.6127" y1="111.58" x2="97.5714" y2="105.429" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 97.96 106.91)" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 97.96 119.148)" stroke="#FF0000" stroke-width="3"/>
+<line x1="97.6538" y1="29.703" x2="120.612" y2="23.5512" stroke="#FF0000" stroke-width="3"/>
+<line x1="97.6118" y1="54.3387" x2="120.57" y2="48.187" stroke="#FF0000" stroke-width="3"/>
+<line x1="97.6118" y1="42.0052" x2="120.57" y2="35.8535" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 120.959 37.335)" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 120.959 49.5728)" stroke="#FF0000" stroke-width="3"/>
+<line x1="97.6538" y1="64.4906" x2="120.612" y2="58.3388" stroke="#FF0000" stroke-width="3"/>
+<line x1="97.6118" y1="89.1263" x2="120.57" y2="82.9746" stroke="#FF0000" stroke-width="3"/>
+<line x1="97.6118" y1="76.7928" x2="120.57" y2="70.6411" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 120.959 72.1226)" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 120.959 84.3604)" stroke="#FF0000" stroke-width="3"/>
+<line x1="97.6538" y1="99.2782" x2="120.612" y2="93.1264" stroke="#FF0000" stroke-width="3"/>
+<line x1="97.6118" y1="123.914" x2="120.57" y2="117.762" stroke="#FF0000" stroke-width="3"/>
+<line x1="97.6118" y1="111.58" x2="120.57" y2="105.429" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 120.959 106.91)" stroke="#FF0000" stroke-width="3"/>
+<line y1="-1.5" x2="23.7686" y2="-1.5" transform="matrix(-0.965926 -0.258819 -0.258819 0.965926 120.959 119.148)" stroke="#FF0000" stroke-width="3"/>
+<circle cx="75" cy="75" r="23.5" stroke="#FF0000" stroke-width="3"/>
+</svg>

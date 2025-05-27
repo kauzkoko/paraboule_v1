@@ -499,7 +499,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   })
 
   const buttonTransition = ref(false);
-  const buttonTransitionIndex = ref(2);
+  const buttonTransitionIndex = ref(1);
 
   return {
     yoloModelCycler,

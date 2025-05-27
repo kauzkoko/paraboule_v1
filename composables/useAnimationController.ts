@@ -1,5 +1,6 @@
 export function useAnimationController() {
   const bus = useEventBus("protoboules");
+  const store = useProtoStore();
 
   const supabase = useSupabaseClient();
   let animationController = supabase.channel("animation-controller");
@@ -7,34 +8,34 @@ export function useAnimationController() {
 
   animationController
     .on("broadcast", { event: "flyToStart" }, (event) => {
-      flyToStart(false);
+      if (!store.modesCycler.state.name.includes("Exhibition")) flyToStart(false);
     })
     .on("broadcast", { event: "flyToCochonnetAndBack" }, (event) => {
-      flyToCochonnetAndBack(false);
+      if (!store.modesCycler.state.name.includes("Exhibition")) flyToCochonnetAndBack(false);
     })
     .on("broadcast", { event: "startCircularRotation" }, (event) => {
-      startCircularRotation(false);
+      if (!store.modesCycler.state.name.includes("Exhibition")) startCircularRotation(false);
     })
     .on("broadcast", { event: "stalefish180" }, (event) => {
-      stalefish180(false);
+      if (!store.modesCycler.state.name.includes("Exhibition")) stalefish180(false);
     })
     .on("broadcast", { event: "lookAlongNegativeXAxis" }, (event) => {
-      lookAlongNegativeXAxis(false);
+      if (!store.modesCycler.state.name.includes("Exhibition")) lookAlongNegativeXAxis(false);
     })
     .on("broadcast", { event: "lookAlongPositiveXAxis" }, (event) => {
-      lookAlongPositiveXAxis(false);
+      if (!store.modesCycler.state.name.includes("Exhibition")) lookAlongPositiveXAxis(false);
     })
     .on("broadcast", { event: "lookAlongPositiveZAxis" }, (event) => {
-      lookAlongPositiveZAxis(false);
+      if (!store.modesCycler.state.name.includes("Exhibition")) lookAlongPositiveZAxis(false);
     })
     .on("broadcast", { event: "lookAlongNegativeZAxis" }, (event) => {
-      lookAlongNegativeZAxis(false);
+      if (!store.modesCycler.state.name.includes("Exhibition")) lookAlongNegativeZAxis(false);
     })
     .on("broadcast", { event: "flyToCochonnet" }, (event) => {
-      flyToCochonnet(false);
+      if (!store.modesCycler.state.name.includes("Exhibition")) flyToCochonnet(false);
     })
     .on("broadcast", { event: "toggleTopCamera" }, (event) => {
-      toggleTopCamera({ broadcast: false, height: event.payload.height ?? 80 });
+      if (!store.modesCycler.state.name.includes("Exhibition")) toggleTopCamera({ broadcast: false, height: event.payload.height ?? 80 });
     })
     .on("broadcast", { event: "playFilm" }, (event) => {
       playFilm(false);

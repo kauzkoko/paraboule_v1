@@ -2,7 +2,7 @@ import { Howler } from "howler";
 
 export function useSoundComposable(soundSrc: string, duration = 0) {
   const store = useProtoStore();
-  const sound = useSound(soundSrc, { interrupt: true });
+  const sound = useSound(soundSrc, { interrupt: true, html5: true });
 
   const play = () => {
     Howler.stop();

@@ -10,23 +10,29 @@ export function useAssistantController() {
   assistantController.subscribe();
 
   assistantController.on("broadcast", { event: "toggle3dAudio" }, (event) => {
-    Howler.stop();
-    store.toggle3dAudio();
-    window.speechSynthesis.cancel();
+    if (!store.modesCycler.state.name.includes("Exhibition")) {
+      Howler.stop();
+      store.toggle3dAudio();
+      window.speechSynthesis.cancel();
+    }
   });
 
   assistantController.on("broadcast", { event: "mute" }, (event) => {
-    console.log("mute");
-    Howler.stop();
-    store.mute3dAudio();
-    window.speechSynthesis.cancel();
+    if (!store.modesCycler.state.name.includes("Exhibition")) {
+      console.log("mute");
+      Howler.stop();
+      store.mute3dAudio();
+      window.speechSynthesis.cancel();
+    }
   });
 
   assistantController.on("broadcast", { event: "unmute" }, (event) => {
-    console.log("unmute");
-    Howler.stop();
-    store.unmute3dAudio();
-    window.speechSynthesis.cancel();
+    if (!store.modesCycler.state.name.includes("Exhibition")) {
+      console.log("unmute");
+      Howler.stop();
+      store.unmute3dAudio();
+      window.speechSynthesis.cancel();
+    }
   });
 
   function sendMute(broadcast = true) {

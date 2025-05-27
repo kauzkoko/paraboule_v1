@@ -34,7 +34,7 @@
                 </div>
                 <div v-if="store.infoStepper.isCurrent('functions')" class="mt--10px!">
                     <Dot class="mix-blend-difference" />
-                    <p class="mt--5px! mb-10px!">TAP once to activate the function..</p>
+                    <p class="mt--5px! mb-10px!">TAP once to activate the function.</p>
                     <LongPress class="mix-blend-difference" />
                     <p class="mt--5px! mb-10px!">PRESS and HOLD to hear an explanation of the function. RELEASE to stop.
                     </p>
@@ -73,7 +73,7 @@
     box-shadow: 0px 0px 20px 3px #F00 inset;
     z-index: 1000;
     pointer-events: auto;
-    background: linear-gradient(180deg, #F00 0%, #900 100%);
+    background: linear-gradient(180deg, #F00 0%, rgb(84, 0, 0) 100%);
     /* border: var(--border-width) solid var(--white); */
     mix-blend-mode: difference;
     color: black;
@@ -204,7 +204,7 @@
 <script setup lang="ts">
 const store = useProtoStore();
 
-const infoButton = ref(false);
+const infoButton = ref(true);
 const infoButtonGlow = ref(false);
 
 setInterval(() => {
@@ -218,7 +218,7 @@ let counter = 0;
 setInterval(() => {
     if (store.infoStepper.isCurrent('functions')) {
         store.buttonTransition = !store.buttonTransition;
-        if (counter % 3 === 0) store.buttonTransitionIndex = store.buttonTransition ? 0 : 1;
+        if (counter % 3 === 1) store.buttonTransitionIndex = store.buttonTransition ? 1 : 0;
         counter++;
     }
 }, 3000);

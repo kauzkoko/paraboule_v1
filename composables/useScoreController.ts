@@ -8,31 +8,41 @@ export function useScoreController() {
   scoreController.subscribe();
 
   scoreController.on("broadcast", { event: "score" }, (event) => {
-    store.players.player1.score = event.payload.player1Score;
-    store.players.player2.score = event.payload.player2Score;
+    if (!store.modesCycler.state.name.includes("Exhibition")) {
+      store.players.player1.score = event.payload.player1Score;
+      store.players.player2.score = event.payload.player2Score;
+    }
   });
 
   scoreController.on("broadcast", { event: "shotsTaken" }, (event) => {
-    store.globalShotsTaken = event.payload.globalShotsTaken;
-    store.players.player1.shotsTaken = event.payload.player1ShotsTaken;
-    store.players.player2.shotsTaken = event.payload.player2ShotsTaken;
+    if (!store.modesCycler.state.name.includes("Exhibition")) {
+      store.globalShotsTaken = event.payload.globalShotsTaken;
+      store.players.player1.shotsTaken = event.payload.player1ShotsTaken;
+      store.players.player2.shotsTaken = event.payload.player2ShotsTaken;
+    }
   });
 
   scoreController.on("broadcast", { event: "globalShotsTaken" }, (event) => {
-    store.globalShotsTaken = event.payload.globalShotsTaken;
+    if (!store.modesCycler.state.name.includes("Exhibition")) {
+      store.globalShotsTaken = event.payload.globalShotsTaken;
+    }
   });
 
   scoreController.on("broadcast", { event: "playersShotsTaken" }, (event) => {
-    store.players.player1.shotsTaken = event.payload.player1ShotsTaken;
-    store.players.player2.shotsTaken = event.payload.player2ShotsTaken;
+    if (!store.modesCycler.state.name.includes("Exhibition")) {
+      store.players.player1.shotsTaken = event.payload.player1ShotsTaken;
+      store.players.player2.shotsTaken = event.payload.player2ShotsTaken;
+    }
   });
 
   scoreController.on("broadcast", { event: "allData" }, (event) => {
-    store.players.player1.score = event.payload.player1Score;
-    store.players.player2.score = event.payload.player2Score;
-    store.globalShotsTaken = event.payload.globalShotsTaken;
-    store.players.player1.shotsTaken = event.payload.player1ShotsTaken;
-    store.players.player2.shotsTaken = event.payload.player2ShotsTaken;
+    if (!store.modesCycler.state.name.includes("Exhibition")) {
+      store.players.player1.score = event.payload.player1Score;
+      store.players.player2.score = event.payload.player2Score;
+      store.globalShotsTaken = event.payload.globalShotsTaken;
+      store.players.player1.shotsTaken = event.payload.player1ShotsTaken;
+      store.players.player2.shotsTaken = event.payload.player2ShotsTaken;
+    }
   });
 
   function sendShotsTaken(broadcast = true) {

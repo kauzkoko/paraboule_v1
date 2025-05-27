@@ -8,8 +8,10 @@ export function useScanController() {
   scanController.subscribe();
 
   scanController.on("broadcast", { event: "reverseField" }, (event) => {
-    console.log("reverseField", event.payload.reverseField);
-    store.reverseField = event.payload.reverseField;
+    if (!store.modesCycler.state.name.includes("Exhibition")) {
+      console.log("reverseField", event.payload.reverseField);
+      store.reverseField = event.payload.reverseField;
+    }
   });
 
   function sendReverseField(broadcast = true) {
