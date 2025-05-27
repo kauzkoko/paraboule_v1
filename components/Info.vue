@@ -41,12 +41,14 @@
                 </div>
             </div>
             <div v-if="!store.infoStepper.isCurrent('welcome')"
-                class="fixed z-1000 bottom-106px left-50dvw transform translate-x--50% flex justify-center">
-                <div class="info-next " @click="store.infoStepper.isLast ? close() : store.infoStepper.goToNext()">{{
-                    store.infoStepper.isLast ? 'START' : 'NEXT' }}</div>
+                class="fixed z-1000 bottom-28px left-50dvw transform translate-x--50% flex justify-center">
+                <div class="info-next" :class="{ 'color-white!': !store.infoStepper.isCurrent('welcome') }"
+                    @click="store.infoStepper.isLast ? close() : store.infoStepper.goToNext()">{{
+                        store.infoStepper.isLast ? 'START' : 'NEXT' }}</div>
             </div>
         </div>
-        <div v-if="!infoButton && !store.infoStepper.isCurrent('welcome')" class="fixed z-1000 top-18px left-50dvw transform translate-x--50% flex justify-center">
+        <div v-if="!infoButton && !store.infoStepper.isCurrent('welcome')"
+            class="fixed z-1000 top-28px left-50dvw transform translate-x--50% flex justify-center">
             <div class="info-close" @click="close()">CLOSE</div>
         </div>
 
@@ -101,7 +103,7 @@
     align-items: center;
     justify-content: center;
 
-    overflow: hidden;
+    /* overflow: hidden; */
     z-index: 1000;
     mix-blend-mode: exclusion;
 }
@@ -114,6 +116,7 @@
     border-width: 3px;
     font-weight: 500;
     width: fit-content;
+    /* color: var(--white); */
 }
 
 
@@ -210,6 +213,15 @@ setInterval(() => {
         infoButtonGlow.value = !infoButtonGlow.value;
     }, 2000);
 }, 5000);
+
+let counter = 0;
+setInterval(() => {
+    if (store.infoStepper.isCurrent('functions')) {
+        store.buttonTransition = !store.buttonTransition;
+        if (counter % 3 === 0) store.buttonTransitionIndex = store.buttonTransition ? 0 : 1;
+        counter++;
+    }
+}, 3000);
 
 // goTo('functions');
 const close = () => {

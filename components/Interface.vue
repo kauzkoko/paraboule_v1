@@ -65,7 +65,7 @@
                 ? 0.5
                 : 1
               : 1,
-            boxShadow: touchedIndex === index || (store.infoStepper.isCurrent('functions') && index === 0) ? '0px 4px 38.4px 22px #616BFF inset, 6px 20px 119.6px 52px #FFF inset' : 'none',
+            boxShadow: touchedIndex === index || (store.infoStepper.isCurrent('functions') && index === store.buttonTransitionIndex && store.buttonTransition) ? '0px 4px 38.4px 22px #616BFF inset, 6px 20px 119.6px 52px #FFF inset' : 'none',
           }">
           <div class="absolute text-[var(--border-color)] text-14px font-bold px-7px py-4px" :class="{
             'top-0 left-0': index === 0,
@@ -100,7 +100,7 @@
               ? 'all 500ms'
               : 'all 500ms',
           boxShadow: touchedIndex === 'pageAnnouncer' || store.infoStepper.isCurrent('center-circle') ? '0px 0px 50px 50px var(--border-color) inset' : 'none',
-          border: touchedIndex === 'pageAnnouncer' || !infoButton ? 'solid 10px black' : 'solid 10px black',
+          border: touchedIndex === 'pageAnnouncer' ? 'solid 10px black' : 'solid 10px black',
 
         }">
         <div class="text-[var(--border-color)] text-38px aspect-1" :style="{
