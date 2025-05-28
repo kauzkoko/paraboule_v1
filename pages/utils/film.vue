@@ -12,7 +12,7 @@ const { playing, currentTime, duration, volume } = useMediaControls(video, {
 
 const {
     shootFilmBoule
-} = useAnimationController();
+} = useExhibitionController();
 
 const bus = useEventBus("protoboules");
 
@@ -48,6 +48,11 @@ watch(currentTime, (newTime) => {
 
 onMounted(() => {
     currentTime.value = 60
+})
+
+onKeyStroke(' ', () => {
+    playing.value = !playing.value
+    console.log('space')
 })
 </script>
 

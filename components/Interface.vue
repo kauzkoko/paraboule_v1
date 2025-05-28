@@ -512,25 +512,35 @@ const isNextRound = computed(() => {
 
 const computedAnnounceBallsPlayedHtml = computed(() => {
   return isNextRound.value
-    ? `<div class='text-40px'>
-            <div>Next round?</div>
+    ? `<div class='text-23px'>
+            <div>Round over. Tap any + below to start new round.</div>
         </div>`
     : `
-        <div class='text-48px'>
+        <div class='text-36px'>
           <div>${store.players.player1.shotsTaken} / 3</div><br />
-          <div class='h-3px bg-hex-ff0000 w-100%'></div><br/>
+          <div class='h-3px bg-hex-ff0000 w-100% my--30px!'></div><br/>
           <div>${store.players.player2.shotsTaken} / 3</div>
         </div>`;
 });
 
+const gameOver = computed(() => {
+  return store.players.player1.score >= 13 || store.players.player2.score >= 13;
+});
+
 const computedScoreStandingsHtml = computed(() => {
+  if (store.gameOver) {
+    return `
+        <div class='text-23px'>Team ${store.previousWinner} wins ${store.previousWinnerScore} / ${store.previousLoserScore}. Tap any + below to restart.</div>
+      </div>`;
+  }
   return `
-    <div class='text-48px word-break-none'>
+    <div class='text-36px word-break-none'>
       <div class='whitespace-nowrap'>${store.players.player1.score} / 13</div><br />
-      <div class='h-3px bg-hex-ff0000 w-100%'></div><br/>
+      <div class='h-3px bg-hex-ff0000 w-100% my--30px!'></div><br/>
       <div>${store.players.player2.score} / 13</div>
     </div>`;
 });
+
 const text = ref("");
 const announceBallsPlayed = () => {
   console.log("announceBallsPlayed");
@@ -539,7 +549,7 @@ const announceBallsPlayed = () => {
     }. `;
   if (isNextRound.value) {
     text.value +=
-      "Current round is over. Please start a new round by pressing the plus button.";
+      "Current round is over. Start new round by pressing any plus button below.";
   }
   speak(text.value);
 };
@@ -826,7 +836,7 @@ const pages = [
       imgSrc: "/icons/hoolahoop.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_hoolaPinger.mp3",
       cycler: useCycleList(["Ping Startpoint", "Ping Cochonnet"]),
-      modes: ["All", "Dev", "Testing", "Player", "S2", "S1", "S3", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Player", "S2", "S1", "Exhibition"],
     },
   ],
   [
@@ -1068,7 +1078,7 @@ const pages = [
       },
       html: "Toggle Sky",
       cycler: useCycleList(["Toggle Sky"]),
-      modes: ["All", "Dev", "Testing", "Exhibition", "S1", "S2", "S3"],
+      modes: ["All", "Dev", "Testing", "Exhibition", "S1", "S2"],
     },
     {
       name: "Exhibition Mode",
@@ -1081,7 +1091,7 @@ const pages = [
       },
       html: "Activate Exhibition Mode",
       cycler: useCycleList(["Exhibition Mode"]),
-      modes: ["All", "Dev", "Testing", "Referee", "S1", "S2", "S3"],
+      modes: ["All", "Dev", "Testing", "Referee", "S1", "S2"],
     },
   ],
   [
@@ -1253,11 +1263,11 @@ const pages = [
   ],
   [
     {
-      name: "Announce Balls Played",
+      name: "Boules Thrown (Round)",
       clickFunction: announceBallsPlayed,
       explanationSrc: "/sounds/elevenlabs/explanation_ballsShotAnnouncer.mp3",
       html: computedAnnounceBallsPlayedHtml,
-      cycler: useCycleList(["Announce Balls Played", "Rewind"]),
+      cycler: useCycleList(["Boules Thrown (Round)"]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
     {
@@ -1265,70 +1275,71 @@ const pages = [
       clickFunction: rewind,
       imgSrc: "/icons/rewind.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
-      cycler: useCycleList(["Rewind", "Announce Balls Played"]),
+      cycler: useCycleList(["Rewind"]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
     {
-      name: "Player 1 Shot Incrementer",
+      name: "Team 1 Shot Incrementer",
       clickFunction: incrementPlayer1,
       imgSrc: "/icons/plus.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
       cycler: useCycleList([
-        "Player 1 Shot Incrementer",
-        "Player 2 Shot Incrementer",
-        "Increment shots taken",
+        "Team 1 Shot Incrementer",
       ]),
       modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
     },
     {
-      name: "Player 2 Shot Incrementer",
+      name: "Team 2 Shot Incrementer",
       clickFunction: incrementPlayer2,
       imgSrc: "/icons/plus.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
       cycler: useCycleList([
-        "Player 2 Shot Incrementer",
-        "Player 1 Shot Incrementer",
+        "Team 2 Shot Incrementer",
       ]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
   ],
   [
     {
-      name: "Score Standings",
+      name: "Total Score (Game)",
       clickFunction: scoreStandings,
       html: computedScoreStandingsHtml,
       explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
       cycler: useCycleList([
-        "Score Standings",
-        "Increment shots taken",
-        "Scan and count points",
-        "Set points from latest scan",
-        "Player 1 Score Incrementer",
-        "Player 2 Score Incrementer",
+        "Total Score (Game)",
       ]),
       modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
     },
     {
-      name: "Player 1 Score Incrementer",
+      name: "50 / 50 Coin Flip",
+      clickFunction: tossCoin,
+      imgSrc: coinImgSrc,
+      // html: "Toss a coin and get heads or tails",
+      explanationSrc: "/sounds/elevenlabs/explanation_tossCoin.mp3",
+      cycler: useCycleList(["50 / 50 Coin Flip"]),
+      modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
+    },
+    {
+      name: "Increment Team 1 Score",
       clickFunction: store.incrementPlayer1score,
       imgSrc: "/icons/plus.svg",
-      html: "Player 1 Score Incrementer",
+      html: "Increment Team 1 Score",
       // explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
       cycler: useCycleList([
-        "Player 1 Score Incrementer",
-        "Player 2 Score Incrementer",
+        "Increment Team 1 Score",
+        "Increment Team 2 Score",
       ]),
       modes: ["All", "Dev", "Testing", "Solo", "S3", "Exhibition"],
     },
     {
-      name: "Player 2 Score Incrementer",
+      name: "Increment Team 2 Score",
       clickFunction: store.incrementPlayer2score,
       imgSrc: "/icons/plus.svg",
-      html: "Player 2 Score Incrementer",
+      html: "Increment Team 2 Score",
       // explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
       cycler: useCycleList([
-        "Player 2 Score Incrementer",
-        "Player 1 Score Incrementer",
+        "Increment Team 2 Score",
+        "Increment Team 1 Score",
       ]),
       modes: ["All", "Dev", "Testing", "Solo", "S3", "Exhibition"],
     },
@@ -1370,17 +1381,6 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_uniqueQr.mp3",
       cycler: useCycleList(["Unique QR", "Scan QR"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
-    },
-  ],
-  [
-    {
-      name: "Toss Coin",
-      clickFunction: tossCoin,
-      imgSrc: coinImgSrc,
-      // html: "Toss a coin and get heads or tails",
-      explanationSrc: "/sounds/elevenlabs/explanation_tossCoin.mp3",
-      cycler: useCycleList(["Toss Coin"]),
-      modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
   ],
   [
@@ -1535,7 +1535,7 @@ const pages = [
       },
       html: "Prediction Visualiser",
       cycler: useCycleList(["Prediction Visualiser"]),
-      modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Referee", "Exhibition"],
     },
     {
       name: "Change YOLO model",
@@ -1584,6 +1584,21 @@ const pages = [
       modes: ["All"],
     },
   ],
+  [
+    {
+      name: "Exhibition Mode",
+      clickFunction: () => {
+        const findExhibitionModeIndex = modesList.findIndex(
+          (mode) => mode.name === "Exhibition"
+        );
+        store.modesCycler.go(findExhibitionModeIndex);
+        speak("Exhibition mode activated");
+      },
+      html: "Activate Exhibition Mode",
+      cycler: useCycleList(["Exhibition Mode"]),
+      modes: ["All", "Dev", "Testing", "Referee", "S3"],
+    },
+  ]
 ];
 
 const flatPages = pages.flat();

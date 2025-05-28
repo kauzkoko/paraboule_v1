@@ -27,7 +27,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const bus = useEventBus("protoboules");
 
   const modesCycler = useCycleList(modesList);
-  const initIndex = modesList.findIndex((mode) => mode.name === "S1");
+  const initIndex = modesList.findIndex((mode) => mode.name === "S3");
   modesCycler.go(initIndex);
 
   const prevMode = computed(() => {
@@ -81,15 +81,38 @@ export const useProtoStore = defineStore("protoStore", () => {
     },
   });
 
+  const previousWinner = ref("1");
+  const previousWinnerScore = ref(0);
+  const previousLoserScore = ref(0);
+  const gameOver = ref(false);
   const incrementPlayer1score = () => {
+    if (gameOver.value) gameOver.value = false;
     players.value.player1.score++;
     sendNewScore();
+    if (players.value.player1.score === 13) {
+      resetGame();
+    }
   };
 
   const incrementPlayer2score = () => {
+    if (gameOver.value) gameOver.value = false;
     players.value.player2.score++;
-    sendNewScore();
+    if (players.value.player2.score === 13) {
+      resetGame();
+    }
   };
+
+  const resetGame = () => {
+    gameOver.value = true;
+    previousWinner.value = players.value.player2.score > players.value.player1.score ? "2" : "1";
+    previousWinnerScore.value = players.value.player2.score > players.value.player1.score ? players.value.player2.score : players.value.player1.score;
+    previousLoserScore.value = players.value.player2.score > players.value.player1.score ? players.value.player1.score : players.value.player2.score;
+    players.value.player1.shotsTaken = 0;
+    players.value.player2.shotsTaken = 0;
+    players.value.player1.score = 0;
+    players.value.player2.score = 0;
+    sendNewScore();
+  }
 
   const incrementPlayer1shotsTaken = () => {
     if (
@@ -583,6 +606,10 @@ export const useProtoStore = defineStore("protoStore", () => {
     buttonTransition,
     buttonTransitionIndex,
     infoScreen,
+    gameOver,
+    previousWinnerScore,
+    previousLoserScore,
+    previousWinner,
   };
 });
 
