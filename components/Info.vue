@@ -6,7 +6,7 @@
                 @click="toggleInfoScreen">
                 <div class="text-48px text-white mt--10px">i</div>
             </div>
-            <div class="inner-grid" v-show="store.infoScreen">
+            <div class="inner-grid text-black!" v-show="store.infoScreen">
                 <div class="upper-content">
                     <div>
                         <h1 v-html="store.infoStepper.current.title"></h1>
