@@ -1,35 +1,39 @@
 <template>
-    <div class="info-button" v-if="infoButton" @click="infoButton = false"
+    <div class="info-button" v-if="!store.infoScreen" @click="store.infoScreen = true"
         :class="{ 'info-button-glow': infoButtonGlow }">
         <h1>i</h1>
     </div>
-    <div v-else class="info-container" :class="{ 'pointer-events-none': infoButton }">
+    <div v-else class="info-container"
+        :class="{ 'pointer-events-none': !store.infoScreen }">
         <div class="info-large">
             <div class="upper-content">
                 <div>
                     <h1 v-html="store.infoStepper.current.title"></h1>
                     <img v-if="store.infoStepper.current.img" :src="store.infoStepper.current.img" />
+                    <p class="mt-10px!" v-html="store.infoStepper.current.subtitle"></p>
                 </div>
             </div>
             <div class="lower-content">
                 <div v-if="store.infoStepper.isCurrent('welcome')"
-                    class="mt--40px! flex justify-center flex-col items-center">
+                    class="mt--10px! flex justify-center flex-col items-center">
                     <div class="info-next mb-10px" @click="store.infoStepper.goToNext">NEXT</div>
                     <p>Tap NEXT to learn more on how<br> to use PARABOULE.</p>
                     <div class="info-close mb-10px mt-20px" @click="close()">CLOSE</div>
-                    <p class="color-hex-ff0000">Tap CLOSE to return to the game.</p>
+                    <p class="color-hex-ff0000">Tap CLOSE to return to the interface.</p>
 
                 </div>
-                <div v-if="store.infoStepper.isCurrent('center-circle')" class="mt-40px!">
-                    <Up />
-                    <p class="mt--5px! mb-10px!">Swipe up to mute/unmute audio.</p>
+                <div v-if="store.infoStepper.isCurrent('center-circle')" class="mt-0px!">
+                    <DoubleTap />
+                    <p class="mt--5px! mb-10px!">DOUBLE TAP to mute audio.</p>
+                    <Up class="mt--10px!" />
+                    <p class="mt--5px! mb-10px!">SWIPE UP to take on Cochonnet perspective.</p>
                     <p class="mb-10px!">
                         <Left class="transform translate-y-5px mr-10px" />
-                        <span>Swipe left and right</span>
+                        <span>SWIPE LEFT or RIGHT</span>
                         <Right class="transform translate-y-5px ml-10px" /><br>
                         to switch pages.
                     </p>
-                    <p class="mb--10px!">Swipe down to return to the start.</p>
+                    <p class="mb--10px!">SWIPE DOWN to return to start.</p>
                     <Down />
                 </div>
                 <div v-if="store.infoStepper.isCurrent('functions')" class="mt--10px!">
@@ -47,11 +51,10 @@
                         store.infoStepper.isLast ? 'START' : 'NEXT' }}</div>
             </div>
         </div>
-        <div v-if="!infoButton && !store.infoStepper.isCurrent('welcome')"
+        <div v-if="store.infoScreen && !store.infoStepper.isCurrent('welcome')"
             class="fixed z-1000 top-28px left-50dvw transform translate-x--50% flex justify-center">
             <div class="info-close" @click="close()">CLOSE</div>
         </div>
-
     </div>
 </template>
 <style scoped>
@@ -75,7 +78,6 @@
     pointer-events: auto;
     background: linear-gradient(180deg, #F00 0%, rgb(84, 0, 0) 100%);
     /* border: var(--border-width) solid var(--white); */
-    mix-blend-mode: difference;
     color: black;
     font-weight: bold;
     font-size: 2rem;
@@ -155,6 +157,14 @@
     box-shadow: 0px 4px 38.4px 22px #616BFF inset, 6px 20px 119.6px 52px #FFF inset;
     border: var(--border-width) solid var(--white);
 
+    p {
+        margin: 0;
+        padding: 0;
+        font-size: 24px;
+        font-weight: 500;
+        max-width: 90dvw;
+    }
+
     .upper-content {
         display: flex;
         flex-direction: column;
@@ -162,7 +172,7 @@
         justify-content: center;
 
         div {
-            margin-top: 112px;
+            /* margin-top: 112px; */
 
             h1 {
                 font-size: 36px;
@@ -189,22 +199,14 @@
         align-items: center;
         justify-content: center;
         overflow: hidden;
-
-        p {
-            margin: 0;
-            padding: 0;
-            font-size: 24px;
-            font-weight: 500;
-            max-width: 90dvw;
-        }
     }
 }
 </style>
 
 <script setup lang="ts">
+import 'animate.css';
 const store = useProtoStore();
 
-const infoButton = ref(true);
 const infoButtonGlow = ref(false);
 
 setInterval(() => {
@@ -214,18 +216,18 @@ setInterval(() => {
     }, 2000);
 }, 5000);
 
-let counter = 0;
+let counter = 3;
 setInterval(() => {
     if (store.infoStepper.isCurrent('functions')) {
         store.buttonTransition = !store.buttonTransition;
-        if (counter % 3 === 1) store.buttonTransitionIndex = store.buttonTransition ? 1 : 0;
-        counter++;
+        store.buttonTransitionIndex = counter % 4;
+        counter = counter + .5;
     }
 }, 3000);
 
-// goTo('functions');
+// store.infoStepper.goTo('functions');
 const close = () => {
-    infoButton.value = true;
+    store.infoScreen = false;
     store.infoStepper.goTo('welcome');
 }
 </script>

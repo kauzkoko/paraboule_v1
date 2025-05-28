@@ -486,20 +486,22 @@ export const useProtoStore = defineStore("protoStore", () => {
     'welcome': {
       title: 'Welcome to',
       img: '/icons/paraboule_black.svg',
-      text: 'Tap NEXT to learn more on how<br> to use PARABOULE.<br><br> Tap CLOSE to return to the game.',
-    },
-    'center-circle': {
-      title: 'Invisible<br> Center Circle',
-      // text: '<Up></Up>Swipe up to toggle audio.<br><br>Swipe left and right <br>to switch pages. <br><br>Swipe down to return to the start.',
+      subtitle: 'PARABOULE is an exploration<br> of spatial audio and object detection technology in Pétanque and built with accessibility in mind.',
     },
     'functions': {
       title: '2x2 Buttons',
-      // text: 'Use the buttons to run functions in the app. Tap and hold to listen to the explanation of the function. Tap once to run the function.',
+      subtitle: 'Each button triggers a function that either changes or clarifies the game situation. Tap and hold to hear what each one does (only when the info is closed).',
     },
+    'center-circle': {
+      title: 'Invisible<br> Center Circle',
+      subtitle: 'The invisible center circle is your main navigation tool in PARABOULE. To use it, perform gestures directly on its area. Note that 2X2 button gestures apply to the center circle as well.',
+    },
+
   })
 
   const buttonTransition = ref(false);
   const buttonTransitionIndex = ref(1);
+  const infoScreen = ref(false);
 
   return {
     yoloModelCycler,
@@ -580,6 +582,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     infoStepper,
     buttonTransition,
     buttonTransitionIndex,
+    infoScreen,
   };
 });
 

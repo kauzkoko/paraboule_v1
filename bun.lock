@@ -15,6 +15,7 @@
         "@vueuse/core": "^13.2.0",
         "@vueuse/integrations": "^13.2.0",
         "@vueuse/sound": "^2.1.3",
+        "animate.css": "^4.1.1",
         "animejs": "^4.0.2",
         "cloudflared": "^0.7.0",
         "gsap": "^3.13.0",
@@ -900,6 +901,8 @@
     "ajv-formats": ["ajv-formats@2.1.1", "", { "dependencies": { "ajv": "^8.0.0" } }, "sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA=="],
 
     "ajv-keywords": ["ajv-keywords@5.1.0", "", { "dependencies": { "fast-deep-equal": "^3.1.3" }, "peerDependencies": { "ajv": "^8.8.2" } }, "sha512-YCS/JNFAUyr5vAuhk1DWm1CBxRHW9LbJ2ozWeemrIqpbsqKjHVxYPyi5GC0rjZIT5JxJ3virVTS8wk4i/Z+krw=="],
+
+    "animate.css": ["animate.css@4.1.1", "", {}, "sha512-+mRmCTv6SbCmtYJCN4faJMNFVNN5EuCTTprDTAo7YzIGji2KADmakjVA3+8mVDkZ2Bf09vayB35lSQIex2+QaQ=="],
 
     "animejs": ["animejs@4.0.2", "", {}, "sha512-f0L/kSya2RF23iMSF/VO01pMmLwlAFoiQeNAvBXhEyLzIPd2/QTBRatwGUqkVCC6seaAJYzAkGir55N4SL+h3A=="],
 

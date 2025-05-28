@@ -53,9 +53,9 @@
     ">
     <div class="container">
       <template v-for="(item, index) in currentPage" :key="'grid-item-' + index">
-        <div :ref="refs.set" class="grid-item" :index="getIndex(item)" @touchend="onTouchEnd" v-show="getItem(item).name !== 'Placeholder'"
-          v-touch:swipe="(dir, e) => onSwipe(dir, e, index, item)" @click="onClick(item, index)"
-          @touchstart="onTouchStart(index)" :style="{
+        <div :ref="refs.set" class="grid-item" :index="getIndex(item)" @touchend="onTouchEnd"
+          v-show="getItem(item).name !== 'Placeholder'" v-touch:swipe="(dir, e) => onSwipe(dir, e, index, item)"
+          @click="onClick(item, index)" @touchstart="onTouchStart(index)" :style="{
             background:
               touchedIndex === index ? 'red' : 'transparent',
             transition:
@@ -75,7 +75,8 @@
           }">
             {{ getItem(item).name }}
           </div>
-          <div class="flex justify-center items-center w-full h-full children:w-70% children:h-70%">
+          <div class="flex justify-center items-center w-full h-full children:w-70% children:h-70% transition-opacity duration-1000"
+            :class="store.infoScreen ? 'opacity-0' : 'opacity-100'">
             <SvgIcon v-if="getItem(item).imgSrc && !getItem(item).imgSrc.value && getItem(item).imgSrc.includes('.svg')"
               :name="getIconName(getItem(item).imgSrc)" />
             <img
