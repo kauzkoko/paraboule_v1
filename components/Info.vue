@@ -1,6 +1,6 @@
 <template>
 
-    <div class="info-container">
+    <div class="info-container" :class="{ 'pointer-events-none': !store.infoScreen }">
         <div class="info-large" :class="{ 'info-button-glow': infoButtonGlow, 'info-button': !store.infoScreen }">
             <div v-if="!store.infoScreen" class="w-full h-full flex justify-center items-center"
                 @click="toggleInfoScreen">

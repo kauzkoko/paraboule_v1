@@ -486,11 +486,11 @@ export const useProtoStore = defineStore("protoStore", () => {
     'welcome': {
       title: 'Welcome to',
       img: '/icons/paraboule_black.svg',
-      subtitle: 'PARABOULE is an exploration<br> of spatial audio and object detection technology in Pétanque and built with accessibility in mind.',
+      subtitle: 'PARABOULE is an exploration<br> of spatial audio and object detection technology in Pétanque.<br> It is built with accessibility in mind.',
     },
     'functions': {
       title: '2x2 Buttons',
-      subtitle: 'Each button triggers a function that either changes or clarifies the game situation. Tap and hold to hear what each one does (only when the info is closed).',
+      subtitle: 'Each button triggers a function that either changes or helps clarify the game situation. PRESS and HOLD to hear what each button does (only when the info is closed).',
     },
     'center-circle': {
       title: 'Invisible<br> Center Circle',
