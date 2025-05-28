@@ -4,7 +4,7 @@
         <div class="info-large" :class="{ 'info-button-glow': infoButtonGlow, 'info-button': !store.infoScreen }">
             <div v-show="!store.infoScreen" class="w-full h-full flex justify-center items-center "
                 @click="toggleInfoScreen">
-                <div class="text-48px text-white mt--10px">i</div>
+                <div class="text-48px mt--10px">i</div>
             </div>
             <div class="inner-grid text-black!" v-show="store.infoScreen">
                 <div class="upper-content">

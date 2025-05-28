@@ -75,12 +75,13 @@
           }">
             {{ getItem(item).name }}
           </div>
-          <div class="flex justify-center items-center w-full h-full children:w-70% children:h-70% transition-opacity duration-1000"
+          <div
+            class="flex justify-center items-center w-full h-full children:w-70% children:h-70% transition-opacity duration-1000"
             :class="store.infoScreen ? 'opacity-0' : 'opacity-100'">
             <SvgIcon v-if="getItem(item).imgSrc && !getItem(item).imgSrc.value && getItem(item).imgSrc.includes('.svg')"
               :name="getIconName(getItem(item).imgSrc)" />
             <img
-              :class="getItem(item).imgSrc.value ?? getItem(item).imgSrc.startsWith('data') ? 'h-initial' : 'initial'"
+              :class="getItem(item).imgSrc.value ?? (getItem(item).imgSrc.startsWith('data') || getItem(item).imgSrc.includes('.png')) ? 'h-initial' : 'initial'"
               v-else-if="getItem(item).imgSrc" :src="getItem(item).imgSrc.value ?? getItem(item).imgSrc" />
             <div v-else-if="getItem(item).html"
               class="text-[var(--border-color)] text-24px font-bold text-center flexCenter max-w-80%">
@@ -747,12 +748,13 @@ const pages = [
       modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo", "S1", "Exhibition"],
     },
     {
-      name: "Ping Cochonnet",
-      clickFunction: click_pingCochonnet,
-      imgSrc: "/icons/cocho.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_pingCocho.mp3",
-      cycler: useCycleList(["Ping Cochonnet", "Ping Startpoint"]),
-      modes: ["All", "Dev", "Testing", "Player", "Solo", "S1", "Exhibition"],
+      name: "Slider",
+      clickFunction: click_slider,
+      imgSrc: "/icons/slider.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_slider.mp3",
+      html: "Slider",
+      cycler: useCycleList(["Slider"]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
       name: "Fly to Cochonnet",
@@ -764,31 +766,18 @@ const pages = [
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
-      name: "Slider",
-      clickFunction: click_slider,
-      imgSrc: "/icons/slider.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_slider.mp3",
-      html: "Slider",
-      cycler: useCycleList(["Slider"]),
+      name: "Fly to Startpoint",
+      clickFunction: () => {
+        console.log("fly to startpoint");
+      },
+      imgSrc: "/icons/flyToStart.svg",
+      // explanationSrc: "/sounds/elevenlabs/explanation_flyOnTheStartpoint.mp3",
+      html: "Fly to Startpoint",
+      cycler: useCycleList(["Fly to Startpoint"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
   ],
   [
-    {
-      name: "Scan Field",
-      deactivated: computed(() => !store.arSupported),
-      clickFunction: scanCamera,
-      imgSrc: "/icons/scanCamera.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_scanField.mp3",
-      cycler: useCycleList([
-        "Scan Field",
-        "Toggle Top Camera Slider",
-        "Scan and count points",
-        "Set points from latest scan",
-        "Increment shots taken",
-      ]),
-      modes: ["All", "Dev", "Testing", "Solo", "Referee", "Player"],
-    },
     {
       name: "Ping Startpoint",
       clickFunction: pingShoes,
@@ -798,37 +787,12 @@ const pages = [
       modes: ["All", "Dev", "Testing", "Player", "S2", "S1", "S3", "Exhibition"],
     },
     {
-      name: "Toggle Boule Focuser",
-      deactivated: computed(() => store.boulesCount < 1),
-      clickFunction: () => {
-        const currentBouleFocuserFunction = flatPages.find(
-          (item) => item.name === store.bouleFocuserCycler.state
-        );
-        currentBouleFocuserFunction.clickFunction();
-        if (store.bouleFocuserCycler.index === store.boulesCount) {
-          store.bouleFocuserCycler.go(0);
-        } else {
-          store.bouleFocuserCycler.next();
-        }
-      },
-      imgSrc: "/icons/quickFocusserFull.svg",
-      html: "Toggle Boule Focuser",
-      explanationSrc: "/sounds/elevenlabs/explanation_toggleBouleFocuser.mp3",
-      cycler: useCycleList(["Toggle Boule Focuser"]),
-      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
-    },
-    {
-      name: "Haptic grid medium",
-      clickFunction: click_hapticGridMedium,
-      html: "Haptic grid medium",
-      imgSrc: "/icons/hapticGridMedium.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
-      cycler: useCycleList([
-        "Haptic grid medium",
-        "Haptic grid near",
-        "Haptic grid far",
-      ]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
+      name: "Ping Cochonnet",
+      clickFunction: click_pingCochonnet,
+      imgSrc: "/icons/cocho.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_pingCocho.mp3",
+      cycler: useCycleList(["Ping Cochonnet", "Ping Startpoint"]),
+      modes: ["All", "Dev", "Testing", "Player", "Solo", "S1", "Exhibition"],
     },
     {
       name: "Toggle Lookalong",
@@ -846,45 +810,47 @@ const pages = [
       cycler: useCycleList(["Toggle Lookalong"]),
       modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
+    {
+      name: "Haptic grid medium",
+      clickFunction: click_hapticGridMedium,
+      html: "Haptic grid medium",
+      imgSrc: "/icons/hapticGridMedium.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      cycler: useCycleList([
+        "Haptic grid medium",
+        "Haptic grid near",
+        "Haptic grid far",
+      ]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
+    },
+
   ],
   [
     {
-      name: "Quick Focuser",
+      name: "Toggle Boule Focuser",
+      deactivated: computed(() => store.boulesCount < 1),
       clickFunction: () => {
-        if (store.volume === 0) {
-          store.volume = 1;
-          let timeout = 2000;
-          const prevSelectedBoules = store.selectedBoules;
-          const amountOfBoulesToDisplay = store.boulesToDisplay.length;
-          for (let i = 0; i < amountOfBoulesToDisplay; i++) {
-            setTimeout(() => {
-              store.focusBoules(i);
-            }, i * timeout);
-            if (i === amountOfBoulesToDisplay - 1) {
-              setTimeout(() => {
-                if (prevSelectedBoules.length > 1) {
-                  click_bouleFocuser("all");
-                } else if (prevSelectedBoules.length === 1) {
-                  click_bouleFocuser(prevSelectedBoules[0]);
-                } else {
-                  console.log("no boules were selected");
-                }
-                store.volume = 0;
-              }, i * timeout + timeout);
-            }
-          }
+        const currentBouleFocuserFunction = flatPages.find(
+          (item) => item.name === store.bouleFocuserCycler.state
+        );
+        currentBouleFocuserFunction.clickFunction();
+        if (store.bouleFocuserCycler.index === store.boulesCount) {
+          store.bouleFocuserCycler.go(0);
+        } else {
+          store.bouleFocuserCycler.next();
         }
       },
-      imgSrc: "/icons/focusLoopGross.svg",
-      html: "Quick Focuser",
-      cycler: useCycleList(["Quick Focuser"]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
+      imgSrc: "/icons/focusTogglerBlur.png",
+      html: "Toggle Boule Focuser",
+      explanationSrc: "/sounds/elevenlabs/explanation_toggleBouleFocuser.mp3",
+      cycler: useCycleList(["Toggle Boule Focuser"]),
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
     {
       name: "Focus All Boules",
       deactivated: computed(() => store.boulesCount < 1),
       clickFunction: () => click_bouleFocuser("all"),
-      imgSrc: "/icons/focusAll.svg",
+      imgSrc: "/icons/test.png",
       html: "Focus all Boules",
       cycler: useCycleList([
         "Focus All Boules",
@@ -908,7 +874,7 @@ const pages = [
         store.selectedBoules = blueBoules;
         store.volumePulse++;
       },
-      imgSrc: "/icons/focusBlue.svg",
+      imgSrc: "/icons/focusBlueBlur.png",
       html: "Focus Team Blue",
       cycler: useCycleList(["Focus Team Blue"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
@@ -923,7 +889,7 @@ const pages = [
         store.selectedBoules = redBoules;
         store.volumePulse++;
       },
-      imgSrc: "/icons/focusRed.svg",
+      imgSrc: "/icons/focusRedBlur.png",
       html: "Focus Team Red",
       cycler: useCycleList(["Focus Team Red"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
@@ -946,7 +912,7 @@ const pages = [
         "Focus Boule 5",
         "Focus Boule 6",
       ]),
-      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
     {
       name: "Focus Boule 1",
@@ -963,7 +929,7 @@ const pages = [
         "Focus Boule 6",
         "Focus All Boules",
       ]),
-      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
     {
       name: "Focus Boule 2",
@@ -979,7 +945,7 @@ const pages = [
         "Focus Boule 6",
         "Focus Boule 1",
       ]),
-      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
     {
       name: "Focus Boule 3",
@@ -994,7 +960,7 @@ const pages = [
         "Focus Boule 6",
         "Focus Boule 1",
       ]),
-      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
   ],
   [
@@ -1009,7 +975,7 @@ const pages = [
         "Look along 3 o'clock",
         "Look along 6 o'clock",
       ]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "Exhibition"],
     },
     {
       name: "Look along 3 o'clock",
@@ -1022,7 +988,7 @@ const pages = [
         "Look along 12 o'clock",
         "Look along 6 o'clock",
       ]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "Exhibition"],
     },
     {
       name: "Look along 9 o'clock",
@@ -1035,7 +1001,7 @@ const pages = [
         "Look along 12 o'clock",
         "Look along 6 o'clock",
       ]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "Exhibition"],
     },
     {
       name: "Look along 6 o'clock",
@@ -1048,17 +1014,16 @@ const pages = [
         "Look along 9 o'clock",
         "Look along 3 o'clock",
       ]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "Exhibition"],
     },
   ],
   [
     {
       name: "Pirate Radar",
       clickFunction: startCocho,
-      imgSrc: "/icons/around.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pirateRadar.mp3",
       cycler: useCycleList(["Pirate Radar", "Boomerang", "Stalefish 180"]),
-      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
     {
       name: "Boomerang",
@@ -1066,51 +1031,17 @@ const pages = [
       imgSrc: "/icons/boomerang1.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_boomerang.mp3",
       cycler: useCycleList(["Boomerang", "Pirate Radar"]),
-      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Exhibition"],
     },
     {
       name: "Stalefish 180",
       clickFunction: click_stalefish180,
-      imgSrc: "/icons/stalefish.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_throughTurnAndBack.mp3",
       cycler: useCycleList(["Stalefish 180"]),
-      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
-    },
-    {
-      name: "Placeholder",
-      clickFunction: () => { },
-      html: "Placeholder",
-      cycler: useCycleList(["Placeholder"]),
-      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Exhibition"],
     },
   ],
   [
-    {
-      name: "Change player 1 audio",
-      clickFunction: () => {
-        store.playSoundBySrc(store.currentSoundPlayer1);
-      },
-      html: computed(
-        () =>
-          `<div class='text-14px opacity-50'>${store.prevSoundPlayer1}</div><div class='text-16px'>${store.currentSoundPlayer1}</div><div class='text-14px opacity-50'>${store.nextSoundPlayer1}</div>`
-      ),
-      explanationSrc: "/sounds/elevenlabs/explanation_player1AudioCycler.mp3",
-      cycler: useCycleList(["Change player 1 audio"]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
-    },
-    {
-      name: "Change player 2 audio",
-      clickFunction: () => {
-        store.playSoundBySrc(store.currentSoundPlayer2);
-      },
-      html: computed(
-        () =>
-          `<div class='text-14px opacity-50'>${store.prevSoundPlayer2}</div><div class='text-16px'>${store.currentSoundPlayer2}</div><div class='text-14px opacity-50'>${store.nextSoundPlayer2}</div>`
-      ),
-      explanationSrc: "/sounds/elevenlabs/explanation_player2AudioCycler.mp3",
-      cycler: useCycleList(["Change player 2 audio"]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
-    },
     {
       name: "Toggle mute",
       clickFunction: click_toggleMute,
@@ -1124,25 +1055,7 @@ const pages = [
       html: "F5",
       explanationSrc: "/sounds/elevenlabs/explanation_pageRefresher.mp3",
       cycler: useCycleList(["Refresh page"]),
-      modes: ["All", "Dev", "Testing", "Exhibition"],
-    },
-  ],
-  [
-    {
-      name: "Show Stunden Orientation",
-      clickFunction: () => {
-        store.showStundenOrientation = !store.showStundenOrientation;
-      },
-      html: "Toggle watch orientation",
-      cycler: useCycleList(["Show Stunden Orientation"]),
-      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
-    },
-    {
-      name: "Toggle Top Camera Slider",
-      clickFunction: click_toggleTopCameraSlider,
-      html: "Toggle Top Camera Slider",
-      cycler: useCycleList(["Toggle Top Camera Slider"]),
-      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Exhibition", "S1"],
     },
     {
       name: "Toggle Sky",
@@ -1154,11 +1067,61 @@ const pages = [
       modes: ["All", "Dev", "Testing", "Exhibition", "S1", "S2", "S3"],
     },
     {
-      name: "Placeholder",
-      clickFunction: () => { },
-      html: "Placeholder",
-      cycler: useCycleList(["Placeholder"]),
-      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
+      name: "Exhibition Mode",
+      clickFunction: () => {
+        const findExhibitionModeIndex = modesList.findIndex(
+          (mode) => mode.name === "Exhibition"
+        );
+        store.modesCycler.go(findExhibitionModeIndex);
+        speak("Exhibition mode activated");
+      },
+      html: "Activate Exhibition Mode",
+      cycler: useCycleList(["Exhibition Mode"]),
+      modes: ["All", "Dev", "Testing", "Referee", "S1", "S2", "S3"],
+    },
+  ],
+  [
+    {
+      name: "Show Stunden Orientation",
+      clickFunction: () => {
+        store.showStundenOrientation = !store.showStundenOrientation;
+      },
+      html: "Toggle watch orientation",
+      cycler: useCycleList(["Show Stunden Orientation"]),
+      modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
+    },
+    {
+      name: "Toggle Top Camera Slider",
+      clickFunction: click_toggleTopCameraSlider,
+      html: "Toggle Top Camera Slider",
+      cycler: useCycleList(["Toggle Top Camera Slider"]),
+      modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
+    },
+    {
+      name: "Change player 1 audio",
+      clickFunction: () => {
+        store.playSoundBySrc(store.currentSoundPlayer1);
+      },
+      html: computed(
+        () =>
+          `<div class='text-14px opacity-50'>${store.prevSoundPlayer1}</div><div class='text-16px'>${store.currentSoundPlayer1}</div><div class='text-14px opacity-50'>${store.nextSoundPlayer1}</div>`
+      ),
+      explanationSrc: "/sounds/elevenlabs/explanation_player1AudioCycler.mp3",
+      cycler: useCycleList(["Change player 1 audio"]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "Exhibition"],
+    },
+    {
+      name: "Change player 2 audio",
+      clickFunction: () => {
+        store.playSoundBySrc(store.currentSoundPlayer2);
+      },
+      html: computed(
+        () =>
+          `<div class='text-14px opacity-50'>${store.prevSoundPlayer2}</div><div class='text-16px'>${store.currentSoundPlayer2}</div><div class='text-14px opacity-50'>${store.nextSoundPlayer2}</div>`
+      ),
+      explanationSrc: "/sounds/elevenlabs/explanation_player2AudioCycler.mp3",
+      cycler: useCycleList(["Change player 2 audio"]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "Exhibition"],
     },
   ],
   [
@@ -1211,29 +1174,39 @@ const pages = [
       modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
     {
-      name: "Placeholder",
-      clickFunction: () => { },
-      html: "Placeholder",
-      cycler: useCycleList(["Placeholder"]),
-      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
+      name: "Quick Focuser",
+      clickFunction: () => {
+        if (store.volume === 0) {
+          store.volume = 1;
+          let timeout = 2000;
+          const prevSelectedBoules = store.selectedBoules;
+          const amountOfBoulesToDisplay = store.boulesToDisplay.length;
+          for (let i = 0; i < amountOfBoulesToDisplay; i++) {
+            setTimeout(() => {
+              store.focusBoules(i);
+            }, i * timeout);
+            if (i === amountOfBoulesToDisplay - 1) {
+              setTimeout(() => {
+                if (prevSelectedBoules.length > 1) {
+                  click_bouleFocuser("all");
+                } else if (prevSelectedBoules.length === 1) {
+                  click_bouleFocuser(prevSelectedBoules[0]);
+                } else {
+                  console.log("no boules were selected");
+                }
+                store.volume = 0;
+              }, i * timeout + timeout);
+            }
+          }
+        }
+      },
+      imgSrc: "/icons/focusLoopGross.svg",
+      html: "Quick Focuser",
+      cycler: useCycleList(["Quick Focuser"]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "Exhibition"],
     },
   ],
   [
-    {
-      name: "Score Standings",
-      clickFunction: scoreStandings,
-      html: computedScoreStandingsHtml,
-      explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
-      cycler: useCycleList([
-        "Score Standings",
-        "Increment shots taken",
-        "Scan and count points",
-        "Set points from latest scan",
-        "Player 1 Score Incrementer",
-        "Player 2 Score Incrementer",
-      ]),
-      modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
-    },
     {
       name: "Scan and count points",
       clickFunction: scanForPoints,
@@ -1271,10 +1244,26 @@ const pages = [
           : "Reset shots taken"
       ),
       cycler: useCycleList(["Increment shots taken"]),
-      modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Referee", "Exhibition"],
     },
   ],
   [
+    {
+      name: "Announce Balls Played",
+      clickFunction: announceBallsPlayed,
+      explanationSrc: "/sounds/elevenlabs/explanation_ballsShotAnnouncer.mp3",
+      html: computedAnnounceBallsPlayedHtml,
+      cycler: useCycleList(["Announce Balls Played", "Rewind"]),
+      modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
+    },
+    {
+      name: "Rewind",
+      clickFunction: rewind,
+      imgSrc: "/icons/rewind.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
+      cycler: useCycleList(["Rewind", "Announce Balls Played"]),
+      modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
+    },
     {
       name: "Player 1 Shot Incrementer",
       clickFunction: incrementPlayer1,
@@ -1298,24 +1287,23 @@ const pages = [
       ]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
-    {
-      name: "Announce Balls Played",
-      clickFunction: announceBallsPlayed,
-      explanationSrc: "/sounds/elevenlabs/explanation_ballsShotAnnouncer.mp3",
-      html: computedAnnounceBallsPlayedHtml,
-      cycler: useCycleList(["Announce Balls Played", "Rewind"]),
-      modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
-    },
-    {
-      name: "Rewind",
-      clickFunction: rewind,
-      imgSrc: "/icons/rewind.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
-      cycler: useCycleList(["Rewind", "Announce Balls Played"]),
-      modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
-    },
   ],
   [
+    {
+      name: "Score Standings",
+      clickFunction: scoreStandings,
+      html: computedScoreStandingsHtml,
+      explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
+      cycler: useCycleList([
+        "Score Standings",
+        "Increment shots taken",
+        "Scan and count points",
+        "Set points from latest scan",
+        "Player 1 Score Incrementer",
+        "Player 2 Score Incrementer",
+      ]),
+      modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
+    },
     {
       name: "Player 1 Score Incrementer",
       clickFunction: store.incrementPlayer1score,
@@ -1390,27 +1378,6 @@ const pages = [
       cycler: useCycleList(["Toss Coin"]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
-    {
-      name: "Placeholder",
-      clickFunction: () => { },
-      html: "Placeholder",
-      cycler: useCycleList(["Placeholder"]),
-      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
-    },
-    {
-      name: "Placeholder",
-      clickFunction: () => { },
-      html: "Placeholder",
-      cycler: useCycleList(["Placeholder"]),
-      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
-    },
-    {
-      name: "Placeholder",
-      clickFunction: () => { },
-      html: "Placeholder",
-      cycler: useCycleList(["Placeholder"]),
-      modes: ["All", "Dev", "Testing", "S1", "Exhibition"],
-    },
   ],
   [
     {
@@ -1450,7 +1417,7 @@ const pages = [
       },
       html: "Activate All Mode",
       cycler: useCycleList(["All Mode"]),
-      modes: ["Dev", "Testing", "Player", "Referee", "Solo", "All", "Exhibition", "S1", "S2", "S3"],
+      modes: ["Dev", "Testing", "Player", "Referee", "Solo", "All", "Exhibition"],
     },
     {
       name: "Change Mode",
@@ -1477,7 +1444,7 @@ const pages = [
       },
       html: "Activate S1 Mode",
       cycler: useCycleList(["S1 Mode"]),
-      modes: ["All", "Dev", "Testing", "Referee", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Referee", "Exhibition"],
     },
     {
       name: "S2 Mode",
@@ -1490,7 +1457,7 @@ const pages = [
       },
       html: "Activate S2 Mode",
       cycler: useCycleList(["S2 Mode"]),
-      modes: ["All", "Dev", "Testing", "Referee", "S2", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Referee", "Exhibition"],
     },
     {
       name: "S3 Mode",
@@ -1503,20 +1470,7 @@ const pages = [
       },
       html: "Activate S3 Mode",
       cycler: useCycleList(["S3 Mode"]),
-      modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
-    },
-    {
-      name: "Exhibition Mode",
-      clickFunction: () => {
-        const findExhibitionModeIndex = modesList.findIndex(
-          (mode) => mode.name === "Exhibition"
-        );
-        store.modesCycler.go(findExhibitionModeIndex);
-        speak("Exhibition mode activated");
-      },
-      html: "Activate Exhibition Mode",
-      cycler: useCycleList(["Exhibition Mode"]),
-      modes: ["All", "Dev", "Testing", "Referee", "Exhibition", "S1", "S2", "S3"],
+      modes: ["All", "Dev", "Testing", "Referee", "Exhibition"],
     },
   ],
   [
@@ -1551,25 +1505,24 @@ const pages = [
         () => `Toggle Reverse Field: ${store.reverseField ? "ON" : "OFF"}`
       ),
       cycler: useCycleList(["Toggle Reverse Field"]),
-      modes: ["All", "Dev", "Testing", "Referee", "S1", "S3", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Referee", "Exhibition"],
     },
   ],
   [
-    // {
-    //   name: "Add function",
-    //   clickFunction: addFunction,
-    //   // imgSrc: "/icons/referenz.svg",
-    //   html: "<div>+ Add</div>",
-    //   cycler: useCycleList(["Add function"]),
-    //   modes: ["All"],
-    // },
     {
-      name: "Default",
-      clickFunction: () => { },
-      html: "Placeholder",
-      imgSrc: "/icons/watch.svg",
-      cycler: useCycleList(["Default"]),
-      modes: ["All"],
+      name: "Scan Field",
+      deactivated: computed(() => !store.arSupported),
+      clickFunction: scanCamera,
+      imgSrc: "/icons/scanCamera.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_scanField.mp3",
+      cycler: useCycleList([
+        "Scan Field",
+        "Toggle Top Camera Slider",
+        "Scan and count points",
+        "Set points from latest scan",
+        "Increment shots taken",
+      ]),
+      modes: ["All", "Dev", "Testing", "Solo", "Referee", "Player"],
     },
     {
       name: "Prediction Visualiser",
@@ -1617,6 +1570,14 @@ const pages = [
         "Haptic grid near",
       ]),
       modes: ["All", "Dev", "Testing", "Exhibition"],
+    },
+    {
+      name: "Add function",
+      clickFunction: addFunction,
+      // imgSrc: "/icons/referenz.svg",
+      html: "<div>+ Add</div>",
+      cycler: useCycleList(["Add function"]),
+      modes: ["All"],
     },
   ],
 ];
