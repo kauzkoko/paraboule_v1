@@ -2,11 +2,11 @@
 
     <div class="info-container" :class="{ 'pointer-events-none': !store.infoScreen }">
         <div class="info-large" :class="{ 'info-button-glow': infoButtonGlow, 'info-button': !store.infoScreen }">
-            <div v-if="!store.infoScreen" class="w-full h-full flex justify-center items-center"
+            <div v-show="!store.infoScreen" class="w-full h-full flex justify-center items-center "
                 @click="toggleInfoScreen">
                 <div class="text-48px text-white mt--10px">i</div>
             </div>
-            <div class="inner-grid" v-else>
+            <div class="inner-grid" v-show="store.infoScreen">
                 <div class="upper-content">
                     <div>
                         <h1 v-html="store.infoStepper.current.title"></h1>
@@ -17,7 +17,8 @@
                 <div class="lower-content">
                     <div v-if="store.infoStepper.isCurrent('welcome')"
                         class="mt--10px! flex justify-center flex-col items-center">
-                        <div class="button-container info-next mb-10px border-black!" @click="store.infoStepper.goToNext">NEXT</div>
+                        <div class="button-container info-next mb-10px border-black!"
+                            @click="store.infoStepper.goToNext">NEXT</div>
                         <p>Tap NEXT to learn more on how<br> to use PARABOULE.</p>
                         <div class="button-container info-close mb-10px mt-20px" @click="close()">CLOSE</div>
                         <p class="color-hex-ff0000">Tap CLOSE to return to the interface.</p>
@@ -49,11 +50,11 @@
             </div>
         </div>
         <div v-if="!store.infoStepper.isCurrent('welcome')"
-                class="fixed z-1000 bottom-28px left-50dvw transform translate-x--50% flex justify-center">
-                <div class="button-container info-next" :class="{ 'color-white!': !store.infoStepper.isCurrent('welcome') }"
-                    @click="store.infoStepper.isLast ? close() : store.infoStepper.goToNext()">{{
-                        store.infoStepper.isLast ? 'START' : 'NEXT' }}</div>
-            </div>
+            class="fixed z-1000 bottom-28px left-50dvw transform translate-x--50% flex justify-center">
+            <div class="button-container info-next" :class="{ 'color-white!': !store.infoStepper.isCurrent('welcome') }"
+                @click="store.infoStepper.isLast ? close() : store.infoStepper.goToNext()">{{
+                    store.infoStepper.isLast ? 'START' : 'NEXT' }}</div>
+        </div>
         <div v-if="store.infoScreen && !store.infoStepper.isCurrent('welcome')"
             class="fixed z-1000 top-28px left-50dvw transform translate-x--50% flex justify-center">
             <div class="button-container info-close" @click="close()">CLOSE</div>
@@ -62,8 +63,6 @@
 </template>
 <style scoped>
 .info-large {
-    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
-
     position: absolute;
     bottom: 50%;
     left: 50%;
@@ -83,7 +82,6 @@
         display: grid;
         grid-template-columns: 1fr;
         grid-template-rows: 1fr 1fr;
-        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     /* flex-direction: column; */
@@ -110,11 +108,9 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 
         div {
             /* margin-top: 112px; */
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 
             h1 {
                 font-size: 36px;
@@ -123,7 +119,6 @@
                 text-transform: uppercase;
                 margin-bottom: 10px;
                 mix-blend-mode: normal;
-                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             }
 
             img {
@@ -131,7 +126,6 @@
                 margin-top: -20px;
                 min-width: 100px;
                 mix-blend-mode: difference;
-                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             }
         }
     }
@@ -143,12 +137,10 @@
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 }
 
 .info-button {
-    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
 
     position: absolute;
     left: 50%;
@@ -179,16 +171,20 @@
     padding: 0;
     margin: 0;
     border-color: black;
+
+
+    transition: v-bind(computedTransition);
 }
 
 .info-button-glow {
     box-shadow: 0px 0px 20px 3px #FFF inset;
     color: white;
-    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .info-container {
     position: fixed;
+
+
 
     top: 0;
     left: 0;
@@ -204,7 +200,6 @@
     z-index: 1000;
     mix-blend-mode: exclusion;
 
-    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .button-container {
@@ -217,7 +212,6 @@
     width: fit-content;
     font-size: 32px;
     font-weight: 500;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     /* mix-blend-mode: difference; */
 }
 
@@ -264,6 +258,10 @@ const toggleInfoScreen = () => {
         store.infoScreen = true;
     }
 }
+
+const computedTransition = computed(() => {
+    return 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
+});
 
 // store.infoStepper.goTo('functions');
 const close = () => {
