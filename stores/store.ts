@@ -27,7 +27,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const bus = useEventBus("protoboules");
 
   const modesCycler = useCycleList(modesList);
-  const initIndex = modesList.findIndex((mode) => mode.name === "S3");
+  const initIndex = modesList.findIndex((mode) => mode.name === "Exhibition");
   modesCycler.go(initIndex);
 
   const prevMode = computed(() => {
@@ -501,6 +501,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   });
 
   const setMockIntersections = () => {
+    console.log("setMockIntersections", mockIntersectionsCycler.state.value);
     rawIntersections.value = mockIntersectionsCycler.state.value;
   };
   setMockIntersections();

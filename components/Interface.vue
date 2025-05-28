@@ -827,15 +827,15 @@ const pages = [
       clickFunction: click_pingCochonnet,
       imgSrc: "/icons/cocho.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pingCocho.mp3",
-      cycler: useCycleList(["Ping Cochonnet", "Ping Startpoint"]),
+      cycler: useCycleList(["Ping Cochonnet", "Ping Starting Point"]),
       modes: ["All", "Dev", "Testing", "Player", "Solo", "S1", "Exhibition"],
     },
     {
-      name: "Ping Startpoint",
+      name: "Ping Starting Point",
       clickFunction: pingShoes,
       imgSrc: "/icons/hoolahoop.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_hoolaPinger.mp3",
-      cycler: useCycleList(["Ping Startpoint", "Ping Cochonnet"]),
+      cycler: useCycleList(["Ping Starting Point", "Ping Cochonnet"]),
       modes: ["All", "Dev", "Testing", "Player", "S2", "S1", "Exhibition"],
     },
   ],
@@ -1597,6 +1597,17 @@ const pages = [
       html: "Activate Exhibition Mode",
       cycler: useCycleList(["Exhibition Mode"]),
       modes: ["All", "Dev", "Testing", "Referee", "S3"],
+    },
+    {
+      name: "Mock Intersections",
+      clickFunction: () => {
+        store.mockIntersectionsCycler.next();
+        store.setMockIntersections();
+        sendRawIntersections();
+      },
+      html: "Mock Intersections",
+      cycler: useCycleList(["Mock Intersections"]),
+      modes: ["All", "Dev", "Testing", "Referee", "Assistant", "Exhibition"],
     },
   ]
 ];

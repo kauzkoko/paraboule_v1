@@ -28,7 +28,7 @@
                         <DoubleTap />
                         <p class="mt--5px! mb-10px!">DOUBLE TAP to mute audio.</p>
                         <Up class="mt--10px!" />
-                        <p class="mt--5px! mb-10px!">SWIPE UP to take on Cochonnet perspective.</p>
+                        <p class="mt--5px! mb-10px!">SWIPE UP to adopt the cochonnet’s point of view.</p>
                         <p class="mb-10px!">
                             <Left class="transform translate-y-5px mr-10px" />
                             <span>SWIPE LEFT or RIGHT</span>
