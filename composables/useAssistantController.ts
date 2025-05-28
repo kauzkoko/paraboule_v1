@@ -10,7 +10,7 @@ export function useAssistantController() {
   assistantController.subscribe();
 
   assistantController.on("broadcast", { event: "toggle3dAudio" }, (event) => {
-    if (!store.modesCycler.state.name.includes("Exhibition")) {
+    if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
       Howler.stop();
       store.toggle3dAudio();
       window.speechSynthesis.cancel();
@@ -18,7 +18,7 @@ export function useAssistantController() {
   });
 
   assistantController.on("broadcast", { event: "mute" }, (event) => {
-    if (!store.modesCycler.state.name.includes("Exhibition")) {
+    if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
       console.log("mute");
       Howler.stop();
       store.mute3dAudio();
@@ -27,7 +27,7 @@ export function useAssistantController() {
   });
 
   assistantController.on("broadcast", { event: "unmute" }, (event) => {
-    if (!store.modesCycler.state.name.includes("Exhibition")) {
+    if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
       console.log("unmute");
       Howler.stop();
       store.unmute3dAudio();

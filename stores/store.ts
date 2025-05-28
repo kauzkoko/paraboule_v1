@@ -201,7 +201,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const modelWorkerId = ref(null);
   const init = async () => {
     const { startWorker } = await useInference();
-    await startWorker();
+    // await startWorker();
 
     arSupported.value =
       (await navigator.xr?.isSessionSupported("immersive-ar")) ?? false;
@@ -486,15 +486,15 @@ export const useProtoStore = defineStore("protoStore", () => {
     'welcome': {
       title: 'Welcome to',
       img: '/icons/paraboule_black.svg',
-      subtitle: 'PARABOULE is an exploration<br> of spatial audio and object detection technology in Pétanque.<br> It is built with accessibility in mind.',
+      subtitle: 'PARABOULE is an exploration<br> of spatial audio and object detection technology in Pétanque. It is built with accessibility in mind.',
     },
     'functions': {
       title: '2x2 Buttons',
-      subtitle: 'Each button triggers a function that either changes or helps clarify the game situation. PRESS and HOLD to hear what each button does (only when the info is closed).',
+      subtitle: 'Each button triggers a function that helps clarify the game situation. PRESS and HOLD to hear what each button does.',
     },
     'center-circle': {
-      title: 'Invisible<br> Center Circle',
-      subtitle: 'The invisible center circle is your main navigation tool in PARABOULE. To use it, perform gestures directly on its area. Note that 2X2 button gestures apply to the center circle as well.',
+      title: 'ICC<br>',
+      subtitle: 'The Invisible Center Circle is your main navigation aid in the app. Perform gestures directly on its area. Note: 2X2 BUTTON gestures apply here as well. ',
     },
 
   })

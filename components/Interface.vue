@@ -99,8 +99,8 @@
               : 'black',
           transition:
             touchedIndex === 'pageAnnouncer'
-              ? 'all 500ms'
-              : 'all 500ms',
+              ? 'all 300ms'
+              : 'all 300ms',
           boxShadow: touchedIndex === 'pageAnnouncer' || store.infoStepper.isCurrent('center-circle') ? '0px 0px 50px 50px var(--border-color) inset' : 'none',
           border: touchedIndex === 'pageAnnouncer' ? 'solid 10px black' : 'solid 10px black',
 
@@ -305,6 +305,12 @@ const click_flyToCochonnet = () => {
   }
 };
 
+const click_flyToStart = () => {
+  if (!afterLongPress) {
+    flyToStart();
+  }
+};
+
 const click_stalefish180 = () => {
   if (!afterLongPress) {
     stalefish180();
@@ -481,10 +487,11 @@ const onDoubleClick = () => {
     clearTimeout(clickTimeout);
     clickTimeout = null;
   }
-  if (!isListening.value) {
-    start();
-    console.log("start listening");
-  }
+  // if (!isListening.value) {
+  //   start();
+  //   console.log("start listening");
+  // }
+  click_toggleMute();
 };
 
 const incrementPlayer1 = () => {
@@ -739,21 +746,21 @@ const getSvgIcon = (iconName) => {
 const pages = [
   [
     {
-      name: "Alpha Controller",
+      name: "Gyros Controller",
       clickFunction: setAlphaController,
       imgSrc: "/icons/gyros.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_gyro.mp3",
-      html: "Toggle Alpha Controller",
-      cycler: useCycleList(["Alpha Controller", "Slider", "Fly to Cochonnet"]),
+      html: "Toggle Gyros Controller",
+      cycler: useCycleList(["Gyros Controller", "Bug Slider", "Fly to Cochonnet"]),
       modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo", "S1", "Exhibition"],
     },
     {
-      name: "Slider",
+      name: "Bug Slider",
       clickFunction: click_slider,
       imgSrc: "/icons/slider.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_slider.mp3",
-      html: "Slider",
-      cycler: useCycleList(["Slider"]),
+      html: "Bug Slider",
+      cycler: useCycleList(["Bug Slider"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
@@ -761,39 +768,21 @@ const pages = [
       clickFunction: click_flyToCochonnet,
       imgSrc: "/icons/flyToCochonnet.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_flyOnTheCochonnet.mp3",
-      html: "Fly to Cochonnet",
+      html: "Fly to cochonnet",
       cycler: useCycleList(["Fly to Cochonnet"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
-      name: "Fly to Startpoint",
-      clickFunction: () => {
-        console.log("fly to startpoint");
-      },
+      name: "Fly to Starting Point",
+      clickFunction: click_flyToStart,
       imgSrc: "/icons/flyToStart.svg",
       // explanationSrc: "/sounds/elevenlabs/explanation_flyOnTheStartpoint.mp3",
-      html: "Fly to Startpoint",
-      cycler: useCycleList(["Fly to Startpoint"]),
+      html: "Fly to starting point",
+      cycler: useCycleList(["Fly to Starting Point"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
   ],
   [
-    {
-      name: "Ping Startpoint",
-      clickFunction: pingShoes,
-      imgSrc: "/icons/hoolahoop.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_hoolaPinger.mp3",
-      cycler: useCycleList(["Ping Startpoint", "Ping Cochonnet"]),
-      modes: ["All", "Dev", "Testing", "Player", "S2", "S1", "S3", "Exhibition"],
-    },
-    {
-      name: "Ping Cochonnet",
-      clickFunction: click_pingCochonnet,
-      imgSrc: "/icons/cocho.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_pingCocho.mp3",
-      cycler: useCycleList(["Ping Cochonnet", "Ping Startpoint"]),
-      modes: ["All", "Dev", "Testing", "Player", "Solo", "S1", "Exhibition"],
-    },
     {
       name: "Toggle Lookalong",
       clickFunction: () => {
@@ -823,7 +812,22 @@ const pages = [
       ]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
-
+    {
+      name: "Ping Cochonnet",
+      clickFunction: click_pingCochonnet,
+      imgSrc: "/icons/cocho.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_pingCocho.mp3",
+      cycler: useCycleList(["Ping Cochonnet", "Ping Startpoint"]),
+      modes: ["All", "Dev", "Testing", "Player", "Solo", "S1", "Exhibition"],
+    },
+    {
+      name: "Ping Startpoint",
+      clickFunction: pingShoes,
+      imgSrc: "/icons/hoolahoop.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_hoolaPinger.mp3",
+      cycler: useCycleList(["Ping Startpoint", "Ping Cochonnet"]),
+      modes: ["All", "Dev", "Testing", "Player", "S2", "S1", "S3", "Exhibition"],
+    },
   ],
   [
     {
@@ -1764,7 +1768,8 @@ watch(isSwiping, (val) => {
       flyToStart();
     }
     if (direction.value === "up") {
-      click_toggleMute();
+      // click_toggleMute();
+      flyToCochonnet();
     }
 
     if (stepperIndex.value === 0) vibratePageOne();

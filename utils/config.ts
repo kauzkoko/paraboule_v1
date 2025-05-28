@@ -1,3 +1,5 @@
+export const includesArray = ["Exhibition", "S1", "S2", "S3"];
+
 export const modesList = [
   {
     name: "Referee",

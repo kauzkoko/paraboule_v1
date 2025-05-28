@@ -8,34 +8,34 @@ export function useAnimationController() {
 
   animationController
     .on("broadcast", { event: "flyToStart" }, (event) => {
-      if (!store.modesCycler.state.name.includes("Exhibition")) flyToStart(false);
+      if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) flyToStart(false);
     })
     .on("broadcast", { event: "flyToCochonnetAndBack" }, (event) => {
-      if (!store.modesCycler.state.name.includes("Exhibition")) flyToCochonnetAndBack(false);
+      if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) flyToCochonnetAndBack(false);
     })
     .on("broadcast", { event: "startCircularRotation" }, (event) => {
-      if (!store.modesCycler.state.name.includes("Exhibition")) startCircularRotation(false);
+      if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) startCircularRotation(false);
     })
     .on("broadcast", { event: "stalefish180" }, (event) => {
-      if (!store.modesCycler.state.name.includes("Exhibition")) stalefish180(false);
+      if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) stalefish180(false);
     })
     .on("broadcast", { event: "lookAlongNegativeXAxis" }, (event) => {
-      if (!store.modesCycler.state.name.includes("Exhibition")) lookAlongNegativeXAxis(false);
+      if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) lookAlongNegativeXAxis(false);
     })
     .on("broadcast", { event: "lookAlongPositiveXAxis" }, (event) => {
-      if (!store.modesCycler.state.name.includes("Exhibition")) lookAlongPositiveXAxis(false);
+      if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) lookAlongPositiveXAxis(false);
     })
     .on("broadcast", { event: "lookAlongPositiveZAxis" }, (event) => {
-      if (!store.modesCycler.state.name.includes("Exhibition")) lookAlongPositiveZAxis(false);
+      if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) lookAlongPositiveZAxis(false);
     })
     .on("broadcast", { event: "lookAlongNegativeZAxis" }, (event) => {
-      if (!store.modesCycler.state.name.includes("Exhibition")) lookAlongNegativeZAxis(false);
+      if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) lookAlongNegativeZAxis(false);
     })
     .on("broadcast", { event: "flyToCochonnet" }, (event) => {
-      if (!store.modesCycler.state.name.includes("Exhibition")) flyToCochonnet(false);
+      if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) flyToCochonnet(false);
     })
     .on("broadcast", { event: "toggleTopCamera" }, (event) => {
-      if (!store.modesCycler.state.name.includes("Exhibition")) toggleTopCamera({ broadcast: false, height: event.payload.height ?? 80 });
+      if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) toggleTopCamera({ broadcast: false, height: event.payload.height ?? 80 });
     })
     .on("broadcast", { event: "playFilm" }, (event) => {
       playFilm(false);

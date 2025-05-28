@@ -8,7 +8,7 @@ export function useScanController() {
   scanController.subscribe();
 
   scanController.on("broadcast", { event: "reverseField" }, (event) => {
-    if (!store.modesCycler.state.name.includes("Exhibition")) {
+    if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
       console.log("reverseField", event.payload.reverseField);
       store.reverseField = event.payload.reverseField;
     }

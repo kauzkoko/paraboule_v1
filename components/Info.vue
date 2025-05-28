@@ -11,7 +11,7 @@
                     <div>
                         <h1 v-html="store.infoStepper.current.title"></h1>
                         <img v-if="store.infoStepper.current.img" :src="store.infoStepper.current.img" />
-                        <p class="mt-10px!" v-html="store.infoStepper.current.subtitle"></p>
+                        <p class="mt-10px! mb-40px!" v-html="store.infoStepper.current.subtitle"></p>
                     </div>
                 </div>
                 <div class="lower-content">
@@ -24,7 +24,7 @@
                         <p class="color-hex-ff0000">Tap CLOSE to return to the interface.</p>
 
                     </div>
-                    <div v-if="store.infoStepper.isCurrent('center-circle')" class="mt-0px!">
+                    <div v-if="store.infoStepper.isCurrent('center-circle')" class="mt--10px!">
                         <DoubleTap />
                         <p class="mt--5px! mb-10px!">DOUBLE TAP to mute audio.</p>
                         <Up class="mt--10px!" />

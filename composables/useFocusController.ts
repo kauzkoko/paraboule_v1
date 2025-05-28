@@ -8,7 +8,7 @@ export function useFocusController() {
   focusController.subscribe();
 
   focusController.on("broadcast", { event: "selectedBoules" }, (event) => {
-    if (!store.modesCycler.state.name.includes("Exhibition")) store.selectedBoules = event.payload.selectedBoules;
+    if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) store.selectedBoules = event.payload.selectedBoules;
   });
 
   function sendSelectedBoules(broadcast = true) {

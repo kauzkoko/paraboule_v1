@@ -8,14 +8,14 @@ export function useScoreController() {
   scoreController.subscribe();
 
   scoreController.on("broadcast", { event: "score" }, (event) => {
-    if (!store.modesCycler.state.name.includes("Exhibition")) {
+    if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
       store.players.player1.score = event.payload.player1Score;
       store.players.player2.score = event.payload.player2Score;
     }
   });
 
   scoreController.on("broadcast", { event: "shotsTaken" }, (event) => {
-    if (!store.modesCycler.state.name.includes("Exhibition")) {
+    if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
       store.globalShotsTaken = event.payload.globalShotsTaken;
       store.players.player1.shotsTaken = event.payload.player1ShotsTaken;
       store.players.player2.shotsTaken = event.payload.player2ShotsTaken;
@@ -23,20 +23,20 @@ export function useScoreController() {
   });
 
   scoreController.on("broadcast", { event: "globalShotsTaken" }, (event) => {
-    if (!store.modesCycler.state.name.includes("Exhibition")) {
+    if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
       store.globalShotsTaken = event.payload.globalShotsTaken;
     }
   });
 
   scoreController.on("broadcast", { event: "playersShotsTaken" }, (event) => {
-    if (!store.modesCycler.state.name.includes("Exhibition")) {
+    if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
       store.players.player1.shotsTaken = event.payload.player1ShotsTaken;
       store.players.player2.shotsTaken = event.payload.player2ShotsTaken;
     }
   });
 
   scoreController.on("broadcast", { event: "allData" }, (event) => {
-    if (!store.modesCycler.state.name.includes("Exhibition")) {
+    if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
       store.players.player1.score = event.payload.player1Score;
       store.players.player2.score = event.payload.player2Score;
       store.globalShotsTaken = event.payload.globalShotsTaken;
