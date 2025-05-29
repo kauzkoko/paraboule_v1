@@ -513,6 +513,29 @@ export const useProtoStore = defineStore("protoStore", () => {
       img: '/icons/paraboule_black.svg',
       subtitle: 'PARABOULE is an exploration<br> of spatial audio and object detection in Pétanque. It is built with accessibility in mind and assists you in playing Boule by binaural hearing.',
     },
+    'role': {
+      'S1': {
+        title: 'Smartphone 1:<br>Before the shot',
+        upperText: 'Text 1 Before the shot',
+        bottomText: 'Text 2 Before the shot.'
+      },
+      'S2': {
+        title: 'Smartphone 2:<br>Orientation',
+        upperText: 'Text 1 Orientation',
+        bottomText: 'Text 2 Orientation.'
+      },
+      'S3': {
+        title: 'Smartphone 3:<br>VAR',
+        upperText: 'As the Virtual Assistant Referee, you continuously scan the Boule field and track the current score.',
+        bottomText: 'You provide real-time data that enables the visually impaired player to receive spatial audio feedback through their earphones. Through that you are helping them understand the positions of the Boules and prepare for their next shot.'
+      },
+      'Empty': {
+        title: 'Empty Title',
+        upperText: '',
+        bottomText: ''
+
+      }
+    },
     'functions': {
       title: '2x2 Buttons',
       subtitle: 'Each button triggers a function that helps clarify the game situation. PRESS and HOLD to hear what each button does.',
@@ -521,7 +544,6 @@ export const useProtoStore = defineStore("protoStore", () => {
       title: 'Invisible Circle<br>',
       subtitle: 'The Invisible Circle is your main navigation aid in the app. Perform the following gestures directly on its area. Note: 2X2 BUTTON gestures apply here as well. ',
     },
-
   })
 
   const buttonTransition = ref(false);

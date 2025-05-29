@@ -8,13 +8,25 @@
             </div>
             <div class="inner-grid text-black!" v-show="store.infoScreen">
                 <div class="upper-content">
-                    <div>
+                    <div v-if="store.infoStepper.isCurrent('role')">
+                        <h1
+                            v-html="store.infoStepper.current[store.modesCycler.state.name === 'S1' || store.modesCycler.state.name === 'S2' || store.modesCycler.state.name === 'S3' ? store.modesCycler.state.name : 'Empty'].title">
+                        </h1>
+
+                        <p
+                            v-html="store.infoStepper.current[store.modesCycler.state.name === 'S1' || store.modesCycler.state.name === 'S2' || store.modesCycler.state.name === 'S3' ? store.modesCycler.state.name : 'Empty'].upperText">
+                        </p>
+                    </div>
+                    <div v-else>
                         <h1 v-html="store.infoStepper.current.title"></h1>
                         <img v-if="store.infoStepper.current.img" :src="store.infoStepper.current.img" />
                         <p class="mt-10px! mb-40px!" v-html="store.infoStepper.current.subtitle"></p>
                     </div>
                 </div>
                 <div class="lower-content">
+                    <!-- <div v-if="store.infoStepper.isCurrent('welcome')">
+                        <p>As the Virtual Assistant Referee, you continuously scan the Boule field and track the current score. In this way you are helping them understand the positions of the Boules and prepare for their next shot.</p>
+                    </div> -->
                     <div v-if="store.infoStepper.isCurrent('welcome')"
                         class="mt--10px! flex justify-center flex-col items-center">
                         <div class="button-container info-next mb-10px border-black!"
@@ -22,7 +34,11 @@
                         <p>Tap NEXT to learn more on how<br> to use PARABOULE.</p>
                         <div class="button-container info-close mb-10px mt-20px" @click="close()">CLOSE</div>
                         <p class="color-hex-ff0000">Tap CLOSE to return to the main interface.</p>
-
+                    </div>
+                    <div v-if="store.infoStepper.isCurrent('role')">
+                        <p
+                            v-html="store.infoStepper.current[store.modesCycler.state.name === 'S1' || store.modesCycler.state.name === 'S2' || store.modesCycler.state.name === 'S3' ? store.modesCycler.state.name : 'Empty'].bottomText">
+                        </p>
                     </div>
                     <div v-if="store.infoStepper.isCurrent('center-circle')" class="mt--10px!">
                         <DoubleTap />
