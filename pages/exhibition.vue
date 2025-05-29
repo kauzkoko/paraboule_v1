@@ -5,7 +5,7 @@
     </TresCanvas> -->
     <Interface />
     <!-- <Predictions /> -->
-     <Info />
+    <Info />
   </div>
 </template>
 
@@ -15,6 +15,8 @@ import { TresCanvas } from "@tresjs/core";
 const store = useProtoStore();
 
 onMounted(async () => {
-  await store.init();
+  // await store.init();
+  // store.trigger++
+  // store.toggle3dAudio()
 });
 </script>

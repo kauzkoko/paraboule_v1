@@ -179,7 +179,7 @@ onBeforeRender(({ delta, elapsed }) => {
   if (store.alphaController) {
     alpha.value = mappedRelativeAlpha.value;
   }
-  if (store.isTouchingSlider) {
+  if (store.isTouchingSlider && !store.isTouchingSliderTimeout) {
     cameraZ.value = map(y.value, 0, height.value, -30, 30);
   }
   if (store.isTouchingTopCameraSlider) {

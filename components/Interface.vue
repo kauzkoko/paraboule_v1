@@ -2,7 +2,8 @@
   <div class="outer fixed left-0 transform-gpu translate-y--11px w-100dvw h-100dvh" @click="onFullscreenClick()">
     <VirtualAudioSpace :trigger="audioTrigger"></VirtualAudioSpace>
   </div>
-  <div class="outer" v-show="store.isTouchingSlider" @click="onClickSliderComponent">
+  <div class="outer" v-show="store.isTouchingSlider" @click="onClickSliderComponent"
+    @touchstart="isTouchingSliderTouchStartHandler">
     <div class="container">
       <div class="big">
         <div v-show="!store.isTappingOnSlider">
@@ -236,6 +237,11 @@ const setAlphaController = () => {
   store.baseAlpha = store.gyroAlpha;
   console.log("in setAlphaController", store.alphaController);
 };
+
+whenever(() => !store.alphaController, () => {
+  console.log('test')
+  flyToStart()
+})
 
 const onFullscreenClick = () => {
   if (store.alphaController) {
@@ -610,13 +616,22 @@ const refreshPage = () => {
 
 const onClickSliderComponent = () => {
   console.log("onClickSliderComponent");
+  store.isTouchingSliderTimeout = true
   store.isTouchingSlider = !store.isTouchingSlider;
 };
 
 const click_slider = () => {
-  console.log("click_slider");
   store.isTouchingSlider = !store.isTouchingSlider;
+
 };
+
+const isTouchingSliderTouchStartHandler = () => {
+  store.isTouchingSliderTimeout = false
+}
+
+whenever(() => !store.isTouchingSlider, () => {
+  flyToStart()
+})
 
 const onClickToggleTopCameraSliderComponent = () => {
   store.isTouchingTopCameraSlider = !store.isTouchingTopCameraSlider;
@@ -761,7 +776,7 @@ const pages = [
       imgSrc: "/icons/gyros.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_gyro.mp3",
       html: "Toggle Gyros Controller",
-      cycler: useCycleList(["Gyros Controller", "Bug Slider", "Fly to Cochonnet"]),
+      cycler: useCycleList(["Gyros Controller"]),
       modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo", "S1", "Exhibition"],
     },
     {

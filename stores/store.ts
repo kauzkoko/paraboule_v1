@@ -415,6 +415,7 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   // slider
   const isTouchingSlider = ref(false);
+  const isTouchingSliderTimeout = ref(false)
   const isTappingOnSlider = ref(false);
 
   // stundenorientation
@@ -510,15 +511,15 @@ export const useProtoStore = defineStore("protoStore", () => {
     'welcome': {
       title: 'Welcome to',
       img: '/icons/paraboule_black.svg',
-      subtitle: 'PARABOULE is an exploration<br> of spatial audio and object detection technology in Pétanque. It is built with accessibility in mind.',
+      subtitle: 'PARABOULE is an exploration<br> of spatial audio and object detection in Pétanque. It is built with accessibility in mind and assists you in playing Boule by binaural hearing.',
     },
     'functions': {
       title: '2x2 Buttons',
       subtitle: 'Each button triggers a function that helps clarify the game situation. PRESS and HOLD to hear what each button does.',
     },
     'center-circle': {
-      title: 'ICC<br>',
-      subtitle: 'The Invisible Center Circle is your main navigation aid in the app. Perform gestures directly on its area. Note: 2X2 BUTTON gestures apply here as well. ',
+      title: 'Invisible Circle<br>',
+      subtitle: 'The Invisible Circle is your main navigation aid in the app. Perform the following gestures directly on its area. Note: 2X2 BUTTON gestures apply here as well. ',
     },
 
   })
@@ -611,6 +612,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     previousWinnerScore,
     previousLoserScore,
     previousWinner,
+    isTouchingSliderTimeout
   };
 });
 

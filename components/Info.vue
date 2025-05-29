@@ -21,7 +21,7 @@
                             @click="store.infoStepper.goToNext">NEXT</div>
                         <p>Tap NEXT to learn more on how<br> to use PARABOULE.</p>
                         <div class="button-container info-close mb-10px mt-20px" @click="close()">CLOSE</div>
-                        <p class="color-hex-ff0000">Tap CLOSE to return to the interface.</p>
+                        <p class="color-hex-ff0000">Tap CLOSE to return to the main interface.</p>
 
                     </div>
                     <div v-if="store.infoStepper.isCurrent('center-circle')" class="mt--10px!">
@@ -35,12 +35,12 @@
                             <Right class="transform translate-y-5px ml-10px" /><br>
                             to switch pages.
                         </p>
-                        <p class="mb--10px!">SWIPE DOWN to return to start.</p>
+                        <p class="mb--10px!">SWIPE DOWN to return to starting point perspective.</p>
                         <Down />
                     </div>
                     <div v-if="store.infoStepper.isCurrent('functions')" class="mt--10px!">
                         <Dot class="mix-blend-difference" />
-                        <p class="mt--5px! mb-10px!">TAP once to activate the function.</p>
+                        <p class="mt--5px! mb-10px!">TAP once to run the function of the button.</p>
                         <LongPress class="mix-blend-difference" />
                         <p class="mt--5px! mb-10px!">PRESS and HOLD to hear an explanation of the function. RELEASE to
                             stop.
