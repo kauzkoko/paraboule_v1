@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :class="{ 'blink': isBlinking }">
         <video @click="playing = !playing" ref="video" class="w-full h-full object-cover" loop />
     </div>
 </template>
@@ -46,14 +46,59 @@ watch(currentTime, (newTime) => {
     }
 })
 
+const isBlinking = ref(false)
+
 onMounted(() => {
     currentTime.value = 60
+    
+    // Set up blinking every 5 seconds
+    setInterval(() => {
+        isBlinking.value = true
+        setTimeout(() => {
+            isBlinking.value = false
+        }, 200) // Blink duration of 200ms
+    }, 5000) // Every 5 seconds
 })
 
-onKeyStroke(' ', () => {
+onKeyStroke('p', () => {
     playing.value = !playing.value
     console.log('space')
 })
+
+const rotation = ref(0)
+onKeyStroke('r', () => {
+    rotation.value += 180
+})
+const computedRotation = computed(() => {
+    return `rotate(${rotation.value}deg)`
+})
+
+const mirror = ref(false)
+onKeyStroke('m', () => {
+    mirror.value = !mirror.value
+})
+const computedMirror = computed(() => {
+    return mirror.value ? 'scaleY(-1)' : 'scaleY(1)'
+})
+
+const computedTransform = computed(() => {
+    return `${computedRotation.value} ${computedMirror.value}`
+})
+
 </script>
 
-<style scoped></style>
+<style scoped>
+video {
+    transform: v-bind(computedTransform);
+}
+
+.blink {
+    animation: blink-animation 0.2s ease-in-out;
+}
+
+@keyframes blink-animation {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+</style>
