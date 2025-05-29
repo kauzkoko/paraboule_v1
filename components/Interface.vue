@@ -126,7 +126,6 @@
 <script setup>
 import { Howler } from "howler";
 import { useQRCode } from "@vueuse/integrations/useQRCode";
-import { gsap } from "gsap";
 
 await preloadComponents(['SvgIcon'])
 
@@ -146,11 +145,7 @@ const onTappingOnHaptic = () => {
 };
 
 const onTappingOnSlider = () => {
-  console.log("onTappingOnSlider");
   store.isTappingOnSlider = !store.isTappingOnSlider;
-  // if (!store.isTappingOnSlider) {
-  //   // flyToStart();
-  // }
 };
 
 const onTappingOnTopCameraSlider = () => {
@@ -325,6 +320,9 @@ const click_stalefish180 = () => {
 
 const click_bouleFocuser = (bouleIndex) => {
   store.volume = 1;
+  // click_toggleMute()
+  store.unmute3dAudio()
+  if (bouleIndex === 'all') store.bouleFocuserCycler.go(0);
   store.focusBoules(bouleIndex);
 };
 
@@ -668,7 +666,7 @@ const click_hapticGridNear = () => {
 
 const click_hapticGridMedium = () => {
   store.currentHapticGrid = "medium";
-  store.isTouchingHaptic = !store.isTouchingHaptic;
+  flyToStart(true, true)
 };
 
 const click_hapticGridFar = () => {
@@ -809,7 +807,7 @@ const pages = [
   ],
   [
     {
-      name: "Toggle Lookalong",
+      name: "Pirate Radar",
       clickFunction: () => {
         store.showStundenOrientation = true;
         const currentLookalongFunction = flatPages.find(
@@ -818,20 +816,20 @@ const pages = [
         currentLookalongFunction.clickFunction();
         store.lookAlongCycler.next();
       },
-      html: "Toggle Lookalong",
+      html: "Pirate Radar",
       imgSrc: "/icons/toggleLookalong.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_ocklocktoggler.mp3",
-      cycler: useCycleList(["Toggle Lookalong"]),
+      cycler: useCycleList(["Pirate Radar"]),
       modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
     {
-      name: "Haptic grid medium",
+      name: "Haptic Grid",
       clickFunction: click_hapticGridMedium,
-      html: "Haptic grid medium",
+      html: "Haptic Grid",
       imgSrc: "/icons/hapticGridMedium.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
       cycler: useCycleList([
-        "Haptic grid medium",
+        "Haptic Grid",
         "Haptic grid near",
         "Haptic grid far",
       ]),
@@ -842,7 +840,7 @@ const pages = [
       clickFunction: click_pingCochonnet,
       imgSrc: "/icons/cocho.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pingCocho.mp3",
-      cycler: useCycleList(["Ping Cochonnet", "Ping Starting Point"]),
+      cycler: useCycleList(["Ping Cochonnet"]),
       modes: ["All", "Dev", "Testing", "Player", "Solo", "S1", "Exhibition"],
     },
     {
@@ -856,33 +854,35 @@ const pages = [
   ],
   [
     {
-      name: "Toggle Boule Focuser",
+      name: "Switch Boule Fokuss <3",
       deactivated: computed(() => store.boulesCount < 1),
       clickFunction: () => {
         const currentBouleFocuserFunction = flatPages.find(
           (item) => item.name === store.bouleFocuserCycler.state
         );
         currentBouleFocuserFunction.clickFunction();
-        if (store.bouleFocuserCycler.index === store.boulesCount) {
+        if (store.bouleFocuserCycler.index === store.boulesCount - 1) {
           store.bouleFocuserCycler.go(0);
         } else {
           store.bouleFocuserCycler.next();
         }
+        console.log(currentBouleFocuserFunction)
+
       },
-      imgSrc: "/icons/focusTogglerBlur.png",
-      html: "Toggle Boule Focuser",
+      imgSrc: "/icons/heart.png",
+      html: "Switch Boule Fokuss <3",
       explanationSrc: "/sounds/elevenlabs/explanation_toggleBouleFocuser.mp3",
-      cycler: useCycleList(["Toggle Boule Focuser"]),
+      cycler: useCycleList(["Switch Boule Fokuss <3"]),
       modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
     {
-      name: "Focus All Boules",
+      name: "Focus Big Boules",
       deactivated: computed(() => store.boulesCount < 1),
       clickFunction: () => click_bouleFocuser("all"),
-      imgSrc: "/icons/test.png",
+      imgSrc: "/icons/focusAllBlur2.png",
       html: "Focus all Boules",
       cycler: useCycleList([
-        "Focus All Boules",
+        "Focus Big Boules",
         "Focus Cochonnet",
         "Focus Boule 1",
         "Focus Boule 2",
@@ -901,6 +901,7 @@ const pages = [
           .filter(boule => boule.class === "light")
           .map(boule => boule.index);
         store.selectedBoules = blueBoules;
+        store.unmute3dAudio()
         store.volumePulse++;
       },
       imgSrc: "/icons/focusBlueBlur.png",
@@ -916,6 +917,7 @@ const pages = [
           .filter(boule => boule.class === "dark")
           .map(boule => boule.index);
         store.selectedBoules = redBoules;
+        store.unmute3dAudio()
         store.volumePulse++;
       },
       imgSrc: "/icons/focusRedBlur.png",
@@ -933,7 +935,7 @@ const pages = [
       html: "Focus Cochonnet",
       cycler: useCycleList([
         "Focus Cochonnet",
-        "Focus All Boules",
+        "Focus Big Boules",
         "Focus Boule 1",
         "Focus Boule 2",
         "Focus Boule 3",
@@ -956,7 +958,7 @@ const pages = [
         "Focus Boule 4",
         "Focus Boule 5",
         "Focus Boule 6",
-        "Focus All Boules",
+        "Focus Big Boules",
       ]),
       modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
@@ -1048,10 +1050,10 @@ const pages = [
   ],
   [
     {
-      name: "Pirate Radar",
+      name: "Pirate Radar Old",
       clickFunction: startCocho,
       explanationSrc: "/sounds/elevenlabs/explanation_pirateRadar.mp3",
-      cycler: useCycleList(["Pirate Radar", "Boomerang", "Stalefish 180"]),
+      cycler: useCycleList(["Pirate Radar Old", "Boomerang", "Stalefish 180"]),
       modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
     {
@@ -1059,7 +1061,7 @@ const pages = [
       clickFunction: flyCochoBack,
       imgSrc: "/icons/boomerang1.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_boomerang.mp3",
-      cycler: useCycleList(["Boomerang", "Pirate Radar"]),
+      cycler: useCycleList(["Boomerang", "Pirate Radar Old"]),
       modes: ["All", "Dev", "Testing", "Exhibition"],
     },
     {
@@ -1167,7 +1169,7 @@ const pages = [
         "Focus Boule 1",
         "Focus Boule 2",
         "Focus Boule 3",
-        "Focus All Boules",
+        "Focus Big Boules",
       ]),
       modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
@@ -1184,7 +1186,7 @@ const pages = [
         "Focus Boule 2",
         "Focus Boule 3",
         "Focus Boule 4",
-        "Focus All Boules",
+        "Focus Big Boules",
       ]),
       modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
@@ -1198,7 +1200,7 @@ const pages = [
         "Focus Boule 6",
         "Focus Boule 4",
         "Focus Boule 5",
-        "Focus All Boules",
+        "Focus Big Boules",
       ]),
       modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
@@ -1278,6 +1280,44 @@ const pages = [
   ],
   [
     {
+      name: "Ping Phone",
+      clickFunction: pingPhone,
+      imgSrc: "/icons/pingPhone.svg",
+      html: "Ping Phone",
+      explanationSrc: "/sounds/elevenlabs/explanation_phonePinger.mp3",
+      cycler: useCycleList(["Ping Phone", "Pairing Status"]),
+      modes: ["All", "Dev", "Testing", "QR", "S3", "Exhibition"],
+    },
+    {
+      name: "50 / 50 Coin Flip",
+      clickFunction: tossCoin,
+      imgSrc: coinImgSrc,
+      // html: "Toss a coin and get heads or tails",
+      explanationSrc: "/sounds/elevenlabs/explanation_tossCoin.mp3",
+      cycler: useCycleList(["50 / 50 Coin Flip"]),
+      modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
+    },
+
+    {
+      name: "Ping Starting Point",
+      clickFunction: pingShoes,
+      imgSrc: "/icons/hoolahoop.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_hoolaPinger.mp3",
+      cycler: useCycleList(["Ping Starting Point", "Ping Cochonnet"]),
+      modes: ["All", "Dev", "Testing", "Player", "S3", "Exhibition"],
+    },
+    {
+      name: "Prediction Visualiser",
+      clickFunction: () => {
+        // store.predictionVisualiser = !store.predictionVisualiser;
+      },
+      html: "Prediction Visualiser",
+      cycler: useCycleList(["Prediction Visualiser"]),
+      modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
+    },
+  ],
+  [
+    {
       name: "Boules Thrown (Round)",
       clickFunction: announceBallsPlayed,
       explanationSrc: "/sounds/elevenlabs/explanation_ballsShotAnnouncer.mp3",
@@ -1286,30 +1326,30 @@ const pages = [
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
     {
-      name: "Rewind",
+      name: "Undo Boules Thrown",
       clickFunction: rewind,
       imgSrc: "/icons/rewind.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
-      cycler: useCycleList(["Rewind"]),
+      cycler: useCycleList(["Undo Boules Thrown"]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
     {
-      name: "Team 1 Shot Incrementer",
+      name: "Increment Shots Team 1",
       clickFunction: incrementPlayer1,
       imgSrc: "/icons/plus.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
       cycler: useCycleList([
-        "Team 1 Shot Incrementer",
+        "Increment Shots Team 1",
       ]),
       modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
     },
     {
-      name: "Team 2 Shot Incrementer",
+      name: "Increment Shots Team 2",
       clickFunction: incrementPlayer2,
       imgSrc: "/icons/plus.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
       cycler: useCycleList([
-        "Team 2 Shot Incrementer",
+        "Increment Shots Team 2",
       ]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
@@ -1326,35 +1366,32 @@ const pages = [
       modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
     },
     {
-      name: "50 / 50 Coin Flip",
-      clickFunction: tossCoin,
-      imgSrc: coinImgSrc,
-      // html: "Toss a coin and get heads or tails",
-      explanationSrc: "/sounds/elevenlabs/explanation_tossCoin.mp3",
-      cycler: useCycleList(["50 / 50 Coin Flip"]),
+      name: "Undo Score",
+      clickFunction: () => { console.log("implement undo score") },
+      imgSrc: "/icons/rewind.svg",
+      explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
+      cycler: useCycleList(["Undo Score"]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
     {
-      name: "Increment Team 1 Score",
+      name: "Increment Score Team 1",
       clickFunction: store.incrementPlayer1score,
       imgSrc: "/icons/plus.svg",
-      html: "Increment Team 1 Score",
+      html: "Increment Score Team 1",
       // explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
       cycler: useCycleList([
-        "Increment Team 1 Score",
-        "Increment Team 2 Score",
+        "Increment Score Team 1",
       ]),
       modes: ["All", "Dev", "Testing", "Solo", "S3", "Exhibition"],
     },
     {
-      name: "Increment Team 2 Score",
+      name: "Increment Score Team 2",
       clickFunction: store.incrementPlayer2score,
       imgSrc: "/icons/plus.svg",
-      html: "Increment Team 2 Score",
+      html: "Increment Score Team 2",
       // explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
       cycler: useCycleList([
-        "Increment Team 2 Score",
-        "Increment Team 1 Score",
+        "Increment Score Team 2",
       ]),
       modes: ["All", "Dev", "Testing", "Solo", "S3", "Exhibition"],
     },
@@ -1573,7 +1610,7 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
       cycler: useCycleList([
         "Haptic grid near",
-        "Haptic grid medium",
+        "Haptic Grid",
         "Haptic grid far",
       ]),
       modes: ["All", "Dev", "Testing", "Exhibition"],
@@ -1585,7 +1622,7 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
       cycler: useCycleList([
         "Haptic grid far",
-        "Haptic grid medium",
+        "Haptic Grid",
         "Haptic grid near",
       ]),
       modes: ["All", "Dev", "Testing", "Exhibition"],
@@ -1789,6 +1826,7 @@ onLongPress(swiper, longPressCallback, {
 const { isSwiping, direction } = useSwipe(swiper);
 watch(isSwiping, (val) => {
   if (val) {
+    store.showStundenOrientation = false
     if (direction.value === "left") {
       if (isLast.value) {
         const firstStep = stepNames.value[0];
@@ -1858,6 +1896,11 @@ onKeyStroke(["1", "2", "3", "4", "5", "6", "7", "8", "9"], (e) => {
 onKeyStroke(["v"], (e) => {
   store.volumePulse++;
 });
+
+onMounted(() => {
+  goTo(stepNames.value[2]);
+
+})
 </script>
 
 <style>

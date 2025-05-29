@@ -20,7 +20,7 @@
       " />
     <TresMeshPhysicalMaterial :roughness=".2" :metalness="1" :emissive="boule.color" />
   </TresMesh>
-  <StundenOrientation :startPoint="startPoint" /> 
+  <StundenOrientation :startPoint="startPoint" />
   <Sky v-if="store.isSky" :elevation="5" :distance="10" />
   <!-- <Environment preset="sunset" /> -->
   <!-- <TresAmbientLight :intensity="230" /> -->
@@ -32,10 +32,10 @@
   <GridComponent />
 
   <Suspense>
-      <EffectComposerPmndrs>
-        <ChromaticAberrationPmndrs v-bind="effectProps" />
-      </EffectComposerPmndrs>
-    </Suspense>
+    <EffectComposerPmndrs>
+      <ChromaticAberrationPmndrs v-bind="effectProps" />
+    </EffectComposerPmndrs>
+  </Suspense>
 </template>
 
 <script setup>
@@ -80,7 +80,11 @@ bus.on((message, payload) => {
     flyToCochonnetAndBack();
   }
   if (message === "flyToStart") {
-    flyToStart();
+    if (payload === "fromHapticGrid") {
+      flyToStart(true)
+    } else {
+      flyToStart();
+    }
   }
   if (message === "stalefish180") {
     stalefish180();
@@ -313,11 +317,16 @@ function frontCamera() {
   });
 }
 
-function flyToStart() {
+function flyToStart(fromHapticGrid = false) {
   store.showStundenOrientation = false
   store.lookAlongCycler.state = "Look along 12 o'clock"
   killTweens();
   frontCamera();
+  let alreadyAtStart = false
+  if (cameraX.value === 0 && cameraZ.value === startPoint) {
+    alreadyAtStart = true
+    if (fromHapticGrid) store.isTouchingHaptic = !store.isTouchingHaptic;
+  }
   gsap.to(cameraX, {
     value: 0,
     duration: 1,
@@ -327,6 +336,9 @@ function flyToStart() {
     value: startPoint,
     duration: 1,
     ease: "power2.out",
+    onComplete: () => {
+      if (fromHapticGrid && !alreadyAtStart) store.isTouchingHaptic = !store.isTouchingHaptic;
+    }
   });
   gsap.to(alpha, {
     value: 0,

@@ -27,7 +27,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const bus = useEventBus("protoboules");
 
   const modesCycler = useCycleList(modesList);
-  const initIndex = modesList.findIndex((mode) => mode.name === "Exhibition");
+  const initIndex = modesList.findIndex((mode) => mode.name === "S1");
   modesCycler.go(initIndex);
 
   const prevMode = computed(() => {
@@ -210,13 +210,13 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   const bouleFocuserCycler = useCycleList([
     "Focus Cochonnet",
-    "Focus All Boules",
     "Focus Boule 1",
     "Focus Boule 2",
     "Focus Boule 3",
     "Focus Boule 4",
     "Focus Boule 5",
     "Focus Boule 6",
+    // "Focus Big Boules",
   ]);
 
   // yolo
@@ -415,7 +415,7 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   // slider
   const isTouchingSlider = ref(false);
-  const isTouchingSliderTimeout = ref(false)
+  const isTouchingSliderTimeout = ref(true)
   const isTappingOnSlider = ref(false);
 
   // stundenorientation

@@ -1,89 +1,75 @@
 <template>
-  <TresGroup v-if="showStundenOrientation">
+  <TresGroup v-if="store.showStundenOrientation">
     <TresMesh :position="[0, 1, -startPoint / 2]">
       <Html center transform>
-        <div class="mt--50px flex flex-col items-center w-2px">
-          <div class="text-white text-30px">12</div>
-          <div class="flex flex-row items-center">
-            <div class="w-2px h-50px bg-white"></div>
-          </div>
+      <div class="mt--50px flex flex-col items-center w-2px">
+        <div class="text-white text-30px text-center">
+          <div class="text-14px mb--6px">FRONT</div>
+          <div>12</div>
         </div>
+        <div class="flex flex-row items-center">
+          <div class="w-2px h-50px bg-white"></div>
+        </div>
+      </div>
+
       </Html>
       <Suspense>
-        <PositionalAudio
-          ref="hihat1Ref"
-          :ready="true"
-          :helper="true"
-          :autoplay="false"
-          :key="hihatTriggers[0]"
-          :url="hihat1Src"
-        />
+        <PositionalAudio ref="hihat1Ref" :ready="true" :helper="true" :autoplay="false" :key="store.hihatTriggers[0]"
+          :url="hihat1Src" />
       </Suspense>
     </TresMesh>
-    <TresMesh
-      :position="[startPoint / 2, 1, 0]"
-      :rotation="[0, Math.PI / 2, 0]"
-    >
+    <TresMesh :position="[startPoint / 2, 1, 0]" :rotation="[0, Math.PI / 2, 0]">
       <Html center transform>
-        <div class="mt--50px flex flex-col items-center">
-          <div class="mirror text-white text-30px">3</div>
-          <div class="flex flex-row items-center">
-            <div class="w-2px h-50px bg-white"></div>
-          </div>
+      <div class="mt--50px flex flex-col items-center">
+        <div class="mirror text-white text-30px text-center">
+          <div class="text-14px mb--6px">RIGHT</div>
+          <div>3</div>
         </div>
+        <div class="flex flex-row items-center">
+          <div class="w-2px h-50px bg-white"></div>
+        </div>
+      </div>
+
       </Html>
       <Suspense>
-        <PositionalAudio
-          ref="hihat4Ref"
-          :ready="true"
-          :helper="true"
-          :autoplay="false"
-          :key="hihatTriggers[3]"
-          :url="hihat4Src"
-        />
+        <PositionalAudio ref="hihat4Ref" :ready="true" :helper="true" :autoplay="false" :key="store.hihatTriggers[3]"
+          :url="hihat4Src" />
       </Suspense>
     </TresMesh>
     <TresMesh :position="[0, 1, startPoint / 2]">
       <Html center transform>
-        <div class="mt--50px flex flex-col items-center">
-          <div class="mirror text-white text-30px">6</div>
-          <div class="flex flex-row items-center">
-              <div class="w-2px h-50px bg-white"></div>
-          </div>
+      <div class="mt--50px flex flex-col items-center">
+        <div class="mirror text-white text-30px text-center">
+          <div class="text-14px mb--6px">YOU</div>
+          <div>6</div>
         </div>
+        <div class="flex flex-row items-center">
+          <div class="w-2px h-50px bg-white"></div>
+        </div>
+      </div>
+
       </Html>
       <Suspense>
-        <PositionalAudio
-          ref="hihat3Ref"
-          :ready="true"
-          :helper="true"
-          :autoplay="false"
-          :key="hihatTriggers[2]"
-          :url="hihat3Src"
-        />
+        <PositionalAudio ref="hihat3Ref" :ready="true" :helper="true" :autoplay="false" :key="store.hihatTriggers[2]"
+          :url="hihat3Src" />
       </Suspense>
     </TresMesh>
-    <TresMesh
-      :position="[-startPoint / 2, 1, 0]"
-      :rotation="[0, Math.PI / 2, 0]"
-    >
+    <TresMesh :position="[-startPoint / 2, 1, 0]" :rotation="[0, Math.PI / 2, 0]">
       <Html center transform>
-        <div class="mt--50px flex flex-col items-center">
-          <div class="text-white text-30px">9</div>
-          <div class="flex flex-row items-center">
-            <div class="w-2px h-50px bg-white"></div>
-          </div>
+      <div class="mt--50px flex flex-col items-center">
+        <div class="text-white text-30px text-center">
+          <div class="text-14px mb--6px">LEFT</div>
+          <div>9</div>
         </div>
+        <div class="flex flex-row items-center">
+          <div class="w-2px h-50px bg-white"></div>
+        </div>
+      </div>
+
       </Html>
       <Suspense>
-        <PositionalAudio
-          ref="hihat2Ref"
-          :ready="true"
-          :helper="true"
-          :autoplay="false"
-          :key="hihatTriggers[1]"
-          :url="hihat2Src"
-        />
+        <PositionalAudio ref="hihat2Ref" :ready="true" :helper="true" :autoplay="false" :key="store.hihatTriggers[1]"
+          :url="hihat2Src" />
       </Suspense>
     </TresMesh>
   </TresGroup>
@@ -102,7 +88,6 @@ defineProps({
 });
 
 const store = useProtoStore();
-const { hihatTriggers, showStundenOrientation } = storeToRefs(store);
 
 const hihat1Ref = ref(null);
 const hihat2Ref = ref(null);

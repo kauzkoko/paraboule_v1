@@ -80,8 +80,9 @@ export function useAnimationController() {
     }
   }
 
-  function flyToStart(broadcast = true) {
-    bus.emit("flyToStart");
+  function flyToStart(broadcast = true, fromHapticGrid = false) {
+    if (fromHapticGrid) bus.emit("flyToStart", "fromHapticGrid")
+    else bus.emit("flyToStart")
     if (broadcast) {
       animationController.send({
         type: "broadcast",
