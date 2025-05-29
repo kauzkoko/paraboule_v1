@@ -424,6 +424,11 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   // sky
   const isSky = ref(false);
+  watch(isSky, () => {
+    const borderColor = useCssVar('--border-color')
+    if (isSky.value) borderColor.value = '#666'
+    else borderColor.value = 'red'
+  })
 
   // positional audio
   const trigger = ref(0);

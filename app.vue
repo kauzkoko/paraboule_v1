@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div @click="logActivity">
     <NuxtPwaManifest />
     <NuxtLoadingIndicator />
     <NuxtLayout>
@@ -9,6 +9,28 @@
 </template>
 
 <script setup>
+const store = useProtoStore();
+let inactivityTimer = null;
+let inactivityTimeInSeconds = 120
+
+const handleInactivity = () => {
+  console.log(`No activity for ${inactivityTimeInSeconds} seconds - running inactivity function`);
+  store.infoScreen = true
+};
+
+const resetInactivityTimer = () => {
+  if (inactivityTimer) {
+    clearTimeout(inactivityTimer);
+  }
+
+  inactivityTimer = setTimeout(handleInactivity, inactivityTimeInSeconds * 1000); // 60 seconds
+};
+
+const logActivity = () => {
+  console.log("click");
+  resetInactivityTimer();
+};
+
 onMounted(() => {
   window.history.pushState(null, null, window.location.href);
   window.onpopstate = function () {
@@ -16,6 +38,14 @@ onMounted(() => {
   };
 
   window.addEventListener('contextmenu', e => e.preventDefault());
+
+  resetInactivityTimer();
+});
+
+onUnmounted(() => {
+  if (inactivityTimer) {
+    clearTimeout(inactivityTimer);
+  }
 });
 </script>
 
@@ -42,7 +72,7 @@ onMounted(() => {
   --cochonnet: var(--yellow);
 
   --background: var(--black);
-  --border-color: var(--red);
+
   --svg-color: var(--red);
 
 
@@ -54,6 +84,10 @@ onMounted(() => {
   --center-circle-border: var(--black);
   --center-circle-background: var(--white);
   --border-width: 3px;
+
+  --border-color-light: #666;
+  --border-color: var(--red);
+  /* --border-color: var(--border-color-light); */
 }
 
 

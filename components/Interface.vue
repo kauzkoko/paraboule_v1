@@ -1,5 +1,6 @@
 <template>
-  <div class="outer fixed left-0 transform-gpu translate-y--11px w-100dvw h-100dvh" @click="onFullscreenClick()">
+  <div class="outer fixed left-0 transform-gpu  w-100dvw h-100dvh" :class="{ 'translate-y--11px': !store.isSky }"
+    @click="onFullscreenClick()">
     <VirtualAudioSpace :trigger="audioTrigger"></VirtualAudioSpace>
   </div>
   <div class="outer" v-show="store.isTouchingSlider" @click="onClickSliderComponent"
@@ -59,7 +60,7 @@
           v-show="getItem(item).name !== 'Placeholder'" v-touch:swipe="(dir, e) => onSwipe(dir, e, index, item)"
           @click="onClick(item, index)" @touchstart="onTouchStart(index)" :style="{
             background:
-              touchedIndex === index ? 'red' : 'transparent',
+              touchedIndex === index ? 'red !important' : 'transparent',
             transition:
               touchedIndex === index ? 'all 100ms' : 'all 500ms',
             opacity: getItem(item).deactivated
@@ -79,7 +80,7 @@
           </div>
           <div
             class="flex justify-center items-center w-full h-full children:w-70% children:h-70% transition-opacity duration-1000"
-            :class="store.infoScreen ? 'opacity-0' : 'opacity-100'">
+            :class="{ 'bg-[rgb(255,78,78)]!': getItem(item).name === 'Toggle Light Mode', 'opacity-0': store.infoScreen, 'opacity-100': !store.infoScreen }">
             <SvgIcon v-if="getItem(item).imgSrc && !getItem(item).imgSrc.value && getItem(item).imgSrc.includes('.svg')"
               :name="getIconName(getItem(item).imgSrc)" />
             <img
@@ -1094,12 +1095,12 @@ const pages = [
       modes: ["All", "Dev", "Testing", "Exhibition", "S1"],
     },
     {
-      name: "Toggle Sky",
+      name: "Toggle Light Mode",
       clickFunction: () => {
         store.isSky = !store.isSky;
       },
-      html: "Toggle Sky",
-      cycler: useCycleList(["Toggle Sky"]),
+      html: "Toggle Light Mode",
+      cycler: useCycleList(["Toggle Light Mode"]),
       modes: ["All", "Dev", "Testing", "Exhibition", "S1", "S2"],
     },
     {
@@ -1588,7 +1589,7 @@ const pages = [
       },
       html: "Prediction Visualiser",
       cycler: useCycleList(["Prediction Visualiser"]),
-      modes: ["All", "Dev", "Testing", "Referee", "Exhibition", "S3"],
+      modes: ["All", "Dev", "Testing", "Referee", "Exhibition", "S2"],
     },
     {
       name: "Change YOLO model",
@@ -1938,8 +1939,15 @@ onMounted(() => {
 }
 
 @keyframes fadeRedToWhite {
-  0% { color: red; border-color: red; }
-  100% { color: white; border-color: white; }
+  0% {
+    color: red;
+    border-color: red;
+  }
+
+  100% {
+    color: white;
+    border-color: white;
+  }
 }
 
 .scannerClass div {

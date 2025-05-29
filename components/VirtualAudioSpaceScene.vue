@@ -21,7 +21,7 @@
     <TresMeshPhysicalMaterial :roughness=".2" :metalness="1" :emissive="boule.color" />
   </TresMesh>
   <StundenOrientation :startPoint="startPoint" />
-  <Sky v-if="store.isSky" :elevation="5" :distance="10" />
+  <Sky v-if="store.isSky" :elevation="1" :distance="20" />
   <!-- <Environment preset="sunset" /> -->
   <!-- <TresAmbientLight :intensity="230" /> -->
   <TresDirectionalLight :position="[cameraX, cameraY, cameraZ]" :rotation="[rotationX, (alpha * Math.PI) / 180, 0]"
