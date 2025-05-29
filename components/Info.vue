@@ -24,9 +24,6 @@
                     </div>
                 </div>
                 <div class="lower-content">
-                    <!-- <div v-if="store.infoStepper.isCurrent('welcome')">
-                        <p>As the Virtual Assistant Referee, you continuously scan the Boule field and track the current score. In this way you are helping them understand the positions of the Boules and prepare for their next shot.</p>
-                    </div> -->
                     <div v-if="store.infoStepper.isCurrent('welcome')"
                         class="mt--10px! flex justify-center flex-col items-center">
                         <div class="button-container info-next mb-10px border-black!"

@@ -9,6 +9,14 @@
 </template>
 
 <script setup>
+onMounted(() => {
+  window.history.pushState(null, null, window.location.href);
+  window.onpopstate = function () {
+    window.history.go(1);
+  };
+
+  window.addEventListener('contextmenu', e => e.preventDefault());
+});
 </script>
 
 <style>
@@ -57,9 +65,11 @@ body {
   /* font-family: "HelveticaNeue-Light", "Helvetica Neue Light", Helvetica, "Trebuchet MS", Verdana, sans-serif; */
   font-weight: 300;
   overflow: hidden;
-  overscroll-behavior-y: contain;
+  /* overscroll-behavior-y: contain; */
   /* font-family: "TwCenMTPro"; */
   font-family: 'Atkinson Hyperlegible Next', sans-serif;
+  user-select: none;
+  overscroll-behavior: none
 }
 
 button {
@@ -68,5 +78,17 @@ button {
   border: none;
   padding: 10px;
   border-radius: 5px;
+}
+
+input,
+textarea,
+select {
+  font-size: 16px;
+  /* Avoid iOS zooming */
+}
+
+img {
+  -webkit-user-drag: none;
+  user-drag: none;
 }
 </style>
