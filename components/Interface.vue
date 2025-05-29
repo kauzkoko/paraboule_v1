@@ -38,10 +38,10 @@
       </div>
     </div>
   </div>
-  <div class="outer pointer-events-none" v-show="store.predictionVisualiser">
-    <div class="container">
+  <div class="outer pointer-events-none" v-show="store.predictionVisualiser || store.scannerOpen">
+    <div class="container scannerClass">
       <div class="big">
-        <div v-show="!store.predictionVisualiser">
+        <div v-show="!store.predictionVisualiser || !store.scannerOpen">
           <div>Tap once to exit.</div>
         </div>
       </div>
@@ -50,7 +50,8 @@
   <div class="outer" ref="el" v-show="!store.isTouchingHaptic &&
     !store.isTouchingSlider &&
     !store.isTouchingTopCameraSlider &&
-    !store.predictionVisualiser
+    !store.predictionVisualiser &&
+    !store.scannerOpen
     ">
     <div class="container">
       <template v-for="(item, index) in currentPage" :key="'grid-item-' + index">
@@ -115,12 +116,13 @@
     </div>
     <QrScanner v-if="scanForQr" :scanForQr="scanForQr" @qrCodeFound="onQrCode"></QrScanner>
   </div>
-  <Slider @click="onClickSliderComponent" @touchstart="onTappingOnSlider" @touchend="onTappingOnSlider" />
+  @click="onClickSliderComponent" @touchstart="onTappingOnSlider" @touchend="onTappingOnSlider" />
   <TopCameraSlider @click="onClickToggleTopCameraSliderComponent" @touchstart="onTappingOnTopCameraSlider"
     @touchend="onTappingOnTopCameraSlider" />
   <VibrationGrid @click="onClickHapticGridComponent" @touchstart="onTappingOnHaptic" @touchend="onTappingOnHaptic">
   </VibrationGrid>
   <PredictionVisualiser></PredictionVisualiser>
+  <Scanner></Scanner>
 </template>
 
 <script setup>
@@ -243,7 +245,10 @@ const onFullscreenClick = () => {
     store.alphaController = false;
     flyToStart();
   }
-  console.log("in onFullscreenClick", store.alphaController);
+
+  if (store.scannerOpen) store.scannerOpen = false
+  if (store.predictionVisualiser) store.predictionVisualiser = false
+  // console.log("in onFullscreenClick", store.alphaController);
 };
 
 // register click functions
@@ -708,7 +713,7 @@ const computedUniqueQrHtml = computed(() => {
     </div>`;
 });
 
-const coinImgSrc = ref("/icons/gsicht.svg");
+const coinImgSrc = ref("/icons/coinFlip.svg");
 const tossCoin = () => {
   const totalTime = 2000;
   const count = 5;
@@ -721,7 +726,7 @@ const tossCoin = () => {
     //   }, (totalTime / count) * i);
     // }
     coinImgSrc.value =
-      Math.random() < 0.5 ? "/icons/gsicht.svg" : "/icons/zahl.svg";
+      Math.random() < 0.5 ? "/icons/coinFlip.svg" : "/icons/zahl.svg";
   }, totalTime);
 };
 
@@ -778,12 +783,12 @@ const pages = [
       modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo", "S1", "Exhibition"],
     },
     {
-      name: "Bug Slider",
+      name: "Bug",
       clickFunction: click_slider,
       imgSrc: "/icons/slider.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_slider.mp3",
-      html: "Bug Slider",
-      cycler: useCycleList(["Bug Slider"]),
+      html: "Bug",
+      cycler: useCycleList(["Bug"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
@@ -1121,13 +1126,7 @@ const pages = [
       cycler: useCycleList(["Show Stunden Orientation"]),
       modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
-    {
-      name: "Toggle Top Camera Slider",
-      clickFunction: click_toggleTopCameraSlider,
-      html: "Toggle Top Camera Slider",
-      cycler: useCycleList(["Toggle Top Camera Slider"]),
-      modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
-    },
+
     {
       name: "Change player 1 audio",
       clickFunction: () => {
@@ -1280,15 +1279,6 @@ const pages = [
   ],
   [
     {
-      name: "Ping Phone",
-      clickFunction: pingPhone,
-      imgSrc: "/icons/pingPhone.svg",
-      html: "Ping Phone",
-      explanationSrc: "/sounds/elevenlabs/explanation_phonePinger.mp3",
-      cycler: useCycleList(["Ping Phone", "Pairing Status"]),
-      modes: ["All", "Dev", "Testing", "QR", "S3", "Exhibition"],
-    },
-    {
       name: "50 / 50 Coin Flip",
       clickFunction: tossCoin,
       imgSrc: coinImgSrc,
@@ -1307,12 +1297,23 @@ const pages = [
       modes: ["All", "Dev", "Testing", "Player", "S3", "Exhibition"],
     },
     {
-      name: "Prediction Visualiser",
+      name: "Toggle Top Camera",
+      clickFunction: click_toggleTopCameraSlider,
+      imgSrc: "/icons/topGrid.svg",
+      html: "Toggle Top Camera",
+      cycler: useCycleList(["Toggle Top Camera"]),
+      modes: ["All", "Dev", "Testing", "Player", "S3", "Exhibition"],
+    },
+    {
+      name: "Scan Field",
       clickFunction: () => {
+        console.log("open scan field")
+        store.scannerOpen = !store.scannerOpen
         // store.predictionVisualiser = !store.predictionVisualiser;
       },
-      html: "Prediction Visualiser",
-      cycler: useCycleList(["Prediction Visualiser"]),
+      imgSrc: "/icons/scanField.svg",
+      html: "Scan Field",
+      cycler: useCycleList(["Scan Field"]),
       modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
     },
   ],
@@ -1326,11 +1327,11 @@ const pages = [
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
     {
-      name: "Undo Boules Thrown",
+      name: "Undo Last Increment",
       clickFunction: rewind,
       imgSrc: "/icons/rewind.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
-      cycler: useCycleList(["Undo Boules Thrown"]),
+      cycler: useCycleList(["Undo Last Increment"]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
     {
@@ -1366,11 +1367,11 @@ const pages = [
       modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
     },
     {
-      name: "Undo Score",
-      clickFunction: () => { console.log("implement undo score") },
+      name: "Undo Last Increment",
+      clickFunction: rewind,
       imgSrc: "/icons/rewind.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
-      cycler: useCycleList(["Undo Score"]),
+      cycler: useCycleList(["Undo Last Increment"]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
     {
@@ -1403,16 +1404,16 @@ const pages = [
       explanationSrc:
         "/sounds/elevenlabs/explanation_pairingStatusAnnouncer.mp3",
       html: "Pairing-Status:<br />Connected to 3wasds3w2.",
-      cycler: useCycleList(["Pairing Status", "Ping Phone"]),
+      cycler: useCycleList(["Pairing Status", "Ping Connected Phone"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
     {
-      name: "Ping Phone",
+      name: "Ping Connected Phone",
       clickFunction: pingPhone,
       imgSrc: "/icons/pingPhone.svg",
-      html: "Ping Phone",
+      html: "Ping Connected Phone",
       explanationSrc: "/sounds/elevenlabs/explanation_phonePinger.mp3",
-      cycler: useCycleList(["Ping Phone", "Pairing Status"]),
+      cycler: useCycleList(["Ping Connected Phone", "Pairing Status"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
     {
@@ -1573,7 +1574,7 @@ const pages = [
       explanationSrc: "/sounds/elevenlabs/explanation_scanField.mp3",
       cycler: useCycleList([
         "Scan Field",
-        "Toggle Top Camera Slider",
+        "Toggle Top Camera",
         "Scan and count points",
         "Set points from latest scan",
         "Increment shots taken",
@@ -1583,11 +1584,11 @@ const pages = [
     {
       name: "Prediction Visualiser",
       clickFunction: () => {
-        // store.predictionVisualiser = !store.predictionVisualiser;
+        store.predictionVisualiser = !store.predictionVisualiser;
       },
       html: "Prediction Visualiser",
       cycler: useCycleList(["Prediction Visualiser"]),
-      modes: ["All", "Dev", "Testing", "Referee", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Referee", "Exhibition", "S3"],
     },
     {
       name: "Change YOLO model",
@@ -1934,6 +1935,15 @@ onMounted(() => {
     ". ."
     ". .";
   user-select: none;
+}
+
+@keyframes fadeRedToWhite {
+  0% { color: red; border-color: red; }
+  100% { color: white; border-color: white; }
+}
+
+.scannerClass div {
+  animation: fadeRedToWhite 2000ms ease-in-out forwards;
 }
 
 .big {

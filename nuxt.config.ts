@@ -11,6 +11,10 @@ export default defineNuxtConfig({
       htmlAttrs: {
         lang: 'en',
       },
+      meta: [
+        { name: 'viewport', content: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' },
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+      ],
       // link: [
       //   { rel: 'preconnect', href: 'https://cdn.fonts.net' },
       //   { href: 'https://cdn.fonts.net/kit/b6404f4d-9ec8-4db4-b5d5-c631ce819028/b6404f4d-9ec8-4db4-b5d5-c631ce819028_enhanced.js', rel: 'stylesheet' },

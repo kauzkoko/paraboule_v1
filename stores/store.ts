@@ -27,7 +27,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const bus = useEventBus("protoboules");
 
   const modesCycler = useCycleList(modesList);
-  const initIndex = modesList.findIndex((mode) => mode.name === "S1");
+  const initIndex = modesList.findIndex((mode) => mode.name === "S3");
   modesCycler.go(initIndex);
 
   const prevMode = computed(() => {

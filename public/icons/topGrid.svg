@@ -1,0 +1,33 @@
+<svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_494_125)">
+<circle cx="133.5" cy="-14.5" r="39" stroke="#FF0000" stroke-width="3"/>
+<circle cx="17.5" cy="131.5" r="39" stroke="#FF0000" stroke-width="3"/>
+<circle cx="75" cy="75" r="23.5" stroke="#FF0000" stroke-width="3"/>
+<g style="mix-blend-mode:difference">
+<rect x="1.5" y="1.5" width="147" height="147" stroke="#FF0000" stroke-width="3"/>
+</g>
+<g style="mix-blend-mode:difference">
+<line x1="75.5" y1="-6.55671e-08" x2="75.5" y2="150" stroke="#FF0000" stroke-width="3"/>
+</g>
+<g style="mix-blend-mode:difference">
+<line x1="38.5" y1="-6.55671e-08" x2="38.5" y2="150" stroke="#FF0000" stroke-width="3"/>
+</g>
+<g style="mix-blend-mode:difference">
+<line x1="113.5" y1="-6.55671e-08" x2="113.5" y2="150" stroke="#FF0000" stroke-width="3"/>
+</g>
+<g style="mix-blend-mode:difference">
+<line x1="150" y1="75.5" x2="6.55671e-08" y2="75.5" stroke="#FF0000" stroke-width="3"/>
+</g>
+<g style="mix-blend-mode:difference">
+<line x1="150" y1="38.5" x2="6.55671e-08" y2="38.5" stroke="#FF0000" stroke-width="3"/>
+</g>
+<g style="mix-blend-mode:difference">
+<line x1="150" y1="113.5" x2="6.55671e-08" y2="113.5" stroke="#FF0000" stroke-width="3"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_494_125">
+<rect width="150" height="150" fill="white"/>
+</clipPath>
+</defs>
+</svg>
