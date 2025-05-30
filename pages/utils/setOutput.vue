@@ -21,7 +21,11 @@ onMounted(() => {
             .selectAudioOutput()
             .then(async (device) => {
                 console.log(`${device.kind}: ${device.label} id = ${device.deviceId}`);
-                await audioPlayer.value.setSinkId(device.deviceId);
+                // await audioPlayer.value.setSinkId(device.deviceId);
+
+                // await audioPlayer.value.setSinkId('70/R27WkAncd+jF0E43UJ8GkXaCsIDRolfHxS9gWWBo=');
+                // await audioPlayer.value.setSinkId('70/R27WkAncd+jF0E43UJ8GkXaCsIDRolfHxS9gWWBo=');
+
 
                 audioPlayer.value.play()
             })
