@@ -17,6 +17,10 @@
                             v-html="store.infoStepper.current[store.modesCycler.state.name === 'S1' || store.modesCycler.state.name === 'S2' || store.modesCycler.state.name === 'S3' ? store.modesCycler.state.name : 'Empty'].upperText">
                         </p>
                     </div>
+                    <div v-if="store.infoStepper.isCurrent('disclaimer')">
+                        <h1 v-html="store.infoStepper.current.title"></h1>
+                        <p class="mt-10px! mb-40px!" v-html="store.infoStepper.current.upperText"></p>
+                    </div>
                     <div v-else>
                         <h1 v-html="store.infoStepper.current.title"></h1>
                         <img v-if="store.infoStepper.current.img" :src="store.infoStepper.current.img" />
@@ -36,6 +40,9 @@
                         <p
                             v-html="store.infoStepper.current[store.modesCycler.state.name === 'S1' || store.modesCycler.state.name === 'S2' || store.modesCycler.state.name === 'S3' ? store.modesCycler.state.name : 'Empty'].bottomText">
                         </p>
+                    </div>
+                    <div v-if="store.infoStepper.isCurrent('disclaimer')">
+                        <p class="mt-10px! mb-40px!" v-html="store.infoStepper.current.bottomText"></p>
                     </div>
                     <div v-if="store.infoStepper.isCurrent('center-circle')" class="mt--10px!">
                         <DoubleTap />

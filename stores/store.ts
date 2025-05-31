@@ -518,18 +518,18 @@ export const useProtoStore = defineStore("protoStore", () => {
     'role': {
       'S1': {
         title: 'Smartphone 1:<br>Before the shot',
-        upperText: 'Text 1 Before the shot',
-        bottomText: 'Text 2 Before the shot.'
+        upperText: 'You are using the first of three smartphone interfaces, each designed for a specific role. It lets you analyze the game through spatial audio and haptic feedback.',
+        bottomText: 'Use the button functions to understand the positions of the boules and prepare for your next shot. The feedback will help you understand the game situation and make strategic decisions.'
       },
       'S2': {
         title: 'Smartphone 2:<br>Orientation',
-        upperText: 'Text 1 Orientation',
-        bottomText: 'Text 2 Orientation.'
+        upperText: 'You are using the second of three smartphone interfaces, each designed for a specific role. It shows you how to orient yourself in the game and how to pair other smartphones.',
+        bottomText: 'Use the button functions to understand the positions of the playground and the starting point. Scan the QR code to pair your smartphone with this session.'
       },
       'S3': {
         title: 'Smartphone 3:<br>VAR',
-        upperText: 'As the Virtual Assistant Referee, you continuously scan the Boule field and track the current score.',
-        bottomText: 'You provide real-time data that enables the visually impaired player to receive spatial audio feedback through their earphones. Through that you are helping them understand the positions of the Boules and prepare for their next shot.'
+        upperText: 'You are using the third of three smartphone interfaces, each designed for a specific role. It acts as the Virtual Assistant Referee, continuously scanning the Boule field and tracking the current score.',
+        bottomText: 'Use this smartphone to provide real-time data. This enables the player on Smartphone 1 to receive spatial audio feedback, helping them understand the positions of the boules and prepare for their next shot.'
       },
       'Empty': {
         title: 'Empty Title',
@@ -546,6 +546,11 @@ export const useProtoStore = defineStore("protoStore", () => {
       title: 'Invisible Circle<br>',
       subtitle: 'The Invisible Circle is your main navigation aid in the app. Perform the following gestures directly on its area. Note: 2X2 BUTTON gestures apply here as well. ',
     },
+    'disclaimer': {
+      title: 'Disclaimer',
+      upperText: 'This version of PARABOULE is curated for exhibition purposes and in this composition not intended for real-life gameplay.',
+      bottomText: 'The app is designed to help visually impaired players as well as sighted players to play and experience Pétanque through binaural audio.'
+    }
   })
 
   const buttonTransition = ref(false);
