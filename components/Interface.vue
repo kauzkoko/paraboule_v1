@@ -116,6 +116,13 @@
       </div>
     </div>
     <QrScanner v-if="scanForQr" :scanForQr="scanForQr" @qrCodeFound="onQrCode"></QrScanner>
+    <div v-if="lastQrCode" class="fixed left-0 top-0 w-100dvw h-100dvh bg-black/50 z-1000 flexCenter" @click="lastQrCode = null">
+      <div class="text-white text-24px font-bold max-w-80%">
+        <div>
+          Wow, you fucked up the app.<br> Ege was that you?<br>Nevermind. You get the idea. Scan a QR code from another PARABOULE session to add an additional smartphone. Tap to close.
+        </div>
+      </div>
+    </div>
   </div>
   @click="onClickSliderComponent" @touchstart="onTappingOnSlider" @touchend="onTappingOnSlider" />
   <TopCameraSlider @click="onClickToggleTopCameraSliderComponent" @touchstart="onTappingOnTopCameraSlider"
@@ -595,9 +602,9 @@ const rewind = () => {
 };
 
 const scanForQr = ref(false);
-const lastQrCode = ref("");
+const lastQrCode = ref(null);
 const onQrCode = (code) => {
-  // console.log("qrCodeFound", code);
+  console.log("onQrCode", code);
   lastQrCode.value = code;
   scanForQr.value = false;
 };
@@ -605,9 +612,9 @@ const onQrCode = (code) => {
 const scanqr = () => {
   // console.log("scanqr");
   scanForQr.value = !scanForQr.value;
-  setInterval(() => {
-    scanForQr.value = false;
-  }, 10000);
+  // setInterval(() => {
+  //   scanForQr.value = false;
+  // }, 10000);
 };
 
 const scoresSounds = [];
@@ -723,7 +730,7 @@ const addFunction = () => {
   // TODO: add add function
 };
 
-const url = ref("asdfdsadf");
+const url = ref("https://exhibitionapp.netlify.app/");
 const qrcode = useQRCode(url.value, {
   margin: 1,
   width: 110,
@@ -873,7 +880,7 @@ const pages = [
       imgSrc: "/icons/cocho.svg",
       explanationSrc: "/sounds/elevenlabs/explanation_pingCocho.mp3",
       cycler: useCycleList(["Ping Cochonnet"]),
-      modes: ["All", "Dev", "Testing", "Player", "Solo", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Player", "Solo", "S1", "S2", "Exhibition"],
     },
     {
       name: "Ping Starting Point",
@@ -1127,7 +1134,7 @@ const pages = [
       },
       html: "Toggle Light Mode",
       cycler: useCycleList(["Toggle Light Mode"]),
-      modes: ["All", "Dev", "Testing", "Exhibition", "S1", "S2"],
+      modes: ["All", "Dev", "Testing", "Exhibition", "S1"],
     },
     {
       name: "Exhibition Mode",
@@ -1140,7 +1147,7 @@ const pages = [
       },
       html: "Activate Exhibition Mode",
       cycler: useCycleList(["Exhibition Mode"]),
-      modes: ["All", "Dev", "Testing", "Referee", "S1", "S2"],
+      modes: ["All", "Dev", "Testing", "Referee", "S1"],
     },
   ],
   [
@@ -1426,11 +1433,29 @@ const pages = [
   ],
   [
     {
+        name: "Find XR Starting Point",
+        clickFunction: () => {
+        },
+        html: "Find XR Starting Point",
+        cycler: useCycleList(["Find XR Starting Point"]),
+        modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
+      },
+      {
+        name: "Find XR Cochonnet",
+        clickFunction: () => {
+        },
+        html: "Find XR Cochonnet",
+        cycler: useCycleList(["Find XR Cochonnet"]),
+        modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
+      },
+  ],
+  [
+    {
       name: "Pairing Status",
       clickFunction: qrStatus,
       explanationSrc:
         "/sounds/elevenlabs/explanation_pairingStatusAnnouncer.mp3",
-      html: "Pairing-Status:<br />Connected to 3wasds3w2.",
+      html: { "value": "Status:<br>Paired with<br> Smartphone 1 and 3" },
       cycler: useCycleList(["Pairing Status", "Ping Connected Phone"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
@@ -1446,20 +1471,20 @@ const pages = [
     {
       name: "Scan QR",
       clickFunction: scanqr,
-      imgSrc: "/icons/scanQr1.svg",
+      imgSrc: "/icons/scanQR.svg",
       html: "Scan QR",
       explanationSrc: "/sounds/elevenlabs/explanation_qrScanner.mp3",
-      cycler: useCycleList(["Scan QR", "Unique QR"]),
+      cycler: useCycleList(["Scan QR", "Pair via Unique QR"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
     {
-      name: "Unique QR",
+      name: "Pair via Unique QR",
       clickFunction: qr,
       imgSrc: qrcode,
-      html: "Unique QR",
+      html: "Pair via Unique QR",
       // html: computedUniqueQrHtml",
       explanationSrc: "/sounds/elevenlabs/explanation_uniqueQr.mp3",
-      cycler: useCycleList(["Unique QR", "Scan QR"]),
+      cycler: useCycleList(["Pair via Unique QR", "Scan QR"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
   ],
@@ -1615,7 +1640,7 @@ const pages = [
       },
       html: "Prediction Visualiser",
       cycler: useCycleList(["Prediction Visualiser"]),
-      modes: ["All", "Dev", "Testing", "Referee", "Exhibition", "S2"],
+      modes: ["All", "Dev", "Testing", "Referee"],
     },
     {
       name: "Change YOLO model",
@@ -1688,6 +1713,39 @@ const pages = [
       html: "Mock Intersections",
       cycler: useCycleList(["Mock Intersections"]),
       modes: ["All", "Dev", "Testing", "Referee", "Assistant", "Exhibition"],
+    },
+  ],
+  [
+    {
+      name: "Toggle Light Mode",
+      clickFunction: () => {
+        store.isSky = !store.isSky;
+      },
+      html: "Toggle Light Mode",
+      cycler: useCycleList(["Toggle Light Mode"]),
+      modes: ["All", "Dev", "Testing", "Exhibition", "S2"],
+    },
+    {
+      name: "Exhibition Mode",
+      clickFunction: () => {
+        const findExhibitionModeIndex = modesList.findIndex(
+          (mode) => mode.name === "Exhibition"
+        );
+        store.modesCycler.go(findExhibitionModeIndex);
+        speak("Exhibition mode activated");
+      },
+      html: "Activate Exhibition Mode",
+      cycler: useCycleList(["Exhibition Mode"]),
+      modes: ["All", "Dev", "Testing", "Referee", "S2"],
+    },
+    {
+      name: "Prediction Visualiser",
+      clickFunction: () => {
+        store.predictionVisualiser = !store.predictionVisualiser;
+      },
+      html: "Prediction Visualiser",
+      cycler: useCycleList(["Prediction Visualiser"]),
+      modes: ["All", "Dev", "Testing", "Referee", "Exhibition", "S2"],
     },
   ]
 ];
@@ -2044,6 +2102,7 @@ onMounted(() => {
 
 .center-circle {
   width: 200px;
+  height: 200px;
   aspect-ratio: 1;
   border-radius: 50%;
   position: absolute;
@@ -2068,6 +2127,7 @@ onMounted(() => {
     aspect-ratio: 1;
     border-radius: 50%;
     width: 100%;
+    height: 100%;
     border: var(--border-width) solid var(--center-circle-border);
     overflow: hidden;
     /* background-color: var(--center-circle-background); */
