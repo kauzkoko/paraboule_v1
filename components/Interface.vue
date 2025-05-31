@@ -132,6 +132,8 @@ import { useQRCode } from "@vueuse/integrations/useQRCode";
 
 await preloadComponents(['SvgIcon'])
 
+
+
 const store = useProtoStore();
 const { speak } = useSpeech();
 const bus = useEventBus("protoboules");
@@ -206,6 +208,21 @@ watch(
     }
   }
 );
+
+let centerCircleOpacityMin = .05
+const centerCircleOpacity = ref(centerCircleOpacityMin);
+const { pause, resume, isActive } = useIntervalFn(() => {
+  centerCircleOpacity.value === centerCircleOpacityMin ? centerCircleOpacity.value = 1 : centerCircleOpacity.value = centerCircleOpacityMin
+}, 10000)
+
+watch(() => store.infoScreen, () => {
+  if (store.infoScreen) {
+    centerCircleOpacity.value = centerCircleOpacityMin
+    pause()
+  } else {
+    resume()
+  }
+})
 
 const onSwipe = (direction, e, index, item) => {
   if (direction === "right") {
@@ -2037,6 +2054,8 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   mix-blend-mode: difference;
+  clip-path: circle(50% at 50% 50%);
+
 
   /* box-shadow: 0px 0px 35px 14px var(--center-circle-shadow) inset; */
   /* background-color: var(--center-circle-background); */
@@ -2064,7 +2083,11 @@ onMounted(() => {
     /* opacity: 0.5; */
     background-color: red;
     background: linear-gradient(180deg, #F00 0%, #900 100%);
-    background: transparent;
+    /* background: transparent; */
+    opacity: v-bind(centerCircleOpacity);
+    transition: opacity 5000ms ease-in-out;
+    clip-path: circle(50% at 50% 50%);
+
   }
 
   >* {
