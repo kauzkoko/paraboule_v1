@@ -108,28 +108,29 @@ export const modesList = [
 // ];
 
 const unscaledBahnMockIntersections = [
-  // [
-  //   {
-  //     x: 0,
-  //     y: 0,
-  //     z: 0,
-  //     class: "cochonnet",
-  //   },
-  // ],
-  // [
-  //   {
-  //     x: 0,
-  //     y: 0,
-  //     z: 0,
-  //     class: "cochonnet",
-  //   },
-  //   {
-  //     x: -119,
-  //     y: 340,
-  //     z: 0,
-  //     class: "dark",
-  //   },
-  // ],
+  [],
+  [
+    {
+      x: 0,
+      y: 0,
+      z: 0,
+      class: "cochonnet",
+    },
+  ],
+  [
+    {
+      x: 0,
+      y: 0,
+      z: 0,
+      class: "cochonnet",
+    },
+    {
+      x: -119,
+      y: 340,
+      z: 0,
+      class: "dark",
+    },
+  ],
   [
     {
       x: 0,

@@ -13,7 +13,7 @@ export function useExhibitionController() {
       stopFilm(false);
     })
     .on("broadcast", { event: "shootFilmBoule" }, (event) => {
-      shootFilmBoule(false);
+      bus.emit("shootFilmBouleSmartphone", event.payload);
     })
     .on("broadcast", { event: "pingCochonnet" }, (event) => {
       pingCochonnet(false);
@@ -50,13 +50,32 @@ export function useExhibitionController() {
     }
   }
 
-  function shootFilmBoule(broadcast = true) {
-    bus.emit("shootFilmBoule");
+  const {
+    isSupported,
+    data,
+    post,
+    error,
+  } = useBroadcastChannel({ name: 'paraboule' })
+
+  watch(data, () => {
+    if (data.value) {
+      if (data.value.event === "shootFilmBouleBahn") {
+        const { playedCount, scheduledTime } = data.value.payload;
+        bus.emit("shootFilmBouleBahn", { playedCount, scheduledTime });
+      }
+    }
+  })
+
+  function shootFilmBoule({ playedCount, scheduledTime, broadcast = false }: { playedCount: number, scheduledTime: number, broadcast?: boolean }) {
+    post({
+      event: "shootFilmBouleBahn",
+      payload: { playedCount, scheduledTime },
+    })
     if (broadcast) {
       exhibitionController.send({
         type: "broadcast",
         event: "shootFilmBoule",
-        payload: {},
+        payload: { playedCount, scheduledTime },
       });
     }
   }

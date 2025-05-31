@@ -503,11 +503,53 @@ export const useProtoStore = defineStore("protoStore", () => {
     }
   });
 
+  const setIntersectionsByNumber = (number: number) => {
+    rawIntersections.value = mockIntersections[number]
+  }
+
+  const checkTimes = [7, 66, 116]
+  bus.on((message, payload) => {
+    if (message === "shootFilmBouleSmartphone") {
+        console.log("shootFilmBouleSmartphone", payload)
+        if (payload.playedCount === 0 || payload.playedCount % 2 === 0) {
+          if (payload.scheduledTime === checkTimes[0]) {
+            setIntersectionsByNumber(2)
+          }
+          if (payload.scheduledTime === checkTimes[1]) {
+            setIntersectionsByNumber(3)
+          }
+          if (payload.scheduledTime === checkTimes[2]) {
+            setIntersectionsByNumber(4)
+          }
+        } else if (payload.playedCount % 2 === 1) {
+          if (payload.scheduledTime === checkTimes[0]) {
+            setIntersectionsByNumber(5)
+          }
+          if (payload.scheduledTime === checkTimes[1]) {
+            setIntersectionsByNumber(6)
+          }
+          if (payload.scheduledTime === checkTimes[2]) {
+            setIntersectionsByNumber(7)
+            setTimeout(() => {
+                setTimeout(() => {
+                  setIntersectionsByNumber(0)
+                  setTimeout(() => {
+                    setIntersectionsByNumber(1)
+                  }, 5000)
+                }, 7000)
+            }, 40000)
+          }
+        }
+    }
+});
+setIntersectionsByNumber(1)
+
+
   const setMockIntersections = () => {
     // console.log("setMockIntersections", mockIntersectionsCycler.state.value);
     rawIntersections.value = mockIntersectionsCycler.state.value;
   };
-  setMockIntersections();
+  // setMockIntersections();
 
   const infoStepper = useStepper({
     'welcome': {

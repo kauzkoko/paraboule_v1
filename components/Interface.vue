@@ -916,7 +916,7 @@ const pages = [
     },
     {
       name: "Focus Big Boules",
-      deactivated: computed(() => store.boulesCount < 1),
+      deactivated: computed(() => store.boulesCount < 2),
       clickFunction: () => click_bouleFocuser("all"),
       imgSrc: "/icons/focusAllBlur2.png",
       html: "Focus all Boules",
@@ -934,6 +934,7 @@ const pages = [
     },
     {
       name: "Focus Team Blue",
+      deactivated: computed(() => store.boulesCount < 2),
       clickFunction: () => {
         const blueBoules = store.boulesToDisplay
           .map((boule, index) => ({ index, class: boule.class }))
@@ -950,6 +951,8 @@ const pages = [
     },
     {
       name: "Focus Team Red",
+      deactivated: computed(() => store.boulesCount < 2),
+
       clickFunction: () => {
         const redBoules = store.boulesToDisplay
           .map((boule, index) => ({ index, class: boule.class }))
