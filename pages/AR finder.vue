@@ -225,7 +225,7 @@ function stop() {
 }
 
 async function onSessionStarted(session) {
-  console.log("onSessionStarted");
+  // console.log("onSessionStarted");
   currentSession = session;
   session.addEventListener("end", onSessionEnded);
 
@@ -236,7 +236,7 @@ async function onSessionStarted(session) {
 
 function onSessionEnded() {
   if (currentSession !== null) {
-    console.log("onSessionEnded");
+    // console.log("onSessionEnded");
     currentSession.removeEventListener("end", onSessionEnded);
     currentSession = null;
 
@@ -400,7 +400,7 @@ function setStartPointByRay() {
 
   if (intersects.length > 0) {
     const intersectPoint = intersects[0].point;
-    console.log("Start point set at:", intersectPoint);
+    // console.log("Start point set at:", intersectPoint);
 
     const markerGeometry = new THREE.CylinderGeometry(0.3, 0.3, 0.1, 32);
     const markerMaterial = new THREE.MeshBasicMaterial({
@@ -420,7 +420,7 @@ function setStartPointByRay() {
     });
     scene.add(startpoint);
   } else {
-    console.log("No intersection with plane found");
+    // console.log("No intersection with plane found");
   }
 }
 
@@ -466,7 +466,7 @@ function setNewField() {
   currentIntersectionMesh = sphere;
   scene.add(currentIntersectionMesh);
 
-  console.log("intersectPoint", intersectPoint);
+  // console.log("intersectPoint", intersectPoint);
 }
 
 function removeField() {
@@ -526,7 +526,7 @@ function setFieldByRay() {
     currentIntersectionMesh = sphere;
     scene.add(currentIntersectionMesh);
   } else {
-    console.log("No intersection with plane found");
+    // console.log("No intersection with plane found");
   }
 }
 
@@ -693,7 +693,7 @@ async function animate(timestamp, frame) {
       const angleXZ = THREE.MathUtils.radToDeg(
         Math.acos(directionXZ.dot(cameraDirectionXZ))
       );
-      console.log("Angle on XZ plane:", angleXZ);
+      // console.log("Angle on XZ plane:", angleXZ);
 
       // Update playback rate
       sound.setVolume(1);

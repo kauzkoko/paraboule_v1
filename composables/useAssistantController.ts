@@ -19,7 +19,7 @@ export function useAssistantController() {
 
   assistantController.on("broadcast", { event: "mute" }, (event) => {
     if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
-      console.log("mute");
+      // console.log("mute");
       Howler.stop();
       store.mute3dAudio();
       window.speechSynthesis.cancel();
@@ -28,7 +28,7 @@ export function useAssistantController() {
 
   assistantController.on("broadcast", { event: "unmute" }, (event) => {
     if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
-      console.log("unmute");
+      // console.log("unmute");
       Howler.stop();
       store.unmute3dAudio();
       window.speechSynthesis.cancel();

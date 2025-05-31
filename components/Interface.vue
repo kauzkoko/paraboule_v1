@@ -239,11 +239,11 @@ const onSwipe = (direction, e, index, item) => {
 const setAlphaController = () => {
   store.alphaController = !store.alphaController;
   store.baseAlpha = store.gyroAlpha;
-  console.log("in setAlphaController", store.alphaController);
+  // console.log("in setAlphaController", store.alphaController);
 };
 
 whenever(() => !store.alphaController, () => {
-  console.log('test')
+  // console.log('test')
   flyToStart()
 })
 
@@ -255,7 +255,7 @@ const onFullscreenClick = () => {
 
   if (store.scannerOpen) store.scannerOpen = false
   if (store.predictionVisualiser) store.predictionVisualiser = false
-  // console.log("in onFullscreenClick", store.alphaController);
+  // // console.log("in onFullscreenClick", store.alphaController);
 };
 
 // register click functions
@@ -268,7 +268,7 @@ const scanCamera = () => {
         bus.emit("startXR");
       }
     } else {
-      console.log("AR not supported");
+      // console.log("AR not supported");
       speak("AR not supported");
     }
   }
@@ -290,7 +290,7 @@ const scanForPoints = () => {
 };
 
 const setPointsFromLatestScan = () => {
-  console.log("setPointsFromLatestScan");
+  // console.log("setPointsFromLatestScan");
   store.setScoreFromPoints();
 };
 
@@ -340,7 +340,7 @@ const click_bouleFocuser = (bouleIndex) => {
 };
 
 const qr = () => {
-  console.log("qr");
+  // console.log("qr");
 };
 
 const pairingStatusAnnouncer = useSoundComposable(
@@ -372,7 +372,7 @@ const micUp = new Audio("/sounds/strudel/micup.mp3");
 watch(isListening, () => {
   if (!isListening.value) {
     let compare = result.value.toLowerCase();
-    console.log("compare", compare);
+    // console.log("compare", compare);
     switch (compare) {
       case "page 1":
       case "page one":
@@ -486,7 +486,7 @@ watch(isListening, () => {
         click_hapticGridNear();
         break;
       default:
-        console.log("default", result.value);
+        // console.log("default", result.value);
         setTimeout(() => {
           micDown.play();
         }, 500);
@@ -499,24 +499,24 @@ watch(isListening, () => {
 });
 
 const onDoubleClick = () => {
-  console.log("onDoubleClick");
+  // console.log("onDoubleClick");
   if (clickTimeout) {
     clearTimeout(clickTimeout);
     clickTimeout = null;
   }
   // if (!isListening.value) {
   //   start();
-  //   console.log("start listening");
+  //   // console.log("start listening");
   // }
   click_toggleMute();
 };
 
 const incrementPlayer1 = () => {
-  console.log("incrementPlayer1");
+  // console.log("incrementPlayer1");
   store.incrementPlayer1shotsTaken();
 };
 const incrementPlayer2 = () => {
-  console.log("incrementPlayer2");
+  // console.log("incrementPlayer2");
   store.incrementPlayer2shotsTaken();
 };
 
@@ -560,7 +560,7 @@ const computedScoreStandingsHtml = computed(() => {
 
 const text = ref("");
 const announceBallsPlayed = () => {
-  console.log("announceBallsPlayed");
+  // console.log("announceBallsPlayed");
   text.value = `Player 1 has played ${store.players.player1.shotsTaken} ${store.players.player1.shotsTaken === 1 ? "ball" : "balls"
     }. Player 2 has played ${store.players.player2.shotsTaken} ${store.players.player2.shotsTaken === 1 ? "ball" : "balls"
     }. `;
@@ -572,20 +572,20 @@ const announceBallsPlayed = () => {
 };
 
 const rewind = () => {
-  console.log("rewind");
+  // console.log("rewind");
   store.undoPlayers();
 };
 
 const scanForQr = ref(false);
 const lastQrCode = ref("");
 const onQrCode = (code) => {
-  console.log("qrCodeFound", code);
+  // console.log("qrCodeFound", code);
   lastQrCode.value = code;
   scanForQr.value = false;
 };
 
 const scanqr = () => {
-  console.log("scanqr");
+  // console.log("scanqr");
   scanForQr.value = !scanForQr.value;
   setInterval(() => {
     scanForQr.value = false;
@@ -602,13 +602,13 @@ for (let i = 0; i <= 13; i++) {
 }
 
 const scoreStandings = () => {
-  console.log("scoreStandings");
+  // console.log("scoreStandings");
   const index = store.players.player1.score * 14 + store.players.player2.score;
   scoresSounds[index].play();
 };
 
 const pingShoes = () => {
-  console.log("pingShoes");
+  // console.log("pingShoes");
   if (!afterLongPress) {
     sendPlayHoola();
     pingStartingPoint();
@@ -622,12 +622,12 @@ const pingPhone = () => {
 };
 
 const refreshPage = () => {
-  console.log("refreshPage");
+  // console.log("refreshPage");
   window.location.reload();
 };
 
 const onClickSliderComponent = () => {
-  console.log("onClickSliderComponent");
+  // console.log("onClickSliderComponent");
   store.isTouchingSliderTimeout = true
   store.isTouchingSlider = !store.isTouchingSlider;
 };
@@ -657,7 +657,7 @@ const click_toggleFixedTopCamera = () => {
 };
 
 const click_toggleTopCameraSlider = () => {
-  console.log("click_toggleTopCamera");
+  // console.log("click_toggleTopCamera");
   store.isTouchingTopCameraSlider = !store.isTouchingTopCameraSlider;
   toggleTopCamera();
 };
@@ -689,7 +689,7 @@ const click_hapticGridFar = () => {
 };
 
 const click_toggleMute = () => {
-  console.log("click_toggleMute");
+  // console.log("click_toggleMute");
   Howler.stop();
   store.toggle3dAudio();
   window.speechSynthesis.cancel();
@@ -701,7 +701,7 @@ const click_toggleMute = () => {
 };
 
 const addFunction = () => {
-  console.log("addFunction");
+  // console.log("addFunction");
   // TODO: add add function
 };
 
@@ -731,7 +731,7 @@ const tossCoin = () => {
     // for (let i = 1; i < count; i++) {
     //   setTimeout(() => {
     //     coinImgSrc.value = "/icons/fragezeichen" + (i + 1) + ".svg";
-    //     console.log("coinImgSrc", coinImgSrc.value);
+    //     // console.log("coinImgSrc", coinImgSrc.value);
     //   }, (totalTime / count) * i);
     // }
     coinImgSrc.value =
@@ -880,7 +880,7 @@ const pages = [
         } else {
           store.bouleFocuserCycler.next();
         }
-        console.log(currentBouleFocuserFunction)
+        // console.log(currentBouleFocuserFunction)
 
       },
       imgSrc: "/icons/heart.png",
@@ -1231,7 +1231,7 @@ const pages = [
                 } else if (prevSelectedBoules.length === 1) {
                   click_bouleFocuser(prevSelectedBoules[0]);
                 } else {
-                  console.log("no boules were selected");
+                  // console.log("no boules were selected");
                 }
                 store.volume = 0;
               }, i * timeout + timeout);
@@ -1316,7 +1316,7 @@ const pages = [
     {
       name: "Scan Field",
       clickFunction: () => {
-        console.log("open scan field")
+        // console.log("open scan field")
         store.scannerOpen = !store.scannerOpen
         // store.predictionVisualiser = !store.predictionVisualiser;
       },
@@ -1703,7 +1703,7 @@ const setPagesBasedOnMode = () => {
     );
   });
   if (flatModes) {
-    console.log("flatModes", flatModes);
+    // console.log("flatModes", flatModes);
     let tempFlatPagesBasedOnMode = [];
     pagesBasedOnMode.value.forEach((page) => {
       page.forEach((item) => {
@@ -1726,7 +1726,7 @@ const setPagesBasedOnMode = () => {
       structuredPages.push(row);
     }
     pagesBasedOnMode.value = structuredPages;
-    console.log("Structured pages created:", pagesBasedOnMode.value);
+    // console.log("Structured pages created:", pagesBasedOnMode.value);
     goTo(stepNames.value[0]);
   }
 };
@@ -1735,7 +1735,7 @@ setPagesBasedOnMode();
 watch(
   () => store.modesCycler.state,
   () => {
-    console.log("mode changed", store.modesCycler.state.name);
+    // console.log("mode changed", store.modesCycler.state.name);
     pagesBasedOnMode.value = [];
     setPagesBasedOnMode();
   }
@@ -1753,7 +1753,7 @@ const announcePage = () => {
     );
   }
   const message = `Page ${stepperIndex.value + 1}. ${names.join(", ")}.`;
-  console.log(message);
+  // console.log(message);
   speak(message);
 };
 
@@ -1787,7 +1787,7 @@ let lastIndex = 0;
 const longPressCallback = (e) => {
   afterLongPress = true;
   const index = e.srcElement.getAttribute("index");
-  console.log("long press on index", index);
+  // console.log("long press on index", index);
 
   if (index === "pageAnnouncer") {
     pageAnnouncerExplanation.play();
@@ -1908,7 +1908,7 @@ onKeyStroke(["v"], (e) => {
 });
 
 onMounted(() => {
-  goTo(stepNames.value[2]);
+  // goTo(stepNames.value[2]);
 
 })
 </script>

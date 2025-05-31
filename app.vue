@@ -14,7 +14,7 @@ let inactivityTimer = null;
 let inactivityTimeInSeconds = 120
 
 const handleInactivity = () => {
-  console.log(`No activity for ${inactivityTimeInSeconds} seconds - running inactivity function`);
+  // console.log(`No activity for ${inactivityTimeInSeconds} seconds - running inactivity function`);
   store.infoScreen = true
 };
 
@@ -27,7 +27,7 @@ const resetInactivityTimer = () => {
 };
 
 const logActivity = () => {
-  console.log("click");
+  // console.log("click");
   resetInactivityTimer();
 };
 

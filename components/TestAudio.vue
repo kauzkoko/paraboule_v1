@@ -22,7 +22,7 @@ let sound;
 watch(
   () => props.parent,
   (newVal) => {
-    console.log(newVal);
+    // console.log(newVal);
     sound = new THREE.PositionalAudio(props.listener);
     const audioLoader = new THREE.AudioLoader();
     audioLoader.load("/sounds/strudel/simplebeat.mp3", function (buffer) {
@@ -47,7 +47,7 @@ const volume = ref(0);
 watch(
   () => props.isSelected,
   (newVal) => {
-    console.log(newVal);
+    // console.log(newVal);
     if (newVal) {
       animate(volume, {
         value: 1,

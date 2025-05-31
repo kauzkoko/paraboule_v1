@@ -27,7 +27,7 @@ const store = useProtoStore();
 const { predictions, xrRunning } = storeToRefs(store);
 
 watch(predictions, (newVal) => {
-  console.log(newVal);
+  // console.log(newVal);
 });
 </script>
 

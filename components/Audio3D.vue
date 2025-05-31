@@ -1,15 +1,8 @@
 <template>
   <TresMesh>
     <Suspense>
-      <PositionalAudio
-        ref="positionalAudioRef"
-        :ready="true"
-        loop
-        :helper="true"
-        :autoplay="false"
-        :key="trigger + props.localTrigger + props.index"
-        :url="props.url ?? props.src"
-      />
+      <PositionalAudio ref="positionalAudioRef" :ready="true" loop :helper="true" :autoplay="false"
+        :key="trigger + props.localTrigger + props.index" :url="props.url ?? props.src" />
     </Suspense>
   </TresMesh>
 </template>
@@ -20,11 +13,11 @@ import { PositionalAudio } from "@tresjs/cientos";
 const props = defineProps({
   url: {
     type: String,
-    // default: "/sounds/strudel/c3major.mp3",
+    default: "/sounds/strudel/raman1.mp3",
   },
   src: {
     type: String,
-    // default: "/sounds/strudel/c3major.mp3",
+    default: "/sounds/strudel/raman2.mp3",
   },
   localTrigger: {
     type: Number,
@@ -53,23 +46,23 @@ const store = useProtoStore();
 const { volume, trigger } = storeToRefs(store);
 import { gsap } from "gsap";
 
-watch(() => store.volumePulse, () => {
-  if (positionalAudioRef.value) {
-    console.log("volumePulse", store.volumePulse);
-    gsap.to(positionalAudioRef.value.instance.gain.gain, {
-      value: 2,
-      duration: .3,
-      ease: "power2.out",
-      onComplete: () => {
-        gsap.to(positionalAudioRef.value.instance.gain.gain, {
-          value: 1,
-          duration: 0.2,
-          ease: "power2.out",
-        });
-      },
-    });
-  }
-});
+// watch(() => store.volumePulse, () => {
+//   if (positionalAudioRef.value) {
+//     // console.log("volumePulse", store.volumePulse);
+//     gsap.to(positionalAudioRef.value.instance.gain.gain, {
+//       value: 2,
+//       duration: .3,
+//       ease: "power2.out",
+//       onComplete: () => {
+//         gsap.to(positionalAudioRef.value.instance.gain.gain, {
+//           value: 1,
+//           duration: 0.2,
+//           ease: "power2.out",
+//         });
+//       },
+//     });
+//   }
+// });
 
 
 // if (positionalAudioRef.value) {
@@ -77,6 +70,7 @@ watch(() => store.volumePulse, () => {
 // }
 
 watchEffect(() => {
+  console.log("triggers watchEffect in audio3d");
   trigger.value = props.localTrigger;
   if (positionalAudioRef.value) {
     positionalAudioRef.value.instance.playbackRate = props.localPlaybackRate;

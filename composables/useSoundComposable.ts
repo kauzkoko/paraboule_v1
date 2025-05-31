@@ -8,7 +8,7 @@ export function useSoundComposable(soundSrc: string, duration = 0) {
     Howler.stop();
     if (window.speechSynthesis.speaking) {
       window.speechSynthesis.cancel();
-      console.log("Already speaking, stopping current speech");
+      // console.log("Already speaking, stopping current speech");
       return;
     }
     if (sound.isPlaying.value && store.currentGlobalSoundSrc === soundSrc) {

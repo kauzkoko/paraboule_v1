@@ -49,7 +49,7 @@ const startXR = async () => {
     init();
     animate();
   } else {
-    console.log("AR not supported");
+    // console.log("AR not supported");
     return false;
   }
 

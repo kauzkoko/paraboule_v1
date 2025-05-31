@@ -7,17 +7,17 @@ export function useSoundController(options: { listen: boolean }) {
   channel.subscribe();
 
   channel.on("broadcast", { event: "playPhone" }, (event) => {
-    console.log("received playPhone event from sound controller: ", event);
+    // console.log("received playPhone event from sound controller: ", event);
     const payload = event.payload || {};
-    console.log("Payload:", payload);
+    // console.log("Payload:", payload);
     if (options.listen) {
-      console.log("playing phone sound");
+      // console.log("playing phone sound");
       play();
     }
   });
 
   function sendPlayCochonnet(duration = 5000) {
-    console.log("sending playCochonnet event to sound controller: ", duration);
+    // console.log("sending playCochonnet event to sound controller: ", duration);
     channel.send({
       type: "broadcast",
       event: "playCochonnet",

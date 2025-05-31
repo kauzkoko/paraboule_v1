@@ -19,5 +19,5 @@ import { Grid } from "@tresjs/cientos";
 const store = useProtoStore();
 const color1 = useCssVar('--grid-cell')
 const color2 = useCssVar('--grid-isTouchingHaptic')
-console.log(color1)
+// console.log(color1)
 </script>

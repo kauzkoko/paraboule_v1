@@ -43,7 +43,7 @@ onBeforeRender(({ delta }) => {
   //   : (2 * Math.PI) + heading;
   // const degrees = THREE.MathUtils.radToDeg(radians);
   // const degreesRounded = Math.floor(degrees);
-  // console.log("rotationY", degreesRounded);
+  // // console.log("rotationY", degreesRounded);
   // setRotation(radians);
 
   // Get the camera's rotation as a matrix

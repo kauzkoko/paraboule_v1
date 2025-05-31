@@ -20,12 +20,12 @@ export async function useInference() {
       store.yoloModelCycler.state.id,
       store.yoloModelCycler.state.modelId
     );
-    console.log("model has loaded", modelWorkerId.value);
+    // console.log("model has loaded", modelWorkerId.value);
     modelLoaded.value = true;
   }
 
   async function stopWorker() {
-    console.log("stopping worker", modelWorkerId.value);
+    // console.log("stopping worker", modelWorkerId.value);
     if (modelWorkerId.value) {
       await inferEngine.stopWorker(modelWorkerId.value);
       modelWorkerId.value = null;

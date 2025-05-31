@@ -27,7 +27,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const bus = useEventBus("protoboules");
 
   const modesCycler = useCycleList(modesList);
-  const initIndex = modesList.findIndex((mode) => mode.name === "S3");
+  const initIndex = modesList.findIndex((mode) => mode.name === "S1");
   modesCycler.go(initIndex);
 
   const prevMode = computed(() => {
@@ -198,10 +198,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     const amountOnlyBoules = amountBoulesAndCochonnet - 1;
     const maxBoulesAmount = globalShotsTaken.value;
     if (amountOnlyBoules <= maxBoulesAmount) {
-      console.log(
-        "filteredBoulesHistory.value.length",
-        filteredBoulesHistory.value.length
-      );
+      // console.log("filteredBoulesHistory.value.length",filteredBoulesHistory.value.length);
       if (filteredBoulesHistory.value.length > 1) isSearching.value = false;
       // bus.emit("stopXR");
     }
@@ -228,7 +225,7 @@ export const useProtoStore = defineStore("protoStore", () => {
 
     arSupported.value =
       (await navigator.xr?.isSessionSupported("immersive-ar")) ?? false;
-    console.log("arSupported", arSupported.value);
+    // console.log("arSupported", arSupported.value);
     // if (arSupported.value) {
     //   await startWorker();
     // }
@@ -386,7 +383,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     else if (boulesToDisplay.value.length >= bouleIndex)
       selectedBoules.value = [bouleIndex];
     else {
-      console.log("bouleIndex out of range", bouleIndex);
+      // console.log("bouleIndex out of range", bouleIndex);
     }
     volumePulse.value++;
     sendSelectedBoules();
@@ -507,7 +504,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   });
 
   const setMockIntersections = () => {
-    console.log("setMockIntersections", mockIntersectionsCycler.state.value);
+    // console.log("setMockIntersections", mockIntersectionsCycler.state.value);
     rawIntersections.value = mockIntersectionsCycler.state.value;
   };
   setMockIntersections();

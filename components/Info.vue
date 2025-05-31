@@ -278,9 +278,9 @@ const computedTransition = computed(() => {
 
 // store.infoStepper.goTo('functions');
 const close = () => {
-    console.log('close');
+    // console.log('close');
     store.infoScreen = false;
     store.infoStepper.goTo('welcome');
-    console.log(store.infoScreen);
+    // console.log(store.infoScreen);
 }
 </script>

@@ -15,7 +15,7 @@ const boules = ref([]);
 const bus = useEventBus("protoboules");
 bus.on((message, payload) => {
   if (message === "screenPositions") {
-    console.log("screenPositions", payload);
+    // console.log("screenPositions", payload);
     boules.value = payload;
   }
 });

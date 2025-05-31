@@ -112,7 +112,7 @@ bus.on((message, payload) => {
   }
 
   if (message === "shootFilmBoule") {
-    console.log("shootFilmBoule");
+    // console.log("shootFilmBoule");
   }
 });
 
@@ -125,7 +125,7 @@ const checkSelectedBoules = (index) => {
 };
 
 watchEffect(() => {
-  console.log(store.boulesToDisplay);
+  // console.log(store.boulesToDisplay);
 });
 //interface controls
 let circleAroundCochonnet = false;

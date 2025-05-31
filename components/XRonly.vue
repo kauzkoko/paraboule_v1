@@ -28,7 +28,7 @@ bus.on((message) => {
 });
 
 const startXR = async () => {
-  console.log("Starting XR");
+  // console.log("Starting XR");
   xrRunning.value = true;
 
   let controller;
@@ -42,7 +42,7 @@ const startXR = async () => {
     init();
     animate();
   } else {
-    console.log("AR not supported");
+    // console.log("AR not supported");
     return false;
   }
 
@@ -95,7 +95,7 @@ const startXR = async () => {
     if (session) {
       await session.end();
       renderer.value.xr.enabled = false;
-      console.log("XR session ended");
+      // console.log("XR session ended");
       xrRunning.value = false;
     }
   }
@@ -206,10 +206,10 @@ const startXR = async () => {
               if (hasCochonnet) {
                 let tempIntersections = [];
                 newPredictions.forEach((newPrediction, index) => {
-                  // console.log("confidence", newPrediction.confidence);
+                  // // console.log("confidence", newPrediction.confidence);
                   if (newPrediction.confidence > 0.5 && planeDetected.value) {
                     let intersectPoint = intersectPrediction(newPrediction);
-                    // console.log("intersectPoint", intersectPoint);
+                    // // console.log("intersectPoint", intersectPoint);
                     tempIntersections.push({
                       class:
                         newPrediction.class === "cochonnette"

@@ -181,7 +181,7 @@ export function useAnimationController() {
   }
 
   function toggleTopCamera(options?: { broadcast?: boolean; height?: number }) {
-    console.log(options);
+    // console.log(options);
     bus.emit("toggleTopCamera", { height: options?.height ?? 80 });
     if (options?.broadcast) {
       animationController.send({

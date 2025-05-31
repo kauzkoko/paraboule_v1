@@ -8,7 +8,7 @@ export function useSpeech() {
     // Check if speech synthesis is already speaking
     if (window.speechSynthesis.speaking) {
       window.speechSynthesis.cancel();
-      console.log("Already speaking, stopping current speech");
+      // console.log("Already speaking, stopping current speech");
       return;
     }
 

@@ -12,7 +12,7 @@
 const store = useProtoStore();
 
 const onClick = () => {
-  console.log("clicked, close me")
+  // console.log("clicked, close me")
   store.scannerOpen = !store.scannerOpen
 };
 

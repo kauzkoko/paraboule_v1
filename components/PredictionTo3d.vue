@@ -64,7 +64,7 @@ const readyToPredict = computed(() => {
 const predictions = ref([]);
 const predict = async () => {
   let result = await predictFromImage(video.value);
-  console.log(result);
+  // console.log(result);
   predictions.value = result;
 };
 
