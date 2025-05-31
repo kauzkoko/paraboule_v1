@@ -95,6 +95,15 @@
     border-radius: 50%;
     background-color: var(--info-background);
     color: var(--black);
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.2;
+    padding: 2rem;
+    z-index: 1000;
+    box-shadow: 0px 4px 38.4px 22px #616BFF inset, 6px 20px 119.6px 52px #FFF inset;
+    border: var(--border-width) solid var(--white);
+    transition: box-shadow .3s ease-in-out;
 
     .inner-grid {
         width: 100%;
@@ -103,17 +112,6 @@
         grid-template-columns: 1fr;
         grid-template-rows: 1fr 1fr;
     }
-
-    /* flex-direction: column; */
-    font-size: 2rem;
-    font-weight: 600;
-    text-align: center;
-    line-height: 1.2;
-    padding: 2rem;
-    z-index: 1000;
-    box-shadow: 0px 4px 38.4px 22px #616BFF inset,
-    6px 20px 119.6px 52px #FFF inset;
-    border: var(--border-width) solid var(--white);
 
     p {
         margin: 0;

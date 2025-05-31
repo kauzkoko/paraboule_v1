@@ -216,11 +216,11 @@ watch(
   }
 );
 
-let centerCircleTimeout = 7000
-let centerCircleOpacityMin = .05
+let centerCircleTimeout = 5000
+let centerCircleOpacityMin = 0
 const centerCircleOpacity = ref(centerCircleOpacityMin);
 const { pause, resume, isActive } = useIntervalFn(() => {
-  centerCircleOpacity.value === centerCircleOpacityMin ? centerCircleOpacity.value = 1 : centerCircleOpacity.value = centerCircleOpacityMin
+  centerCircleOpacity.value = centerCircleOpacity.value === centerCircleOpacityMin ? 1 : centerCircleOpacityMin
 }, centerCircleTimeout)
 
 watch(() => store.infoScreen, () => {
