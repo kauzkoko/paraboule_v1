@@ -142,6 +142,12 @@ const { sendPlayCochonnet, sendPlayHoola, sendPlayPhone } = useSoundController({
 });
 const { sendMute, sendUnmute } = useAssistantController();
 const { sendGlobalShotsTaken } = useScoreController();
+const {
+  pingStartingPoint,
+  stopPingStartingPoint,
+  pingCochonnet,
+  stopPingCochonnet
+} = useExhibitionController();
 
 const onTappingOnHaptic = () => {
   store.isTappingOnHaptic = !store.isTappingOnHaptic;
@@ -291,6 +297,7 @@ const setPointsFromLatestScan = () => {
 const click_pingCochonnet = () => {
   if (!afterLongPress) {
     sendPlayCochonnet(5000);
+    pingCochonnet();
   }
 };
 
@@ -604,6 +611,7 @@ const pingShoes = () => {
   console.log("pingShoes");
   if (!afterLongPress) {
     sendPlayHoola();
+    pingStartingPoint();
   }
 };
 
