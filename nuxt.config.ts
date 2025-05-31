@@ -163,5 +163,8 @@ export default defineNuxtConfig({
     families: [
       { name: 'Test', provider: 'none' },
     ]
+  },
+  devServer: {
+    port: 5555
   }
 });
