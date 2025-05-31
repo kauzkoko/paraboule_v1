@@ -2,36 +2,8 @@ export const includesArray = ["Exhibition", "S1", "S2", "S3"];
 
 export const modesList = [
   {
-    name: "Referee",
-    description: "Referee mode",
-  },
-  {
-    name: "Player",
-    description: "Player mode",
-  },
-  {
-    name: "Solo",
-    description: "Solo mode",
-  },
-  {
-    name: "QR",
-    description: "QR mode",
-  },
-  {
-    name: "Testing",
-    description: "Testing mode",
-  },
-  {
-    name: "Dev",
-    description: "Dev mode",
-  },
-  {
     name: "All",
     description: "All mode",
-  },
-  {
-    name: "SBV",
-    description: "SBV mode",
   },
   {
     name: "Exhibition",
@@ -333,34 +305,6 @@ export const mockIntersections = unscaledBahnMockIntersections.map((intersection
 
 
 export const soundSrcs = [
-  "/sounds/strudel/simplebeat.mp3",
-  // "/sounds/noise.mp3",
-  // "/sounds/noisehigh.mp3",
-  // "/sounds/noiselow.mp3",
-  // "/sounds/waterBig.m4a",
-  // "/sounds/waterMedium.m4a",
-  // "/sounds/waterBigger.m4a",
-  // "/sounds/strudel/c3major.mp3",
-  // "/sounds/strudel/e3major.mp3",
-  // "/sounds/strudel/g3major.mp3",
-  "/sounds/strudel/startpoint.mp3",
-  "/sounds/shortdeep.mp3",
-  "/sounds/noz2.mp3",
-  "/sounds/noz.mp3",
-  "/sounds/elevenlabs/mone.mp3",
-  "/sounds/elevenlabs/mtwo.mp3",
-  "/sounds/elevenlabs/mthree.mp3",
-  "/sounds/elevenlabs/blue.mp3",
-  "/sounds/elevenlabs/blue1.mp3",
-  "/sounds/elevenlabs/blue2.mp3",
-  "/sounds/elevenlabs/blue3.mp3",
-  "/sounds/elevenlabs/fone.mp3",
-  "/sounds/elevenlabs/ftwo.mp3",
-  "/sounds/elevenlabs/fthree.mp3",
-  "/sounds/elevenlabs/red.mp3",
-  "/sounds/elevenlabs/red1.mp3",
-  "/sounds/elevenlabs/red2.mp3",
-  "/sounds/elevenlabs/red3.mp3",
   "/sounds/raman1.mp3",
   "/sounds/raman2.mp3",
 ];
@@ -369,31 +313,6 @@ export const yoloModels = [
   {
     name: "bolobolo",
     id: "24",
-    modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
-  },
-  {
-    name: "bolobolo",
-    id: "25",
-    modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
-  },
-  {
-    name: "bolobolo",
-    id: "26",
-    modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
-  },
-  {
-    name: "bolobolo",
-    id: "27",
-    modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
-  },
-  {
-    name: "babouche-hzhjy",
-    id: "2",
-    modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
-  },
-  {
-    name: "babouche-hzhjy",
-    id: "1",
     modelId: "rf_li9xBZWuL5cSB9B343OFn9GGqpF2",
   },
 ];

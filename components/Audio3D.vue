@@ -20,11 +20,11 @@ import { PositionalAudio } from "@tresjs/cientos";
 const props = defineProps({
   url: {
     type: String,
-    default: "/sounds/strudel/c3major.mp3",
+    // default: "/sounds/strudel/c3major.mp3",
   },
   src: {
     type: String,
-    default: "/sounds/strudel/c3major.mp3",
+    // default: "/sounds/strudel/c3major.mp3",
   },
   localTrigger: {
     type: Number,

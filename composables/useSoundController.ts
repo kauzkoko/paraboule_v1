@@ -2,7 +2,6 @@ export function useSoundController(options: { listen: boolean }) {
   const supabase = useSupabaseClient();
   let channel = supabase.channel("sound-controller");
 
-  const { sendCochonnetMqtt, sendHoolaMqtt } = useMqtt();
   const { play } = useSoundComposable("/sounds/noz.mp3", 5);
 
   channel.subscribe();
