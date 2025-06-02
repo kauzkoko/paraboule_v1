@@ -18,7 +18,7 @@
           ? '/sounds/strudel/simplebeat.mp3'
           : '/strudel/still.mp3'
       " />
-    <TresMeshPhysicalMaterial :roughness=".2" :metalness="1" :emissive="boule.color" />
+    <!-- <TresMeshPhysicalMaterial :roughness=".2" :metalness="1" :emissive="boule.color" /> -->
   </TresMesh>
   <StundenOrientation :startPoint="startPoint" />
   <Sky v-if="store.isSky" :elevation="1" :distance="20" />

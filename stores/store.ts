@@ -27,7 +27,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const bus = useEventBus("protoboules");
 
   const modesCycler = useCycleList(modesList);
-  const initIndex = modesList.findIndex((mode) => mode.name === "S2");
+  const initIndex = modesList.findIndex((mode) => mode.name === "S1");
   modesCycler.go(initIndex);
 
   const prevMode = computed(() => {
@@ -333,6 +333,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     }, 100);
   });
 
+
   // score / winner
   const roundWinnerPoints = ref(0);
   const roundWinnerClass = ref("");
@@ -340,7 +341,9 @@ export const useProtoStore = defineStore("protoStore", () => {
     () => boulesToDisplay.value,
     (newBoules) => {
       roundWinnerPoints.value = 0;
-      if (newBoules.length < 2) return;
+      if (newBoules.length < 2) {
+        return;
+      }
       const closestBoule = newBoules[1];
       const closestClass = closestBoule.class;
       roundWinnerPoints.value++;
@@ -385,7 +388,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     else {
       // console.log("bouleIndex out of range", bouleIndex);
     }
-    volumePulse.value++;
+    // volumePulse.value++;
     sendSelectedBoules();
   };
 
@@ -445,6 +448,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     }
     unmuteCounter++;
   };
+  // unmute3dAudio();
 
   const toggle3dAudio = () => {
     if (volume.value === 0) {
@@ -556,7 +560,7 @@ export const useProtoStore = defineStore("protoStore", () => {
       title: 'Welcome to',
       img: '/icons/paraboule_black.svg',
       // subtitle: 'PARABOULE is an exploration<br> of spatial audio and object detection in Pétanque. It is built with accessibility in mind and assists you in playing Boule by binaural hearing.',
-      subtitle: 'PARABOULE is an assistive tool for visually impaired and sighted players to play Pétanque by binaural hearing.',
+      subtitle: 'PARABOULE is an assistive tool for visually impaired and sighted players to play Pétanque by binaural hearing and haptic feedback.',
       bottomText: 'PARABOULE is an exploration<br> of spatial audio and object detection technologies in Pétanque. It is built with accessibility considerations in mind.'
     },
     'role': {
@@ -568,13 +572,13 @@ export const useProtoStore = defineStore("protoStore", () => {
       'S2': {
         title: 'Smartphone 2:<br>Orientation',
         upperText: 'You are using the second of three smartphone interfaces in the exhibition. Each smartphone demonstrates specific functions of PARABOULE being used in a real game of Pétanque.',
-        bottomText: 'This smartphone demonstrates features that help you identify the playground and starting point without using sight. It also shows how to connect to other smartphones running PARABOULE.'
+        bottomText: 'This smartphone shows features that help you identify the playground and starting point without using sight. It also demonstrates how to connect to other smartphones running PARABOULE.'
       },
       'S3': {
         title: 'Smartphone 3:<br>VAR',
         upperText: 'You are using the first of three smartphone interfaces in the exhibition. Each smartphone demonstrates specific functions of PARABOULE being used in a real game of Pétanque.',
-        bottomText: 'This smartphone showcases the role of a VAR (Virtual Assistant Referee) in PARABOULE, who is continuously scanning the Boule field and tracking the current score.',
-        additionalText: 'Use this smartphone to provide real-time data. This enables the player on Smartphone 1 to receive spatial audio feedback, helping them understand the positions of the boules and prepare for their next shot.'
+        bottomText: 'This smartphone showcases the role of a VAR (Virtual Assistant Referee) in PARABOULE. The VAR is continuously scanning the Boule field and tracking the current score.',
+        // additionalText: 'Use this smartphone to provide real-time data. This enables the player on Smartphone 1 to receive spatial audio feedback, helping them understand the positions of the boules and prepare for their next shot.'
       },
       'Empty': {
         title: 'Empty Title',
@@ -585,7 +589,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     },
     'functions': {
       title: 'How to use<br> the Buttons',
-      subtitle: 'Each button triggers a function that demonstrates a specific feature of PARABOULE. You can always PRESS and HOLD on the button to hear what it is supposed to do.',
+      subtitle: 'Each button triggers a function that demonstrates a specific feature of PARABOULE. You can always PRESS and HOLD on the button to hear what it is supposed to do and how it works.',
     },
     'center-circle': {
       title: 'How to navigate<br> in the app',
@@ -593,14 +597,23 @@ export const useProtoStore = defineStore("protoStore", () => {
     },
     'disclaimer': {
       title: 'Disclaimer',
-      upperText: 'This version of PARABOULE is curated for exhibition purposes and in this exact composition not intended for real-life gameplay. Many functions are staged or simplified.',
-      bottomText: 'The app is designed to help visually impaired players to play and experience Pétanque through binaural audio. Every aspect of the interface should be able to be controlled blindly.'
+      upperText: 'This version of PARABOULE is curated for exhibition purposes and, in this exact composition, is not intended for real-life gameplay. Many functions are staged or simplified.',
+      bottomText: 'This app is designed to make Pétanque accessible to visually impaired players. Every part of the interface should be fully usable without sight and support intuitive long-term use. Some elements may not be intuitively understandable in the exhibition setting.'
     }
   })
 
   const buttonTransition = ref(false);
   const buttonTransitionIndex = ref(1);
   const infoScreen = ref(true);
+
+
+  watchEffect(() => {
+    if (boulesToDisplay.value.length < 2) {
+      focusBoules(0);
+    } else {
+      focusBoules('all');
+    }
+  })
 
   return {
     yoloModelCycler,
@@ -686,7 +699,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     previousWinnerScore,
     previousLoserScore,
     previousWinner,
-    isTouchingSliderTimeout
+    isTouchingSliderTimeout,
   };
 });
 

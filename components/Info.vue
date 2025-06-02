@@ -32,7 +32,7 @@
                         class="flex justify-center flex-col items-center">
                         <p class="mt-50px!" v-html="store.infoStepper.current.bottomText"></p>
                         <div class="button-container info-next mb-10px border-black!"
-                            @click="store.infoStepper.goToNext"><span class="color-black!">LEARN MORE</span></div>
+                            @click="nextFunction()"><span class="color-black!">LEARN MORE</span></div>
                     </div>
                     <div v-if="store.infoStepper.isCurrent('role')">
                         <p
@@ -74,7 +74,7 @@
                 @click="store.infoStepper.goToPrevious()">BACK</div>
             <div class="button-container info-next"
                 :class="{ 'color-white!': !store.infoStepper.isCurrent('welcome') && !store.infoStepper.isLast, 'start-button': store.infoStepper.isLast }"
-                @click="store.infoStepper.isLast ? close() : store.infoStepper.goToNext()">{{
+                @click="store.infoStepper.isLast ? close() : nextFunction()">{{
                     store.infoStepper.isLast ? 'START' : 'NEXT' }}</div>
 
         </div>
@@ -301,12 +301,19 @@ const toggleInfoScreen = () => {
     }
 }
 
+const nextFunction = () => {
+    store.infoStepper.goToNext();
+    store.unmute3dAudio();
+}
+
 const computedTransition = computed(() => {
     return 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
 });
 
 // store.infoStepper.goTo('functions');
 const close = () => {
+    store.unmute3dAudio();
+    // store.toggle3dAudio();
     // console.log('close');
     store.infoScreen = false;
     store.infoStepper.goTo('welcome');

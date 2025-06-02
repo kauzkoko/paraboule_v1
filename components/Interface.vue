@@ -98,7 +98,7 @@
           </div>
         </div>
       </template>
-      <div class="center-circle aspect-1!" ref="swiper" :index="'pageAnnouncer'" @click="onSingleClick"
+      <div class="center-circle" ref="swiper" :index="'pageAnnouncer'" @click="onSingleClick"
         @touchstart="onTouchStart('pageAnnouncer')" @touchend="onTouchEnd" :style="{
           background:
             touchedIndex === 'pageAnnouncer'
@@ -111,13 +111,15 @@
           boxShadow: touchedIndex === 'pageAnnouncer' ? '0px 0px 50px 50px var(--border-color) inset' : 'none',
           borderWidth: store.infoStepper.isCurrent('center-circle') ? '3px' : centerCircleBorderWidth + 'px',
         }">
-        <div class="text-[var(--border-color)] text-30px font-medium color-black! aspect-1" :style="{}"
-          :index="'pageAnnouncer'">
+        <div class="text-[var(--border-color)] text-30px font-medium color-black!" :style="{}" :index="'pageAnnouncer'">
           <span class="transition-all duration-200 color-black!"> {{ swipe ? '' : stepperIndex + 1 }}</span>
         </div>
       </div>
     </div>
-    <div v-if="swipe" class="text-30px font-medium color-black! fixed top-50% left-50% transform translate-x--50% translate-y--50% transition-all duration-200">SWIPE</div>
+    <div v-if="swipe"
+      class="text-30px font-medium fixed top-50% left-50% transform translate-x--50% translate-y--50% transition-color duration-0"
+      :style="{ color: swipeColor }">
+      SWIPE</div>
     <QrScanner v-if="scanForQr" :scanForQr="scanForQr" @qrCodeFound="onQrCode"></QrScanner>
     <div v-if="lastQrCode" class="fixed left-0 top-0 w-100dvw h-100dvh bg-black/50 z-1000 flexCenter"
       @click="lastQrCode = null">
@@ -220,15 +222,18 @@ watch(
   }
 );
 
+const swipeColor = ref('black')
 const swipe = ref(true)
 const centerCircleBorderWidth = ref(0)
 let centerCircleTimeout = 5000
 let centerCircleOpacityMin = 0
 const centerCircleOpacity = ref(centerCircleOpacityMin);
 const { pause, resume, isActive } = useIntervalFn(() => {
-  centerCircleOpacity.value = centerCircleOpacity.value === centerCircleOpacityMin ? 1 : centerCircleOpacityMin
+  let isMinimum = centerCircleOpacity.value === centerCircleOpacityMin
+  centerCircleOpacity.value = isMinimum ? 1 : centerCircleOpacityMin
   centerCircleBorderWidth.value = 3
-  swipe.value = centerCircleOpacity.value ? true : false
+  swipe.value = isMinimum ? true : false
+  swipeColor.value = isMinimum ? 'black' : 'red'
 }, centerCircleTimeout, { immediate: false })
 
 watch(() => store.infoScreen, () => {
@@ -245,20 +250,20 @@ watch(() => store.infoScreen, () => {
 pause()
 
 
-const glowingCircle = ref(false)
-watch(() => store.infoStepper.isCurrent('center-circle'), (newVal) => {
-  if (newVal) {
-    glowingCircle.value = true
-    glowingCircleResume()
-  } else {
-    glowingCircle.value = false
-    glowingCirclePause()
-  }
-})
-let glowingCircleTimeout = 2000
-const { pause: glowingCirclePause, resume: glowingCircleResume } = useIntervalFn(() => {
-  // glowingCircle.value = !glowingCircle.value
-}, glowingCircleTimeout, { immediate: false })
+// const glowingCircle = ref(false)
+// watch(() => store.infoStepper.isCurrent('center-circle'), (newVal) => {
+//   if (newVal) {
+//     glowingCircle.value = true
+//     glowingCircleResume()
+//   } else {
+//     glowingCircle.value = false
+//     glowingCirclePause()
+//   }
+// })
+// let glowingCircleTimeout = 2000
+// const { pause: glowingCirclePause, resume: glowingCircleResume } = useIntervalFn(() => {
+//   glowingCircle.value = !glowingCircle.value
+// }, glowingCircleTimeout, { immediate: false })
 
 const onSwipe = (direction, e, index, item) => {
   if (direction === "right") {
@@ -561,7 +566,7 @@ const onDoubleClick = () => {
   //   start();
   //   // console.log("start listening");
   // }
-  click_toggleMute();
+  // click_toggleMute();
 };
 
 const incrementPlayer1 = () => {
@@ -746,11 +751,11 @@ const click_toggleMute = () => {
   Howler.stop();
   store.toggle3dAudio();
   window.speechSynthesis.cancel();
-  if (store.volume === 0) {
-    sendMute();
-  } else {
-    sendUnmute();
-  }
+  // if (store.volume === 0) {
+  //   sendMute();
+  // } else {
+  //   sendUnmute();
+  // }
 };
 
 const addFunction = () => {
@@ -970,7 +975,7 @@ const pages = [
           .map(boule => boule.index);
         store.selectedBoules = blueBoules;
         store.unmute3dAudio()
-        store.volumePulse++;
+        // store.volumePulse++;
       },
       imgSrc: "/icons/focusBlueBlur.png",
       html: "Focus Team Blue",
@@ -988,7 +993,7 @@ const pages = [
           .map(boule => boule.index);
         store.selectedBoules = redBoules;
         store.unmute3dAudio()
-        store.volumePulse++;
+        // store.volumePulse++;
       },
       imgSrc: "/icons/focusRedBlur.png",
       html: "Focus Team Red",
@@ -1148,7 +1153,7 @@ const pages = [
       clickFunction: click_toggleMute,
       html: "Toggle mute",
       cycler: useCycleList(["Toggle mute"]),
-      modes: ["All", "Dev", "Testing", "Referee", "S1", "Exhibition"],
+      modes: ["All", "Dev", "Testing", "Referee", "Exhibition"],
     },
     {
       name: "Refresh page",
@@ -1346,6 +1351,7 @@ const pages = [
     {
       name: "50 / 50 Coin Flip",
       clickFunction: tossCoin,
+      // clickFunction: click_toggleMute,
       imgSrc: coinImgSrc,
       // html: "Toss a coin and get heads or tails",
       explanationSrc: "/sounds/elevenlabs/explanation_tossCoin.mp3",
@@ -1623,7 +1629,7 @@ const pages = [
       },
       html: "Mock Intersections",
       cycler: useCycleList(["Mock Intersections"]),
-      modes: ["All", "Dev", "Testing", "Referee", "Assistant"],
+      modes: ["All", "Dev", "Testing", "Referee", "Assistant", "S1"],
     },
     {
       name: "Raw Intersections",
@@ -2010,13 +2016,13 @@ onKeyStroke(["1", "2", "3", "4", "5", "6", "7", "8", "9"], (e) => {
   }
 });
 
-onKeyStroke(["v"], (e) => {
-  store.volumePulse++;
-});
+// onKeyStroke(["v"], (e) => {
+//   store.volumePulse++;
+// });
 
 onMounted(() => {
   // goTo(stepNames.value[2]);
-
+  // store.toggle3dAudio();
 })
 </script>
 
@@ -2136,6 +2142,7 @@ onMounted(() => {
 .center-circle {
   width: 200px;
   height: 200px;
+  overflow: hidden;
   aspect-ratio: 1;
   border-radius: 50%;
   position: absolute;
