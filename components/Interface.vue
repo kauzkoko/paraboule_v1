@@ -113,10 +113,11 @@
         }">
         <div class="text-[var(--border-color)] text-30px font-medium color-black! aspect-1" :style="{}"
           :index="'pageAnnouncer'">
-          <span class="transition-all duration-200 color-black!"> {{ swipe ? 'SWIPE' : stepperIndex + 1 }}</span>
+          <span class="transition-all duration-200 color-black!"> {{ swipe ? '' : stepperIndex + 1 }}</span>
         </div>
       </div>
     </div>
+    <div v-if="swipe" class="text-30px font-medium color-black! fixed top-50% left-50% transform translate-x--50% translate-y--50% transition-all duration-200">SWIPE</div>
     <QrScanner v-if="scanForQr" :scanForQr="scanForQr" @qrCodeFound="onQrCode"></QrScanner>
     <div v-if="lastQrCode" class="fixed left-0 top-0 w-100dvw h-100dvh bg-black/50 z-1000 flexCenter"
       @click="lastQrCode = null">

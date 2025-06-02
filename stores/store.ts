@@ -568,7 +568,7 @@ export const useProtoStore = defineStore("protoStore", () => {
       'S2': {
         title: 'Smartphone 2:<br>Orientation',
         upperText: 'You are using the second of three smartphone interfaces in the exhibition. Each smartphone demonstrates specific functions of PARABOULE being used in a real game of Pétanque.',
-        bottomText: 'This smartphone demonstrates features that help you identify the playground and starting point without using sight. It also shows how to pair with other smartphones running PARABOULE.”.'
+        bottomText: 'This smartphone demonstrates features that help you identify the playground and starting point without using sight. It also shows how to connect to other smartphones running PARABOULE.'
       },
       'S3': {
         title: 'Smartphone 3:<br>VAR',

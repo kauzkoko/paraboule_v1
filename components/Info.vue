@@ -32,7 +32,7 @@
                         class="flex justify-center flex-col items-center">
                         <p class="mt-50px!" v-html="store.infoStepper.current.bottomText"></p>
                         <div class="button-container info-next mb-10px border-black!"
-                            @click="store.infoStepper.goToNext">LEARN MORE</div>
+                            @click="store.infoStepper.goToNext"><span class="color-black!">LEARN MORE</span></div>
                     </div>
                     <div v-if="store.infoStepper.isCurrent('role')">
                         <p
@@ -70,7 +70,7 @@
         </div>
         <div v-if="!store.infoStepper.isCurrent('welcome')"
             class="fixed z-1000 bottom-48px left-50dvw transform translate-x--50% flex justify-center children:mx-30px mix-blend-difference">
-            <div class="button-container info-next" :class="{ 'color-white!': !store.infoStepper.isCurrent('welcome') }"
+            <div class="button-container info-back" :class="{ 'color-white!': !store.infoStepper.isCurrent('welcome') }"
                 @click="store.infoStepper.goToPrevious()">BACK</div>
             <div class="button-container info-next"
                 :class="{ 'color-white!': !store.infoStepper.isCurrent('welcome') && !store.infoStepper.isLast, 'start-button': store.infoStepper.isLast }"
@@ -243,6 +243,12 @@
 }
 
 .info-next {
+    margin-top: 40px;
+    border-color: var(--green);
+    color: var(--green) !important;
+}
+
+.info-back {
     margin-top: 40px;
     border-color: var(--white);
     color: var(--black);
