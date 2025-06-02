@@ -68,6 +68,10 @@
                 ? 0.5
                 : 1
               : 1,
+            borderBottomRightRadius: swipe && index === 0 ? '100px' : index === 0 && !swipe ? '60px' : '5px',
+            borderBottomLeftRadius: swipe && index === 1 ? '100px' : index === 1 && !swipe ? '60px' : '5px',
+            borderTopRightRadius: swipe && index === 2 ? '100px !important' : index === 2 && !swipe ? '60px' : '5px',
+            borderTopLeftRadius: swipe && index === 3 ? '100px !important' : index === 3 && !swipe ? '60px' : '5px',
             boxShadow: touchedIndex === index || (store.infoStepper.isCurrent('functions') && index === store.buttonTransitionIndex && store.buttonTransition) ? '0px 4px 38.4px 22px #616BFF inset, 6px 20px 119.6px 52px #FFF inset' : 'none',
           }">
           <div class="absolute text-[var(--border-color)] text-14px font-bold px-7px py-4px" :class="{
@@ -107,8 +111,9 @@
           boxShadow: touchedIndex === 'pageAnnouncer' ? '0px 0px 50px 50px var(--border-color) inset' : 'none',
           borderWidth: store.infoStepper.isCurrent('center-circle') ? '3px' : centerCircleBorderWidth + 'px',
         }">
-        <div class="text-[var(--border-color)] text-38px aspect-1" :style="{}" :index="'pageAnnouncer'">
-          <span> {{ stepperIndex + 1 }}</span>
+        <div class="text-[var(--border-color)] text-30px font-medium color-black! aspect-1" :style="{}"
+          :index="'pageAnnouncer'">
+          <span class="transition-all duration-200 color-black!"> {{ swipe ? 'SWIPE' : stepperIndex + 1 }}</span>
         </div>
       </div>
     </div>
@@ -168,7 +173,6 @@ const onTappingOnTopCameraSlider = () => {
 };
 
 
-
 const {
   vibrateOnce,
   vibrateTwice,
@@ -215,6 +219,7 @@ watch(
   }
 );
 
+const swipe = ref(true)
 const centerCircleBorderWidth = ref(0)
 let centerCircleTimeout = 5000
 let centerCircleOpacityMin = 0
@@ -222,6 +227,7 @@ const centerCircleOpacity = ref(centerCircleOpacityMin);
 const { pause, resume, isActive } = useIntervalFn(() => {
   centerCircleOpacity.value = centerCircleOpacity.value === centerCircleOpacityMin ? 1 : centerCircleOpacityMin
   centerCircleBorderWidth.value = 3
+  swipe.value = centerCircleOpacity.value ? true : false
 }, centerCircleTimeout, { immediate: false })
 
 watch(() => store.infoScreen, () => {
@@ -235,6 +241,7 @@ watch(() => store.infoScreen, () => {
     resume()
   }
 })
+pause()
 
 
 const glowingCircle = ref(false)
@@ -249,7 +256,7 @@ watch(() => store.infoStepper.isCurrent('center-circle'), (newVal) => {
 })
 let glowingCircleTimeout = 2000
 const { pause: glowingCirclePause, resume: glowingCircleResume } = useIntervalFn(() => {
-  glowingCircle.value = !glowingCircle.value
+  // glowingCircle.value = !glowingCircle.value
 }, glowingCircleTimeout, { immediate: false })
 
 const onSwipe = (direction, e, index, item) => {
@@ -2093,7 +2100,7 @@ onMounted(() => {
   user-select: none;
   pointer-events: auto;
   overflow: hidden;
-  transition: all 50ms;
+  transition: all 1000ms ease-in-out;
   position: relative;
   mix-blend-mode: difference;
 
@@ -2103,10 +2110,12 @@ onMounted(() => {
     mix-blend-mode: difference;
   }
 
+
   &:first-child {
     border-bottom-right-radius: 60px;
     /* padding-left: 10px; */
   }
+
 
   &:nth-child(2) {
     border-bottom-left-radius: 60px;
