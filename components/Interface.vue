@@ -94,7 +94,7 @@
           </div>
         </div>
       </template>
-      <div class="center-circle aspect-1" ref="swiper" :index="'pageAnnouncer'" @click="onSingleClick"
+      <div class="center-circle aspect-1!" ref="swiper" :index="'pageAnnouncer'" @click="onSingleClick"
         @touchstart="onTouchStart('pageAnnouncer')" @touchend="onTouchEnd" :style="{
           background:
             touchedIndex === 'pageAnnouncer'
@@ -104,22 +104,21 @@
             touchedIndex === 'pageAnnouncer'
               ? 'all 300ms'
               : 'all 300ms',
-          boxShadow: touchedIndex === 'pageAnnouncer' || store.infoStepper.isCurrent('center-circle') ? '0px 0px 50px 50px var(--border-color) inset' : 'none',
-          border: touchedIndex === 'pageAnnouncer' ? 'solid 10px black' : 'solid 10px black',
-
+          boxShadow: touchedIndex === 'pageAnnouncer' ? '0px 0px 50px 50px var(--border-color) inset' : 'none',
+          borderWidth: store.infoStepper.isCurrent('center-circle') ? '3px' : centerCircleBorderWidth + 'px',
         }">
-        <div class="text-[var(--border-color)] text-38px aspect-1" :style="{
-          width: store.infoStepper.isCurrent('center-circle') ? '130px' : '200px',
-        }" :index="'pageAnnouncer'">
+        <div class="text-[var(--border-color)] text-38px aspect-1" :style="{}" :index="'pageAnnouncer'">
           <span> {{ stepperIndex + 1 }}</span>
         </div>
       </div>
     </div>
     <QrScanner v-if="scanForQr" :scanForQr="scanForQr" @qrCodeFound="onQrCode"></QrScanner>
-    <div v-if="lastQrCode" class="fixed left-0 top-0 w-100dvw h-100dvh bg-black/50 z-1000 flexCenter" @click="lastQrCode = null">
+    <div v-if="lastQrCode" class="fixed left-0 top-0 w-100dvw h-100dvh bg-black/50 z-1000 flexCenter"
+      @click="lastQrCode = null">
       <div class="text-white text-24px font-bold max-w-80%">
         <div>
-          Wow, you fucked up the app.<br> Ege was that you?<br>Nevermind. You get the idea. Scan a QR code from another PARABOULE session to add an additional smartphone. Tap to close.
+          Wow, you fucked up the app.<br> Ege was that you?<br>Nevermind. You get the idea. Scan a QR code from another
+          PARABOULE session to add an additional smartphone. Tap to close.
         </div>
       </div>
     </div>
@@ -138,8 +137,6 @@ import { Howler } from "howler";
 import { useQRCode } from "@vueuse/integrations/useQRCode";
 
 await preloadComponents(['SvgIcon'])
-
-
 
 const store = useProtoStore();
 const { speak } = useSpeech();
@@ -169,6 +166,8 @@ const onTappingOnSlider = () => {
 const onTappingOnTopCameraSlider = () => {
   store.isTappingOnTopCameraSlider = !store.isTappingOnTopCameraSlider;
 };
+
+
 
 const {
   vibrateOnce,
@@ -216,21 +215,42 @@ watch(
   }
 );
 
+const centerCircleBorderWidth = ref(0)
 let centerCircleTimeout = 5000
 let centerCircleOpacityMin = 0
 const centerCircleOpacity = ref(centerCircleOpacityMin);
 const { pause, resume, isActive } = useIntervalFn(() => {
   centerCircleOpacity.value = centerCircleOpacity.value === centerCircleOpacityMin ? 1 : centerCircleOpacityMin
-}, centerCircleTimeout)
+  centerCircleBorderWidth.value = 3
+}, centerCircleTimeout, { immediate: false })
 
 watch(() => store.infoScreen, () => {
   if (store.infoScreen) {
-    centerCircleOpacity.value = centerCircleOpacityMin
+    centerCircleOpacity.value = 0
+    centerCircleBorderWidth.value = 0
     pause()
   } else {
+    centerCircleOpacity.value = 0
+    centerCircleBorderWidth.value = 3
     resume()
   }
 })
+
+
+const glowingCircle = ref(false)
+watch(() => store.infoStepper.isCurrent('center-circle'), (newVal) => {
+  if (newVal) {
+    glowingCircle.value = true
+    glowingCircleResume()
+  } else {
+    glowingCircle.value = false
+    glowingCirclePause()
+  }
+})
+let glowingCircleTimeout = 2000
+const { pause: glowingCirclePause, resume: glowingCircleResume } = useIntervalFn(() => {
+  glowingCircle.value = !glowingCircle.value
+}, glowingCircleTimeout, { immediate: false })
 
 const onSwipe = (direction, e, index, item) => {
   if (direction === "right") {
@@ -1436,21 +1456,21 @@ const pages = [
   ],
   [
     {
-        name: "Find XR Starting Point",
-        clickFunction: () => {
-        },
-        html: "Find XR Starting Point",
-        cycler: useCycleList(["Find XR Starting Point"]),
-        modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
+      name: "Find XR Starting Point",
+      clickFunction: () => {
       },
-      {
-        name: "Find XR Cochonnet",
-        clickFunction: () => {
-        },
-        html: "Find XR Cochonnet",
-        cycler: useCycleList(["Find XR Cochonnet"]),
-        modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
+      html: "Find XR Starting Point",
+      cycler: useCycleList(["Find XR Starting Point"]),
+      modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
+    },
+    {
+      name: "Find XR Cochonnet",
+      clickFunction: () => {
       },
+      html: "Find XR Cochonnet",
+      cycler: useCycleList(["Find XR Cochonnet"]),
+      modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
+    },
   ],
   [
     {
@@ -2112,12 +2132,13 @@ onMounted(() => {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border: 1px dashed transparent;
+  border: solid 3px rgb(255, 0, 0);
   display: flex;
   justify-content: center;
   align-items: center;
   mix-blend-mode: difference;
   clip-path: circle(50% at 50% 50%);
+  transition: border 1000ms ease-in-out;
 
 
   /* box-shadow: 0px 0px 35px 14px var(--center-circle-shadow) inset; */
@@ -2132,7 +2153,7 @@ onMounted(() => {
     width: 100%;
     height: 100%;
     border: var(--border-width) solid var(--center-circle-border);
-    overflow: hidden;
+    /* overflow: hidden; */
     /* background-color: var(--center-circle-background); */
     color: var(--center-circle-border);
     /* color: transparent; */

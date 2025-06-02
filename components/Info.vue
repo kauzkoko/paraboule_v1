@@ -17,36 +17,34 @@
                             v-html="store.infoStepper.current[store.modesCycler.state.name === 'S1' || store.modesCycler.state.name === 'S2' || store.modesCycler.state.name === 'S3' ? store.modesCycler.state.name : 'Empty'].upperText">
                         </p>
                     </div>
-                    <div v-if="store.infoStepper.isCurrent('disclaimer')">
+                    <div v-if="store.infoStepper.isCurrent('disclaimer')" class="flex flex-col items-center disclaimer">
                         <h1 v-html="store.infoStepper.current.title"></h1>
                         <p class="mt-10px! mb-40px!" v-html="store.infoStepper.current.upperText"></p>
                     </div>
                     <div v-else>
-                        <h1 v-html="store.infoStepper.current.title"></h1>
+                        <h1 class="text-center" v-html="store.infoStepper.current.title"></h1>
                         <img v-if="store.infoStepper.current.img" :src="store.infoStepper.current.img" />
                         <p class="mt-10px! mb-40px!" v-html="store.infoStepper.current.subtitle"></p>
                     </div>
                 </div>
                 <div class="lower-content">
                     <div v-if="store.infoStepper.isCurrent('welcome')"
-                        class="mt--10px! flex justify-center flex-col items-center">
+                        class="flex justify-center flex-col items-center">
+                        <p class="mt-50px!" v-html="store.infoStepper.current.bottomText"></p>
                         <div class="button-container info-next mb-10px border-black!"
-                            @click="store.infoStepper.goToNext">NEXT</div>
-                        <p>Tap NEXT to learn more on how<br> to use PARABOULE.</p>
-                        <div class="button-container info-close mb-10px mt-20px" @click="close()">CLOSE</div>
-                        <p class="color-hex-ff0000">Tap CLOSE to return to the main interface.</p>
+                            @click="store.infoStepper.goToNext">LEARN MORE</div>
                     </div>
                     <div v-if="store.infoStepper.isCurrent('role')">
                         <p
                             v-html="store.infoStepper.current[store.modesCycler.state.name === 'S1' || store.modesCycler.state.name === 'S2' || store.modesCycler.state.name === 'S3' ? store.modesCycler.state.name : 'Empty'].bottomText">
                         </p>
                     </div>
-                    <div v-if="store.infoStepper.isCurrent('disclaimer')">
+                    <div class="disclaimer" v-if="store.infoStepper.isCurrent('disclaimer')">
                         <p class="mt-10px! mb-40px!" v-html="store.infoStepper.current.bottomText"></p>
                     </div>
                     <div v-if="store.infoStepper.isCurrent('center-circle')" class="mt--10px!">
-                        <DoubleTap />
-                        <p class="mt--5px! mb-10px!">DOUBLE TAP to mute audio.</p>
+                        <!-- <DoubleTap />
+                        <p class="mt--5px! mb-10px!">DOUBLE TAP to mute audio.</p> -->
                         <Up class="mt--10px!" />
                         <p class="mt--5px! mb-10px!">SWIPE UP to adopt the cochonnet’s point of view.</p>
                         <p class="mb-10px!">
@@ -60,7 +58,8 @@
                     </div>
                     <div v-if="store.infoStepper.isCurrent('functions')" class="mt--10px!">
                         <Dot class="mix-blend-difference" />
-                        <p class="mt--5px! mb-10px!">TAP once to run the function of the button.</p>
+                        <p class="mt--5px! mb-10px!">TAP once to run the function of the button. Depending on the
+                            function you receive feedback in the app or on the TV screens.</p>
                         <LongPress class="mix-blend-difference" />
                         <p class="mt--5px! mb-10px!">PRESS and HOLD to hear an explanation of the function. RELEASE to
                             stop.
@@ -70,12 +69,16 @@
             </div>
         </div>
         <div v-if="!store.infoStepper.isCurrent('welcome')"
-            class="fixed z-1000 bottom-28px left-50dvw transform translate-x--50% flex justify-center">
+            class="fixed z-1000 bottom-48px left-50dvw transform translate-x--50% flex justify-center children:mx-30px mix-blend-difference">
             <div class="button-container info-next" :class="{ 'color-white!': !store.infoStepper.isCurrent('welcome') }"
+                @click="store.infoStepper.goToPrevious()">BACK</div>
+            <div class="button-container info-next"
+                :class="{ 'color-white!': !store.infoStepper.isCurrent('welcome') && !store.infoStepper.isLast, 'start-button': store.infoStepper.isLast }"
                 @click="store.infoStepper.isLast ? close() : store.infoStepper.goToNext()">{{
                     store.infoStepper.isLast ? 'START' : 'NEXT' }}</div>
+
         </div>
-        <div v-if="store.infoScreen && !store.infoStepper.isCurrent('welcome')"
+        <div v-if="store.infoScreen"
             class="fixed z-1000 top-28px left-50dvw transform translate-x--50% flex justify-center">
             <div class="button-container info-close" @click="close()">CLOSE</div>
         </div>
@@ -194,6 +197,12 @@
     transition: v-bind(computedTransition);
 }
 
+.start-button {
+    /* background-color: var(--white); */
+    color: var(--green) !important;
+    border: 3px solid var(--green) !important;
+}
+
 .info-button-glow {
     box-shadow: 0px 0px 20px 3px #FFF inset;
     color: white;
@@ -239,6 +248,15 @@
     color: var(--black);
 }
 
+.disclaimer {
+    h1 {
+        @apply: color-hex-ff0000 ! w-fit text-center px-3 border-solid border-red;
+        border-radius: 10px;
+    }
+
+    color: red !important;
+
+}
 
 .info-close {
     color: var(--red);

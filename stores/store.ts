@@ -510,39 +510,39 @@ export const useProtoStore = defineStore("protoStore", () => {
   const checkTimes = [7, 66, 116]
   bus.on((message, payload) => {
     if (message === "shootFilmBouleSmartphone") {
-        console.log("shootFilmBouleSmartphone", payload)
-        if (payload.playedCount === 0 || payload.playedCount % 2 === 0) {
-          if (payload.scheduledTime === checkTimes[0]) {
-            setIntersectionsByNumber(2)
-          }
-          if (payload.scheduledTime === checkTimes[1]) {
-            setIntersectionsByNumber(3)
-          }
-          if (payload.scheduledTime === checkTimes[2]) {
-            setIntersectionsByNumber(4)
-          }
-        } else if (payload.playedCount % 2 === 1) {
-          if (payload.scheduledTime === checkTimes[0]) {
-            setIntersectionsByNumber(5)
-          }
-          if (payload.scheduledTime === checkTimes[1]) {
-            setIntersectionsByNumber(6)
-          }
-          if (payload.scheduledTime === checkTimes[2]) {
-            setIntersectionsByNumber(7)
-            setTimeout(() => {
-                setTimeout(() => {
-                  setIntersectionsByNumber(0)
-                  setTimeout(() => {
-                    setIntersectionsByNumber(1)
-                  }, 5000)
-                }, 7000)
-            }, 40000)
-          }
+      console.log("shootFilmBouleSmartphone", payload)
+      if (payload.playedCount === 0 || payload.playedCount % 2 === 0) {
+        if (payload.scheduledTime === checkTimes[0]) {
+          setIntersectionsByNumber(2)
         }
+        if (payload.scheduledTime === checkTimes[1]) {
+          setIntersectionsByNumber(3)
+        }
+        if (payload.scheduledTime === checkTimes[2]) {
+          setIntersectionsByNumber(4)
+        }
+      } else if (payload.playedCount % 2 === 1) {
+        if (payload.scheduledTime === checkTimes[0]) {
+          setIntersectionsByNumber(5)
+        }
+        if (payload.scheduledTime === checkTimes[1]) {
+          setIntersectionsByNumber(6)
+        }
+        if (payload.scheduledTime === checkTimes[2]) {
+          setIntersectionsByNumber(7)
+          setTimeout(() => {
+            setTimeout(() => {
+              setIntersectionsByNumber(0)
+              setTimeout(() => {
+                setIntersectionsByNumber(1)
+              }, 5000)
+            }, 7000)
+          }, 40000)
+        }
+      }
     }
-});
-setIntersectionsByNumber(1)
+  });
+  setIntersectionsByNumber(1)
 
 
   const setMockIntersections = () => {
@@ -555,23 +555,26 @@ setIntersectionsByNumber(1)
     'welcome': {
       title: 'Welcome to',
       img: '/icons/paraboule_black.svg',
-      subtitle: 'PARABOULE is an exploration<br> of spatial audio and object detection in Pétanque. It is built with accessibility in mind and assists you in playing Boule by binaural hearing.',
+      // subtitle: 'PARABOULE is an exploration<br> of spatial audio and object detection in Pétanque. It is built with accessibility in mind and assists you in playing Boule by binaural hearing.',
+      subtitle: 'PARABOULE is an assistive tool for visually impaired and sighted players to play Pétanque by binaural hearing.',
+      bottomText: 'PARABOULE is an exploration<br> of spatial audio and object detection in Pétanque. It is built with accessibility in mind and assists you in playing Boule by binaural hearing.'
     },
     'role': {
       'S1': {
         title: 'Smartphone 1:<br>Before the shot',
-        upperText: 'You are using the first of three smartphone interfaces, each designed for a specific role. It lets you analyze the game through spatial audio and haptic feedback.',
-        bottomText: 'Use the button functions to understand the positions of the boules and prepare for your next shot. The feedback will help you understand the game situation and make strategic decisions.'
+        upperText: 'You are using the first of three smartphone interfaces in the exhibition. Each one demonstrates specific functions of PARABOULE being used in a real game of Pétanque.',
+        bottomText: 'This smartphone lets you analyze the game situation through spatial audio and haptic feedback. The feedback will help you understand the game situation and make strategic decisions in a real game of Pétanque.'
       },
       'S2': {
         title: 'Smartphone 2:<br>Orientation',
-        upperText: 'You are using the second of three smartphone interfaces, each designed for a specific role. It shows you how to orient yourself in the game and how to pair other smartphones.',
-        bottomText: 'Use the button functions to understand the positions of the playground and the starting point. Scan the QR code to pair your smartphone with this session.'
+        upperText: 'You are using the second of three smartphone interfaces in the exhibition. Each one demonstrates specific functions of PARABOULE being used in a real game of Pétanque.',
+        bottomText: 'This smartphone showcases functions that help you understand the positions of the playground and the starting point without the eyes. Also it shows how to pair other smartphones running PARABOULE.'
       },
       'S3': {
         title: 'Smartphone 3:<br>VAR',
-        upperText: 'You are using the third of three smartphone interfaces, each designed for a specific role. It acts as the Virtual Assistant Referee, continuously scanning the Boule field and tracking the current score.',
-        bottomText: 'Use this smartphone to provide real-time data. This enables the player on Smartphone 1 to receive spatial audio feedback, helping them understand the positions of the boules and prepare for their next shot.'
+        upperText: 'You are using the first of three smartphone interfaces in the exhibition. Each one demonstrates specific functions of PARABOULE being used in a real game of Pétanque.',
+        bottomText: 'This smartphone showcases the role of a Virtual Assistant Referee in PARABOULE, continuously scanning the Boule field and tracking the current score.',
+        additionalText: 'Use this smartphone to provide real-time data. This enables the player on Smartphone 1 to receive spatial audio feedback, helping them understand the positions of the boules and prepare for their next shot.'
       },
       'Empty': {
         title: 'Empty Title',
@@ -581,23 +584,23 @@ setIntersectionsByNumber(1)
       }
     },
     'functions': {
-      title: '2x2 Buttons',
-      subtitle: 'Each button triggers a function that helps clarify the game situation. PRESS and HOLD to hear what each button does.',
+      title: 'How to use<br> the Buttons',
+      subtitle: 'Each button triggers a function that demonstrates a specific feature of PARABOULE. You can always PRESS and HOLD on the button to hear what it is supposed to do.',
     },
     'center-circle': {
-      title: 'Invisible Circle<br>',
-      subtitle: 'The Invisible Circle is your main navigation aid in the app. Perform the following gestures directly on its area. Note: 2X2 BUTTON gestures apply here as well. ',
+      title: 'How to navigate<br> in the app',
+      subtitle: 'A small circle in the middle is your main navigation aid in the app. Perform the following SWIPE gestures directly on its area to find your way around the app.',
     },
     'disclaimer': {
       title: 'Disclaimer',
-      upperText: 'This version of PARABOULE is curated for exhibition purposes and in this composition not intended for real-life gameplay.',
-      bottomText: 'The app is designed to help visually impaired players as well as sighted players to play and experience Pétanque through binaural audio.'
+      upperText: 'This version of PARABOULE is curated for exhibition purposes and in this exact composition not intended for real-life gameplay. Many functions are staged or simplified.',
+      bottomText: 'The app is designed to help visually impaired players to play and experience Pétanque through binaural audio. Every aspect of the interface should be able to be controlled blindly.'
     }
   })
 
   const buttonTransition = ref(false);
   const buttonTransitionIndex = ref(1);
-  const infoScreen = ref(false);
+  const infoScreen = ref(true);
 
   return {
     yoloModelCycler,
