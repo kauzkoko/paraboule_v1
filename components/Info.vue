@@ -313,6 +313,9 @@ const computedTransition = computed(() => {
 // store.infoStepper.goTo('functions');
 const close = () => {
     store.unmute3dAudio();
+    setTimeout(() => {
+        store.setIntersectionsByNumber(1);
+    }, 1000)
     // store.toggle3dAudio();
     // console.log('close');
     store.infoScreen = false;

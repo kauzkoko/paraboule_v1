@@ -955,13 +955,6 @@ const pages = [
       html: "Focus all Boules",
       cycler: useCycleList([
         "Focus Big Boules",
-        "Focus Cochonnet",
-        "Focus Boule 1",
-        "Focus Boule 2",
-        "Focus Boule 3",
-        "Focus Boule 4",
-        "Focus Boule 5",
-        "Focus Boule 6",
       ]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },

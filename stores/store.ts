@@ -389,7 +389,7 @@ export const useProtoStore = defineStore("protoStore", () => {
       // console.log("bouleIndex out of range", bouleIndex);
     }
     // volumePulse.value++;
-    sendSelectedBoules();
+    // sendSelectedBoules();
   };
 
   const touchCounter = ref(0);
@@ -433,7 +433,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   // positional audio
   const trigger = ref(0);
   const helpers = ref(false);
-  const volume = ref(0);
+  const volume = ref(1);
   const mute3dAudio = () => {
     volume.value = 0;
   };
@@ -509,6 +509,12 @@ export const useProtoStore = defineStore("protoStore", () => {
 
   const setIntersectionsByNumber = (number: number) => {
     rawIntersections.value = mockIntersections[number]
+    if (number === 1) focusBoules(0)
+    else {
+      setTimeout(() => {
+        focusBoules('all')
+      }, 1000)
+    }
   }
 
   const checkTimes = [7, 66, 116]
@@ -546,7 +552,6 @@ export const useProtoStore = defineStore("protoStore", () => {
       }
     }
   });
-  setIntersectionsByNumber(1)
 
 
   const setMockIntersections = () => {
@@ -605,15 +610,6 @@ export const useProtoStore = defineStore("protoStore", () => {
   const buttonTransition = ref(false);
   const buttonTransitionIndex = ref(1);
   const infoScreen = ref(true);
-
-
-  watchEffect(() => {
-    if (boulesToDisplay.value.length < 2) {
-      focusBoules(0);
-    } else {
-      focusBoules('all');
-    }
-  })
 
   return {
     yoloModelCycler,
@@ -700,6 +696,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     previousLoserScore,
     previousWinner,
     isTouchingSliderTimeout,
+    setIntersectionsByNumber,
   };
 });
 
