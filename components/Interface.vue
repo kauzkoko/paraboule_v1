@@ -1681,15 +1681,6 @@ const pages = [
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
     {
-      name: "Scan QR",
-      clickFunction: scanqr,
-      imgSrc: "/icons/scanQR.svg",
-      html: "Scan QR",
-      explanationSrc: "/sounds/explanations/qrScanner.mp3",
-      cycler: useCycleList(["Scan QR"]),
-      modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
-    },
-    {
       name: "Pair via Unique QR",
       clickFunction: qr,
       imgSrc: "/icons/qrCode.png",
@@ -1697,6 +1688,15 @@ const pages = [
       // html: computedUniqueQrHtml",
       explanationSrc: "/sounds/explanations/uniqueQrCode.mp3",
       cycler: useCycleList(["Pair via Unique QR"]),
+      modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
+    },
+    {
+      name: "Scan QR",
+      clickFunction: scanqr,
+      imgSrc: "/icons/scanQR.svg",
+      html: "Scan QR",
+      explanationSrc: "/sounds/explanations/qrScanner.mp3",
+      cycler: useCycleList(["Scan QR"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
     {
