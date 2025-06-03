@@ -74,13 +74,22 @@
             borderTopLeftRadius: swipe && index === 3 ? '100px !important' : index === 3 && !swipe ? '60px' : '5px',
             boxShadow: touchedIndex === index || (store.infoStepper.isCurrent('functions') && index === store.buttonTransitionIndex && store.buttonTransition) ? '0px 4px 38.4px 22px #616BFF inset, 6px 20px 119.6px 52px #FFF inset' : 'none',
           }">
-          <div class="absolute text-[var(--border-color)] text-14px font-bold px-7px py-4px" :class="{
+          <div class="absolute text-[var(--border-color)] text-14px font-bold pl-7px py-4px" :class="{
             'top-0 left-0': index === 0,
             'top-0 right-0': index === 1,
             'bottom-0 left-0': index === 2,
             'bottom-0 right-0': index === 3,
           }">
             {{ getItem(item).name }}
+            <div v-if="index === 0" :style="{ opacity: swipe ? .3 : 0 }"
+              class="transition-opacity duration-3000 children:text-red!">
+              <span>
+                <DotSmall class="mr-2px" />TAP TO ACTIVATE
+              </span><br>
+              <span>
+                <LongPressSmall class="mr--48px" />EXPLANATION
+              </span>
+            </div>
           </div>
           <div
             class="flex justify-center items-center w-full h-full children:w-70% children:h-70% transition-opacity duration-1000"
@@ -276,9 +285,9 @@ const onSwipe = (direction, e, index, item) => {
       let shouldGoToS3 = exhibitionModeCycler.state.value
       console.log(shouldGoToS3)
       const findExhibitionModeIndex = modesList.findIndex(
-          (mode) => mode.name === shouldGoToS3
-        );
-        store.modesCycler.go(findExhibitionModeIndex);
+        (mode) => mode.name === shouldGoToS3
+      );
+      store.modesCycler.go(findExhibitionModeIndex);
       exhibitionModeCycler.next();
     }
   } else if (direction === "left") {
