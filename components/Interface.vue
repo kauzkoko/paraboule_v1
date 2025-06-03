@@ -265,9 +265,22 @@ pause()
 //   glowingCircle.value = !glowingCircle.value
 // }, glowingCircleTimeout, { immediate: false })
 
+const exhibitionModes = ["S1", "S2", "S3"]
+const exhibitionModeCycler = useCycleList(exhibitionModes)
+
 const onSwipe = (direction, e, index, item) => {
   if (direction === "right") {
     currentPage.value[index].cycler.next();
+    console.log(item.name)
+    if (item.name === "Scan Field") {
+      let shouldGoToS3 = exhibitionModeCycler.state.value
+      console.log(shouldGoToS3)
+      const findExhibitionModeIndex = modesList.findIndex(
+          (mode) => mode.name === shouldGoToS3
+        );
+        store.modesCycler.go(findExhibitionModeIndex);
+      exhibitionModeCycler.next();
+    }
   } else if (direction === "left") {
     currentPage.value[index].cycler.prev();
   } else if (direction === "bottom") {
@@ -405,6 +418,11 @@ const pairingStatusAnnouncer = useSoundComposable(
   "/sounds/elevenlabs/click_pairingStatusAnnouncer.mp3"
 );
 
+
+const coinFlipSound = useSoundComposable(
+  "/sounds/clickers/coinFlip.mp3"
+);
+
 const qrStatus = () => {
   pairingStatusAnnouncer.play();
 };
@@ -425,136 +443,136 @@ const onSingleClick = () => {
   }
 };
 
-const micDown = new Audio("/sounds/strudel/micdown.mp3");
-const micUp = new Audio("/sounds/strudel/micup.mp3");
-watch(isListening, () => {
-  if (!isListening.value) {
-    let compare = result.value.toLowerCase();
-    // console.log("compare", compare);
-    switch (compare) {
-      case "page 1":
-      case "page one":
-      case "h1":
-        goTo(stepNames.value[0]);
-        break;
-      case "page 2":
-      case "page two":
-      case "h2":
-        goTo(stepNames.value[1]);
-        break;
-      case "page 3":
-      case "page three":
-      case "h3":
-        goTo(stepNames.value[2]);
-        break;
-      case "page 4":
-      case "page four":
-      case "h4":
-        goTo(stepNames.value[3]);
-        break;
-      case "page 5":
-      case "page five":
-      case "h5":
-        goTo(stepNames.value[4]);
-        break;
-      case "page 6":
-      case "page six":
-      case "h6":
-        goTo(stepNames.value[5]);
-        break;
-      case "scan camera":
-      case "scan field":
-      case "scan the field":
-        scanCamera();
-        break;
-      case "scan qr":
-      case "scan qr code":
-      case "scan the qr code":
-        scanqr();
-        break;
-      case "ping the field":
-        ping();
-        break;
-      case "ping the shoes":
-      case "ping the hoop":
-      case "ping the hoolahoop":
-        pingShoes();
-        break;
-      case "ping the phone":
-        pingPhone();
-        break;
-      case "score standings":
-      case "tell the score":
-        scoreStandings();
-        break;
-      case "boule focuser":
-      case "focus all":
-        click_bouleFocuser("all");
-        break;
-      case "focus the ball 1":
-      case "focus ball 1":
-      case "focus ball one":
-      case "focus the ball one":
-      case "focus the first ball":
-        click_bouleFocuser(1);
-        break;
-      case "focus the ball 2":
-      case "focus ball 2":
-      case "focus ball two":
-      case "focus the second ball":
-        click_bouleFocuser(2);
-        break;
-      case "focus the ball 3":
-      case "focus ball 3":
-      case "focus ball three":
-      case "focus the third ball":
-        click_bouleFocuser(3);
-        break;
-      case "focus the ball 4":
-      case "focus ball 4":
-      case "focus ball four":
-      case "focus ball for":
-      case "focus the fourth ball":
-        click_bouleFocuser(4);
-        break;
-      case "focus the ball 5":
-      case "focus ball 5":
-      case "focus ball five":
-      case "focus the fifth ball":
-        click_bouleFocuser(5);
-        break;
-      case "focus the ball 6":
-      case "focus ball 6":
-      case "focus ball six":
-      case "focus the sixth ball":
-        click_bouleFocuser(6);
-        break;
-      case "fly to center and back":
-      case "fly to center":
-        flyToCochonnetAndBack();
-        break;
-      case "fly to other side and back":
-      case "fly to other side":
-        stalefish180();
-        break;
-      case "Haptic grid":
-      case "toggle haptic":
-      case "toggle haptic feedback":
-      case "toggle haptics":
-        click_hapticGridNear();
-        break;
-      default:
-        // console.log("default", result.value);
-        setTimeout(() => {
-          micDown.play();
-        }, 500);
-        return;
-    }
-    // setTimeout(() => {
-    //   micUp.play();
-    // }, 500);
-  }
-});
+// const micDown = new Audio("/sounds/strudel/micdown.mp3");
+// const micUp = new Audio("/sounds/strudel/micup.mp3");
+// watch(isListening, () => {
+//   if (!isListening.value) {
+//     let compare = result.value.toLowerCase();
+//     // console.log("compare", compare);
+//     switch (compare) {
+//       case "page 1":
+//       case "page one":
+//       case "h1":
+//         goTo(stepNames.value[0]);
+//         break;
+//       case "page 2":
+//       case "page two":
+//       case "h2":
+//         goTo(stepNames.value[1]);
+//         break;
+//       case "page 3":
+//       case "page three":
+//       case "h3":
+//         goTo(stepNames.value[2]);
+//         break;
+//       case "page 4":
+//       case "page four":
+//       case "h4":
+//         goTo(stepNames.value[3]);
+//         break;
+//       case "page 5":
+//       case "page five":
+//       case "h5":
+//         goTo(stepNames.value[4]);
+//         break;
+//       case "page 6":
+//       case "page six":
+//       case "h6":
+//         goTo(stepNames.value[5]);
+//         break;
+//       case "scan camera":
+//       case "scan field":
+//       case "scan the field":
+//         scanCamera();
+//         break;
+//       case "scan qr":
+//       case "scan qr code":
+//       case "scan the qr code":
+//         scanqr();
+//         break;
+//       case "ping the field":
+//         ping();
+//         break;
+//       case "ping the shoes":
+//       case "ping the hoop":
+//       case "ping the hoolahoop":
+//         pingShoes();
+//         break;
+//       case "ping the phone":
+//         pingPhone();
+//         break;
+//       case "score standings":
+//       case "tell the score":
+//         scoreStandings();
+//         break;
+//       case "boule focuser":
+//       case "focus all":
+//         click_bouleFocuser("all");
+//         break;
+//       case "focus the ball 1":
+//       case "focus ball 1":
+//       case "focus ball one":
+//       case "focus the ball one":
+//       case "focus the first ball":
+//         click_bouleFocuser(1);
+//         break;
+//       case "focus the ball 2":
+//       case "focus ball 2":
+//       case "focus ball two":
+//       case "focus the second ball":
+//         click_bouleFocuser(2);
+//         break;
+//       case "focus the ball 3":
+//       case "focus ball 3":
+//       case "focus ball three":
+//       case "focus the third ball":
+//         click_bouleFocuser(3);
+//         break;
+//       case "focus the ball 4":
+//       case "focus ball 4":
+//       case "focus ball four":
+//       case "focus ball for":
+//       case "focus the fourth ball":
+//         click_bouleFocuser(4);
+//         break;
+//       case "focus the ball 5":
+//       case "focus ball 5":
+//       case "focus ball five":
+//       case "focus the fifth ball":
+//         click_bouleFocuser(5);
+//         break;
+//       case "focus the ball 6":
+//       case "focus ball 6":
+//       case "focus ball six":
+//       case "focus the sixth ball":
+//         click_bouleFocuser(6);
+//         break;
+//       case "fly to center and back":
+//       case "fly to center":
+//         flyToCochonnetAndBack();
+//         break;
+//       case "fly to other side and back":
+//       case "fly to other side":
+//         stalefish180();
+//         break;
+//       case "Haptic grid":
+//       case "toggle haptic":
+//       case "toggle haptic feedback":
+//       case "toggle haptics":
+//         click_hapticGridNear();
+//         break;
+//       default:
+//         // console.log("default", result.value);
+//         setTimeout(() => {
+//           micDown.play();
+//         }, 500);
+//         return;
+//     }
+//     // setTimeout(() => {
+//     //   micUp.play();
+//     // }, 500);
+//   }
+// });
 
 const onDoubleClick = () => {
   // console.log("onDoubleClick");
@@ -650,19 +668,24 @@ const scanqr = () => {
   // }, 10000);
 };
 
-const scoresSounds = [];
-for (let i = 0; i <= 13; i++) {
-  for (let j = 0; j <= 13; j++) {
-    scoresSounds.push(
-      useSoundComposable(`/sounds/elevenlabs/scores/${i}_${j}.mp3`)
-    );
-  }
-}
+// const scoresSounds = [];
+// for (let i = 0; i <= 13; i++) {
+//   for (let j = 0; j <= 13; j++) {
+//     scoresSounds.push(
+//       useSoundComposable(`/sounds/elevenlabs/scores/${i}_${j}.mp3`)
+//     );
+//   }
+// }
 
 const scoreStandings = () => {
   // console.log("scoreStandings");
   const index = store.players.player1.score * 14 + store.players.player2.score;
-  scoresSounds[index].play();
+  // scoresSounds[index].play();
+  if (store.players.player1.score === 0 && store.players.player2.score === 0) {
+    speak(`The last game is over. Tap any + below to start new game.`)
+  } else {
+    speak(`The score is ${store.players.player1.score} to ${store.players.player2.score}.`)
+  }
 };
 
 const pingShoes = () => {
@@ -782,9 +805,10 @@ const computedUniqueQrHtml = computed(() => {
 
 const coinImgSrc = ref("/icons/coinFlip.svg");
 const tossCoin = () => {
-  const totalTime = 2000;
+  const totalTime = 6000;
   const count = 5;
   coinImgSrc.value = "/icons/fragezeichen.svg";
+  coinFlipSound.play();
   setTimeout(() => {
     // for (let i = 1; i < count; i++) {
     //   setTimeout(() => {
@@ -792,8 +816,10 @@ const tossCoin = () => {
     //     // console.log("coinImgSrc", coinImgSrc.value);
     //   }, (totalTime / count) * i);
     // }
-    coinImgSrc.value =
-      Math.random() < 0.5 ? "/icons/coinFlip.svg" : "/icons/zahl.svg";
+    coinFlipSound.stop();
+    const random = Math.random();
+    coinImgSrc.value = random < 0.5 ? "/icons/coinFlip.svg" : "/icons/zahl.svg";
+    speak(`The coin landed on ${random < 0.5 ? "heads" : "tails"}.`)
   }, totalTime);
 };
 
@@ -844,7 +870,7 @@ const pages = [
       name: "Gyros Controller",
       clickFunction: setAlphaController,
       imgSrc: "/icons/gyros.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_gyro.mp3",
+      explanationSrc: "/sounds/explanations/gyrosController.mp3",
       html: "Toggle Gyros Controller",
       cycler: useCycleList(["Gyros Controller"]),
       modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo", "S1", "Exhibition"],
@@ -853,7 +879,7 @@ const pages = [
       name: "Bug",
       clickFunction: click_slider,
       imgSrc: "/icons/slider.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_slider.mp3",
+      explanationSrc: "/sounds/explanations/bugSlider.mp3",
       html: "Bug",
       cycler: useCycleList(["Bug"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
@@ -862,7 +888,7 @@ const pages = [
       name: "Fly to Cochonnet",
       clickFunction: click_flyToCochonnet,
       imgSrc: "/icons/flyToCochonnet.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_flyOnTheCochonnet.mp3",
+      explanationSrc: "/sounds/explanations/flyToCochonnet.mp3",
       html: "Fly to cochonnet",
       cycler: useCycleList(["Fly to Cochonnet"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
@@ -871,7 +897,7 @@ const pages = [
       name: "Fly to Starting Point",
       clickFunction: click_flyToStart,
       imgSrc: "/icons/flyToStart.svg",
-      // explanationSrc: "/sounds/elevenlabs/explanation_flyOnTheStartpoint.mp3",
+      explanationSrc: "/sounds/explanations/returnToStartingPoint.mp3",
       html: "Fly to starting point",
       cycler: useCycleList(["Fly to Starting Point"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
@@ -879,7 +905,7 @@ const pages = [
   ],
   [
     {
-      name: "Pirate Radar",
+      name: "O'Clock Toggler",
       clickFunction: () => {
         store.showStundenOrientation = true;
         const currentLookalongFunction = flatPages.find(
@@ -888,10 +914,10 @@ const pages = [
         currentLookalongFunction.clickFunction();
         store.lookAlongCycler.next();
       },
-      html: "Pirate Radar",
+      html: "O'Clock Toggler",
       imgSrc: "/icons/toggleLookalong.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_ocklocktoggler.mp3",
-      cycler: useCycleList(["Pirate Radar"]),
+      explanationSrc: "/sounds/explanations/oClockToggler.mp3",
+      cycler: useCycleList(["O'Clock Toggler"]),
       modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
     {
@@ -899,11 +925,9 @@ const pages = [
       clickFunction: click_hapticGridMedium,
       html: "Haptic Grid",
       imgSrc: "/icons/hapticGridMedium.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
+      explanationSrc: "/sounds/explanations/hapticGrid.mp3",
       cycler: useCycleList([
         "Haptic Grid",
-        "Haptic grid near",
-        "Haptic grid far",
       ]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
@@ -911,7 +935,7 @@ const pages = [
       name: "Ping Cochonnet",
       clickFunction: click_pingCochonnet,
       imgSrc: "/icons/cocho.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_pingCocho.mp3",
+      explanationSrc: "/sounds/explanations/pingCochonnet.mp3",
       cycler: useCycleList(["Ping Cochonnet"]),
       modes: ["All", "Dev", "Testing", "Player", "Solo", "S1", "S2", "Exhibition"],
     },
@@ -919,7 +943,7 @@ const pages = [
       name: "Ping Starting Point",
       clickFunction: pingShoes,
       imgSrc: "/icons/hoolahoop.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_hoolaPinger.mp3",
+      explanationSrc: "/sounds/explanations/pingStartingPoint.mp3",
       cycler: useCycleList(["Ping Starting Point", "Ping Cochonnet"]),
       modes: ["All", "Dev", "Testing", "Player", "S2", "S1", "Exhibition"],
     },
@@ -943,7 +967,7 @@ const pages = [
       },
       imgSrc: "/icons/heart.png",
       html: "Switch Boule Fokuss <3",
-      explanationSrc: "/sounds/elevenlabs/explanation_toggleBouleFocuser.mp3",
+      explanationSrc: "/sounds/explanations/switchBouleFocus.mp3",
       cycler: useCycleList(["Switch Boule Fokuss <3"]),
       modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
     },
@@ -951,6 +975,7 @@ const pages = [
       name: "Focus Big Boules",
       deactivated: computed(() => store.boulesCount < 2),
       clickFunction: () => click_bouleFocuser("all"),
+      explanationSrc: "/sounds/explanations/focusBigBoules.mp3",
       imgSrc: "/icons/focusAllBlur2.png",
       html: "Focus all Boules",
       cycler: useCycleList([
@@ -970,6 +995,7 @@ const pages = [
         store.unmute3dAudio()
         // store.volumePulse++;
       },
+      explanationSrc: "/sounds/explanations/focusTeamBlue.mp3",
       imgSrc: "/icons/focusBlueBlur.png",
       html: "Focus Team Blue",
       cycler: useCycleList(["Focus Team Blue"]),
@@ -988,6 +1014,7 @@ const pages = [
         store.unmute3dAudio()
         // store.volumePulse++;
       },
+      explanationSrc: "/sounds/explanations/focusTeamRed.mp3",
       imgSrc: "/icons/focusRedBlur.png",
       html: "Focus Team Red",
       cycler: useCycleList(["Focus Team Red"]),
@@ -1118,24 +1145,21 @@ const pages = [
   ],
   [
     {
-      name: "Pirate Radar Old",
+      name: "O'Clock Toggler Old",
       clickFunction: startCocho,
-      explanationSrc: "/sounds/elevenlabs/explanation_pirateRadar.mp3",
-      cycler: useCycleList(["Pirate Radar Old", "Boomerang", "Stalefish 180"]),
+      cycler: useCycleList(["O'Clock Toggler Old", "Boomerang", "Stalefish 180"]),
       modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
     {
       name: "Boomerang",
       clickFunction: flyCochoBack,
       imgSrc: "/icons/boomerang1.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_boomerang.mp3",
-      cycler: useCycleList(["Boomerang", "Pirate Radar Old"]),
+      cycler: useCycleList(["Boomerang", "O'Clock Toggler Old"]),
       modes: ["All", "Dev", "Testing", "Exhibition"],
     },
     {
       name: "Stalefish 180",
       clickFunction: click_stalefish180,
-      explanationSrc: "/sounds/elevenlabs/explanation_throughTurnAndBack.mp3",
       cycler: useCycleList(["Stalefish 180"]),
       modes: ["All", "Dev", "Testing", "Exhibition"],
     },
@@ -1152,7 +1176,6 @@ const pages = [
       name: "Refresh page",
       clickFunction: refreshPage,
       html: "F5",
-      explanationSrc: "/sounds/elevenlabs/explanation_pageRefresher.mp3",
       cycler: useCycleList(["Refresh page"]),
       modes: ["All", "Dev", "Testing", "Exhibition", "S1"],
     },
@@ -1162,6 +1185,7 @@ const pages = [
         store.isSky = !store.isSky;
       },
       html: "Toggle Light Mode",
+      explanationSrc: "/sounds/explanations/lightModeToggler.mp3",
       cycler: useCycleList(["Toggle Light Mode"]),
       modes: ["All", "Dev", "Testing", "Exhibition", "S1"],
     },
@@ -1172,11 +1196,11 @@ const pages = [
           (mode) => mode.name === "Exhibition"
         );
         store.modesCycler.go(findExhibitionModeIndex);
-        speak("Exhibition mode activated");
+        // speak("Exhibition mode activated");
       },
       html: "Activate Exhibition Mode",
       cycler: useCycleList(["Exhibition Mode"]),
-      modes: ["All", "Dev", "Testing", "Referee", "S1"],
+      modes: ["All", "Dev", "Testing", "Referee"],
     },
   ],
   [
@@ -1199,7 +1223,6 @@ const pages = [
         () =>
           `<div class='text-14px opacity-50'>${store.prevSoundPlayer1}</div><div class='text-16px'>${store.currentSoundPlayer1}</div><div class='text-14px opacity-50'>${store.nextSoundPlayer1}</div>`
       ),
-      explanationSrc: "/sounds/elevenlabs/explanation_player1AudioCycler.mp3",
       cycler: useCycleList(["Change player 1 audio"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "Exhibition"],
     },
@@ -1212,7 +1235,6 @@ const pages = [
         () =>
           `<div class='text-14px opacity-50'>${store.prevSoundPlayer2}</div><div class='text-16px'>${store.currentSoundPlayer2}</div><div class='text-14px opacity-50'>${store.nextSoundPlayer2}</div>`
       ),
-      explanationSrc: "/sounds/elevenlabs/explanation_player2AudioCycler.mp3",
       cycler: useCycleList(["Change player 2 audio"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "Exhibition"],
     },
@@ -1226,12 +1248,6 @@ const pages = [
       html: "Focus on Boule 4",
       cycler: useCycleList([
         "Focus Boule 4",
-        "Focus Boule 5",
-        "Focus Boule 6",
-        "Focus Boule 1",
-        "Focus Boule 2",
-        "Focus Boule 3",
-        "Focus Big Boules",
       ]),
       modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
@@ -1243,12 +1259,6 @@ const pages = [
       html: "Focus on Boule 5",
       cycler: useCycleList([
         "Focus Boule 5",
-        "Focus Boule 6",
-        "Focus Boule 1",
-        "Focus Boule 2",
-        "Focus Boule 3",
-        "Focus Boule 4",
-        "Focus Big Boules",
       ]),
       modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
@@ -1260,9 +1270,6 @@ const pages = [
       html: "Focus on Boule 6",
       cycler: useCycleList([
         "Focus Boule 6",
-        "Focus Boule 4",
-        "Focus Boule 5",
-        "Focus Big Boules",
       ]),
       modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
@@ -1347,7 +1354,7 @@ const pages = [
       // clickFunction: click_toggleMute,
       imgSrc: coinImgSrc,
       // html: "Toss a coin and get heads or tails",
-      explanationSrc: "/sounds/elevenlabs/explanation_tossCoin.mp3",
+      explanationSrc: "/sounds/explanations/coinFlipper.mp3",
       cycler: useCycleList(["50 / 50 Coin Flip"]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
@@ -1356,14 +1363,15 @@ const pages = [
       name: "Ping Starting Point",
       clickFunction: pingShoes,
       imgSrc: "/icons/hoolahoop.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_hoolaPinger.mp3",
-      cycler: useCycleList(["Ping Starting Point", "Ping Cochonnet"]),
+      explanationSrc: "/sounds/explanations/pingStartingPoint.mp3",
+      cycler: useCycleList(["Ping Starting Point"]),
       modes: ["All", "Dev", "Testing", "Player", "S3", "Exhibition"],
     },
     {
       name: "Toggle Top Camera",
       clickFunction: click_toggleTopCameraSlider,
       imgSrc: "/icons/topGrid.svg",
+      explanationSrc: "/sounds/explanations/topCameraToggler.mp3",
       html: "Toggle Top Camera",
       cycler: useCycleList(["Toggle Top Camera"]),
       modes: ["All", "Dev", "Testing", "Player", "S3", "Exhibition"],
@@ -1377,6 +1385,7 @@ const pages = [
       },
       imgSrc: "/icons/scanField.svg",
       html: "Scan Field",
+      explanationSrc: "/sounds/explanations/scanField.mp3",
       cycler: useCycleList(["Scan Field"]),
       modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
     },
@@ -1385,7 +1394,7 @@ const pages = [
     {
       name: "Boules Thrown (Round)",
       clickFunction: announceBallsPlayed,
-      explanationSrc: "/sounds/elevenlabs/explanation_ballsShotAnnouncer.mp3",
+      explanationSrc: "/sounds/explanations/boulesThrown.mp3",
       html: computedAnnounceBallsPlayedHtml,
       cycler: useCycleList(["Boules Thrown (Round)"]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
@@ -1394,7 +1403,7 @@ const pages = [
       name: "Undo Last Increment",
       clickFunction: rewind,
       imgSrc: "/icons/rewind.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
+      explanationSrc: "/sounds/explanations/undo.mp3",
       cycler: useCycleList(["Undo Last Increment"]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
@@ -1402,7 +1411,7 @@ const pages = [
       name: "Increment Shots Team 1",
       clickFunction: incrementPlayer1,
       imgSrc: "/icons/plus.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
+      explanationSrc: "/sounds/explanations/incrementShotsTeam1.mp3",
       cycler: useCycleList([
         "Increment Shots Team 1",
       ]),
@@ -1412,7 +1421,7 @@ const pages = [
       name: "Increment Shots Team 2",
       clickFunction: incrementPlayer2,
       imgSrc: "/icons/plus.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
+      explanationSrc: "/sounds/explanations/incrementShotsTeam2.mp3",
       cycler: useCycleList([
         "Increment Shots Team 2",
       ]),
@@ -1424,7 +1433,7 @@ const pages = [
       name: "Total Score (Game)",
       clickFunction: scoreStandings,
       html: computedScoreStandingsHtml,
-      explanationSrc: "/sounds/elevenlabs/explanation_currentScore.mp3",
+      explanationSrc: "/sounds/explanations/totalScore.mp3",
       cycler: useCycleList([
         "Total Score (Game)",
       ]),
@@ -1434,7 +1443,7 @@ const pages = [
       name: "Undo Last Increment",
       clickFunction: rewind,
       imgSrc: "/icons/rewind.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_rewinder.mp3",
+      explanationSrc: "/sounds/explanations/undo.mp3",
       cycler: useCycleList(["Undo Last Increment"]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
@@ -1443,7 +1452,7 @@ const pages = [
       clickFunction: store.incrementPlayer1score,
       imgSrc: "/icons/plus.svg",
       html: "Increment Score Team 1",
-      // explanationSrc: "/sounds/elevenlabs/explanation_playerOneIncrementer.mp3",
+      explanationSrc: "/sounds/explanations/incrementTotalScoreTeam1.mp3",
       cycler: useCycleList([
         "Increment Score Team 1",
       ]),
@@ -1454,7 +1463,7 @@ const pages = [
       clickFunction: store.incrementPlayer2score,
       imgSrc: "/icons/plus.svg",
       html: "Increment Score Team 2",
-      // explanationSrc: "/sounds/elevenlabs/explanation_playerTwoIncrementer.mp3",
+      explanationSrc: "/sounds/explanations/incrementTotalScoreTeam2.mp3",
       cycler: useCycleList([
         "Increment Score Team 2",
       ]),
@@ -1467,6 +1476,7 @@ const pages = [
       clickFunction: () => {
       },
       html: "Find XR Starting Point",
+      explanationSrc: "/sounds/explanations/findXrStartingPoint.mp3",
       cycler: useCycleList(["Find XR Starting Point"]),
       modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
     },
@@ -1475,6 +1485,7 @@ const pages = [
       clickFunction: () => {
       },
       html: "Find XR Cochonnet",
+      explanationSrc: "/sounds/explanations/findXrCochonnet.mp3",
       cycler: useCycleList(["Find XR Cochonnet"]),
       modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
     },
@@ -1484,9 +1495,9 @@ const pages = [
       name: "Pairing Status",
       clickFunction: qrStatus,
       explanationSrc:
-        "/sounds/elevenlabs/explanation_pairingStatusAnnouncer.mp3",
+        "/sounds/explanations/pairingStatusAnnouncer.mp3",
       html: { "value": "Status:<br>Paired with<br> Smartphone 1 and 3" },
-      cycler: useCycleList(["Pairing Status", "Ping Connected Phone"]),
+      cycler: useCycleList(["Pairing Status"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
     {
@@ -1494,8 +1505,8 @@ const pages = [
       clickFunction: pingPhone,
       imgSrc: "/icons/pingPhone.svg",
       html: "Ping Connected Phone",
-      explanationSrc: "/sounds/elevenlabs/explanation_phonePinger.mp3",
-      cycler: useCycleList(["Ping Connected Phone", "Pairing Status"]),
+      explanationSrc: "/sounds/explanations/phonePinger.mp3",
+      cycler: useCycleList(["Ping Connected Phone"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
     {
@@ -1503,7 +1514,7 @@ const pages = [
       clickFunction: scanqr,
       imgSrc: "/icons/scanQR.svg",
       html: "Scan QR",
-      explanationSrc: "/sounds/elevenlabs/explanation_qrScanner.mp3",
+      explanationSrc: "/sounds/explanations/qrScanner.mp3",
       cycler: useCycleList(["Scan QR", "Pair via Unique QR"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
@@ -1513,7 +1524,7 @@ const pages = [
       imgSrc: qrcode,
       html: "Pair via Unique QR",
       // html: computedUniqueQrHtml",
-      explanationSrc: "/sounds/elevenlabs/explanation_uniqueQr.mp3",
+      explanationSrc: "/sounds/explanations/uniqueQrCode.mp3",
       cycler: useCycleList(["Pair via Unique QR", "Scan QR"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
@@ -1526,7 +1537,7 @@ const pages = [
           (mode) => mode.name === "Referee"
         );
         store.modesCycler.go(findRefereeModeIndex);
-        speak("Referee mode activated");
+        // speak("Referee mode activated");
       },
       html: "Activate Referee Mode",
       cycler: useCycleList(["Referee Mode"]),
@@ -1552,7 +1563,7 @@ const pages = [
           (mode) => mode.name === "All"
         );
         store.modesCycler.go(findAllModeIndex);
-        speak("All mode activated");
+        // speak("All mode activated");
       },
       html: "Activate All Mode",
       cycler: useCycleList(["All Mode"]),
@@ -1579,7 +1590,7 @@ const pages = [
           (mode) => mode.name === "S1"
         );
         store.modesCycler.go(findPlayerModeIndex);
-        speak("S1 mode activated");
+        // speak("S1 mode activated");
       },
       html: "Activate S1 Mode",
       cycler: useCycleList(["S1 Mode"]),
@@ -1592,7 +1603,7 @@ const pages = [
           (mode) => mode.name === "S2"
         );
         store.modesCycler.go(findS2ModeIndex);
-        speak("S2 mode activated");
+        // speak("S2 mode activated");
       },
       html: "Activate S2 Mode",
       cycler: useCycleList(["S2 Mode"]),
@@ -1605,7 +1616,7 @@ const pages = [
           (mode) => mode.name === "S3"
         );
         store.modesCycler.go(findS3ModeIndex);
-        speak("S3 mode activated");
+        // speak("S3 mode activated");
       },
       html: "Activate S3 Mode",
       cycler: useCycleList(["S3 Mode"]),
@@ -1628,7 +1639,6 @@ const pages = [
       name: "Raw Intersections",
       clickFunction: sendRawIntersections,
       html: "Send scan results to other device",
-      explanationSrc: "/sounds/elevenlabs/explanation_calibrator.mp3",
       cycler: useCycleList(["Raw Intersections"]),
       modes: ["All", "Dev", "Testing", "Referee"],
     },
@@ -1653,13 +1663,8 @@ const pages = [
       deactivated: computed(() => !store.arSupported),
       clickFunction: scanCamera,
       imgSrc: "/icons/scanCamera.svg",
-      explanationSrc: "/sounds/elevenlabs/explanation_scanField.mp3",
       cycler: useCycleList([
         "Scan Field",
-        "Toggle Top Camera",
-        "Scan and count points",
-        "Set points from latest scan",
-        "Increment shots taken",
       ]),
       modes: ["All", "Dev", "Testing", "Solo", "Referee", "Player"],
     },
@@ -1690,11 +1695,8 @@ const pages = [
       name: "Haptic grid near",
       clickFunction: click_hapticGridNear,
       html: "Haptic grid near",
-      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
       cycler: useCycleList([
         "Haptic grid near",
-        "Haptic Grid",
-        "Haptic grid far",
       ]),
       modes: ["All", "Dev", "Testing", "Exhibition"],
     },
@@ -1702,18 +1704,14 @@ const pages = [
       name: "Haptic grid far",
       clickFunction: click_hapticGridFar,
       html: "Haptic grid far",
-      explanationSrc: "/sounds/elevenlabs/explanation_hapticGrid.mp3",
       cycler: useCycleList([
         "Haptic grid far",
-        "Haptic Grid",
-        "Haptic grid near",
       ]),
       modes: ["All", "Dev", "Testing", "Exhibition"],
     },
     {
       name: "Add function",
       clickFunction: addFunction,
-      // imgSrc: "/icons/referenz.svg",
       html: "<div>+ Add</div>",
       cycler: useCycleList(["Add function"]),
       modes: ["All"],
@@ -1727,11 +1725,11 @@ const pages = [
           (mode) => mode.name === "Exhibition"
         );
         store.modesCycler.go(findExhibitionModeIndex);
-        speak("Exhibition mode activated");
+        // speak("Exhibition mode activated");
       },
       html: "Activate Exhibition Mode",
       cycler: useCycleList(["Exhibition Mode"]),
-      modes: ["All", "Dev", "Testing", "Referee", "S3"],
+      modes: ["All", "Dev", "Testing", "Referee"],
     },
     {
       name: "Mock Intersections",
@@ -1752,6 +1750,7 @@ const pages = [
         store.isSky = !store.isSky;
       },
       html: "Toggle Light Mode",
+      explanationSrc: "/sounds/explanations/lightModeToggler.mp3",
       cycler: useCycleList(["Toggle Light Mode"]),
       modes: ["All", "Dev", "Testing", "Exhibition", "S2"],
     },
@@ -1762,11 +1761,11 @@ const pages = [
           (mode) => mode.name === "Exhibition"
         );
         store.modesCycler.go(findExhibitionModeIndex);
-        speak("Exhibition mode activated");
+        // speak("Exhibition mode activated");
       },
       html: "Activate Exhibition Mode",
       cycler: useCycleList(["Exhibition Mode"]),
-      modes: ["All", "Dev", "Testing", "Referee", "S2"],
+      modes: ["All", "Dev", "Testing", "Referee"],
     },
     {
       name: "Prediction Visualiser",
@@ -1886,7 +1885,7 @@ const explanations = flatPages.map((item) =>
 );
 
 const pageAnnouncerExplanation = useSoundComposable(
-  "/sounds/elevenlabs/explanation_pageAnnouncer.mp3"
+  "/sounds/explanations/navigationCircle.mp3"
 );
 
 let lastIndex = 0;
@@ -1904,6 +1903,7 @@ const longPressCallback = (e) => {
   if (!isNaN(index) && index !== null) {
     explanations[index].play();
     lastIndex = index;
+    console.log("long press on index", index);
   }
 
   store.touchCounter++;
@@ -1918,6 +1918,7 @@ onLongPress(refs, longPressCallback, {
   },
   // distanceThreshold: 5,
   onMouseUp: () => {
+    console.log("mouse up");
     Howler.stop();
     setTimeout(() => {
       afterLongPress = false;

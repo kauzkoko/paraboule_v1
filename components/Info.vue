@@ -39,7 +39,7 @@
                             v-html="store.infoStepper.current[store.modesCycler.state.name === 'S1' || store.modesCycler.state.name === 'S2' || store.modesCycler.state.name === 'S3' ? store.modesCycler.state.name : 'Empty'].bottomText">
                         </p>
                     </div>
-                    <div class="disclaimer" v-if="store.infoStepper.isCurrent('disclaimer')">
+                    <div class="" v-if="store.infoStepper.isCurrent('disclaimer')">
                         <p class="mt-10px! mb-40px!" v-html="store.infoStepper.current.bottomText"></p>
                     </div>
                     <div v-if="store.infoStepper.isCurrent('center-circle')" class="mt--10px!">
@@ -84,6 +84,63 @@
         </div>
     </div>
 </template>
+
+
+<script setup lang="ts">
+import 'animate.css';
+const store = useProtoStore();
+
+const infoButtonGlow = ref(false);
+
+setInterval(() => {
+    if (!store.infoScreen) {
+        infoButtonGlow.value = !infoButtonGlow.value;
+        setTimeout(() => {
+            infoButtonGlow.value = !infoButtonGlow.value;
+        }, 2000);
+    }
+}, 5000);
+
+let counter = 3;
+setInterval(() => {
+    if (store.infoStepper.isCurrent('functions')) {
+        store.buttonTransition = !store.buttonTransition;
+        store.buttonTransitionIndex = counter % 4;
+        counter = counter + .5;
+    }
+}, 3000);
+
+const toggleInfoScreen = () => {
+    if (store.infoScreen) {
+        close();
+    } else {
+        store.infoScreen = true;
+    }
+}
+
+const nextFunction = () => {
+    store.infoStepper.goToNext();
+    store.unmute3dAudio();
+}
+
+const computedTransition = computed(() => {
+    return 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
+});
+
+// store.infoStepper.goTo('functions');
+const close = () => {
+    store.unmute3dAudio();
+    setTimeout(() => {
+        store.setIntersectionsByNumber(1);
+    }, 1000)
+    // store.toggle3dAudio();
+    // console.log('close');
+    store.infoScreen = false;
+    store.infoStepper.goTo('welcome');
+    // console.log(store.infoScreen);
+}
+</script>
+
 <style scoped>
 .info-large {
     position: absolute;
@@ -269,57 +326,8 @@
 }
 </style>
 
-<script setup lang="ts">
-import 'animate.css';
-const store = useProtoStore();
-
-const infoButtonGlow = ref(false);
-
-setInterval(() => {
-    if (!store.infoScreen) {
-        infoButtonGlow.value = !infoButtonGlow.value;
-        setTimeout(() => {
-            infoButtonGlow.value = !infoButtonGlow.value;
-        }, 2000);
-    }
-}, 5000);
-
-let counter = 3;
-setInterval(() => {
-    if (store.infoStepper.isCurrent('functions')) {
-        store.buttonTransition = !store.buttonTransition;
-        store.buttonTransitionIndex = counter % 4;
-        counter = counter + .5;
-    }
-}, 3000);
-
-const toggleInfoScreen = () => {
-    if (store.infoScreen) {
-        close();
-    } else {
-        store.infoScreen = true;
-    }
+<style>
+.important {
+    color: var(--red) !important;
 }
-
-const nextFunction = () => {
-    store.infoStepper.goToNext();
-    store.unmute3dAudio();
-}
-
-const computedTransition = computed(() => {
-    return 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
-});
-
-// store.infoStepper.goTo('functions');
-const close = () => {
-    store.unmute3dAudio();
-    setTimeout(() => {
-        store.setIntersectionsByNumber(1);
-    }, 1000)
-    // store.toggle3dAudio();
-    // console.log('close');
-    store.infoScreen = false;
-    store.infoStepper.goTo('welcome');
-    // console.log(store.infoScreen);
-}
-</script>
+</style>

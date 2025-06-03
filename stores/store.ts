@@ -27,7 +27,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const bus = useEventBus("protoboules");
 
   const modesCycler = useCycleList(modesList);
-  const initIndex = modesList.findIndex((mode) => mode.name === "S1");
+  const initIndex = modesList.findIndex((mode) => mode.name === "S3");
   modesCycler.go(initIndex);
 
   const prevMode = computed(() => {
@@ -594,7 +594,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     },
     'functions': {
       title: 'How to use<br> the Buttons',
-      subtitle: 'Each button triggers a function that demonstrates a specific feature of PARABOULE. You can always PRESS and HOLD on the button to hear what it is supposed to do and how it works.',
+      subtitle: 'Each button triggers a function that demonstrates a specific feature of PARABOULE. <span class="important text-red!">You can always PRESS and HOLD on the button to hear what it is supposed to do and how it works.</span>',
     },
     'center-circle': {
       title: 'How to navigate<br> in the app',

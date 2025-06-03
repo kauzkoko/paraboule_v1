@@ -143,18 +143,18 @@ const cameraZ = ref(startPoint);
 
 const screenPositions = ref([]);
 
-let sounds = {};
-sounds.noise = {
-  low: "/sounds/noiselow.mp3",
-  medium: "/sounds/noz.mp3",
-  high: "/sounds/noz2.mp3",
-};
+// let sounds = {};
+// sounds.noise = {
+//   low: "/sounds/noiselow.mp3",
+//   medium: "/sounds/noz.mp3",
+//   high: "/sounds/noz2.mp3",
+// };
 
-sounds.colors = {
-  color: "/sounds/color.mp3",
-  white: "/sounds/white.mp3",
-  blue: "/sounds/blue.mp3",
-};
+// sounds.colors = {
+//   color: "/sounds/color.mp3",
+//   white: "/sounds/white.mp3",
+//   blue: "/sounds/blue.mp3",
+// };
 
 function killTweens() {
   circleAroundCochonnet = false;

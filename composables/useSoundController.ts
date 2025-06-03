@@ -12,7 +12,7 @@ export function useSoundController(options: { listen: boolean }) {
     // console.log("Payload:", payload);
     if (options.listen) {
       // console.log("playing phone sound");
-      play();
+      // play();
     }
   });
 
