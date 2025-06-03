@@ -144,6 +144,11 @@
             </div>
           </div>
         </div>
+        <div v-if="getItem(item).name === 'Placeholder'">
+          <div class="text-24px font-bold text-center flexCenter max-w-80%">
+            <div v-html="getItem(item).html.value ?? 'sdfsdf'"></div>
+          </div>
+        </div>
       </template>
       <div class="center-circle" ref="swiper" :index="'pageAnnouncer'" @click="onSingleClick"
         @touchstart="onTouchStart('pageAnnouncer')" @touchend="onTouchEnd" :style="{
@@ -490,6 +495,18 @@ const flyCochoBack = () => {
   }
 };
 
+const toggleStateCochonnetStartingPoint = ref(false)
+const click_toggleCochonnetStartingPoint = () => {
+  if (!afterLongPress) {
+    toggleStateCochonnetStartingPoint.value = !toggleStateCochonnetStartingPoint.value
+    if (toggleStateCochonnetStartingPoint.value) {
+      flyToCochonnet();
+    } else {
+      flyToStart();
+    }
+  }
+};
+
 const click_flyToCochonnet = () => {
   if (!afterLongPress) {
     flyToCochonnet();
@@ -527,6 +544,10 @@ const pairingStatusAnnouncer = useSoundComposable(
 
 const coinFlipSound = useSoundComposable(
   "/sounds/clickers/coinFlip.mp3"
+);
+
+const discoverMoreSound = useSoundComposable(
+  "/sounds/clickers/okay.mp3"
 );
 
 const qrStatus = () => {
@@ -1005,25 +1026,9 @@ const onTouchEnd = () => {
   }, 300);
 };
 
-const getSvgIcon = (iconName) => {
-  const svgIcons = {
-    gyros: `<svg class="custom-svg-icon" width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="75" cy="75" r="23.5" stroke="currentColor" stroke-width="3"/>
-      <path d="M108.178 92.3553C108.178 93.1838 108.849 93.8553 109.678 93.8553H123.178C124.006 93.8553 124.678 93.1838 124.678 92.3553C124.678 91.5269 124.006 90.8553 123.178 90.8553L111.178 90.8553L111.178 78.8553C111.178 78.0269 110.506 77.3553 109.678 77.3553C108.849 77.3553 108.178 78.0269 108.178 78.8553V92.3553ZM117 74.6777L118.5 74.6777V74.6777H117ZM115.097 65.1106L116.483 64.5366L116.483 64.5366L115.097 65.1106ZM110.738 93.416C113.199 90.9552 115.151 88.0339 116.483 84.8188L113.711 83.6707C112.53 86.5219 110.799 89.1125 108.617 91.2947L110.738 93.416ZM116.483 84.8188C117.815 81.6037 118.5 78.1577 118.5 74.6777L115.5 74.6777C115.5 77.7637 114.892 80.8196 113.711 83.6707L116.483 84.8188ZM118.5 74.6777C118.5 71.1976 117.815 67.7517 116.483 64.5366L113.711 65.6846C114.892 68.5358 115.5 71.5916 115.5 74.6777H118.5ZM116.483 64.5366C115.151 61.3214 113.199 58.4001 110.738 55.9393L108.617 58.0607C110.799 60.2428 112.53 62.8335 113.711 65.6846L116.483 64.5366Z" fill="currentColor"/>
-      <path d="M42.1777 57.0001C42.1777 56.1717 41.5062 55.5001 40.6777 55.5001H27.1777C26.3493 55.5001 25.6777 56.1717 25.6777 57.0001C25.6777 57.8286 26.3493 58.5001 27.1777 58.5001H39.1777V70.5001C39.1777 71.3286 39.8493 72.0001 40.6777 72.0001C41.5062 72.0001 42.1777 71.3286 42.1777 70.5001V57.0001ZM33.3554 74.6778L31.8554 74.6778L31.8554 74.6778H33.3554ZM35.2584 84.2449L33.8726 84.8189L33.8726 84.8189L35.2584 84.2449ZM39.6171 55.9395C37.1563 58.4002 35.2043 61.3216 33.8726 64.5367L36.6442 65.6847C37.8252 62.8336 39.5562 60.243 41.7384 58.0608L39.6171 55.9395ZM33.8726 64.5367C32.5408 67.7518 31.8554 71.1978 31.8554 74.6778L34.8554 74.6778C34.8554 71.5917 35.4632 68.5359 36.6442 65.6847L33.8726 64.5367ZM31.8554 74.6778C31.8554 78.1578 32.5408 81.6038 33.8726 84.8189L36.6442 83.6709C35.4632 80.8197 34.8554 77.7639 34.8554 74.6778H31.8554ZM33.8726 84.8189C35.2043 88.034 37.1563 90.9554 39.6171 93.4161L41.7384 91.2948C39.5562 89.1126 37.8252 86.522 36.6442 83.6709L33.8726 84.8189Z" fill="currentColor"/>
-      <path d="M0 75H10H20M150 75H140H130" stroke="currentColor" stroke-width="3"/>
-      <path d="M10 113L18.6603 108M139.904 38L131.244 43" stroke="currentColor" stroke-width="3"/>
-      <path d="M10 38L18.6603 43M139.904 113L131.244 108" stroke="currentColor" stroke-width="3"/>
-      <path d="M37 139.904L42 131.244M112 10L107 18.6603" stroke="currentColor" stroke-width="3"/>
-      <path d="M37 10L42 18.6603M112 139.904L107 131.244" stroke="currentColor" stroke-width="3"/>
-      <path d="M75 150V140V130M75 0V10V20" stroke="currentColor" stroke-width="3"/>
-      <rect x="51.5" y="24.5" width="47" height="100" rx="6.5" stroke="currentColor" stroke-width="3"/>
-    </svg>`,
-    // Add more icons as needed
-  };
-
-  return svgIcons[iconName] || '';
-};
+const computedIconToggleCochonnetStartingPoint = computed(() => {
+  return !toggleStateCochonnetStartingPoint.value ? "/icons/flyToCochonnet.svg" : "/icons/flyToStart.svg";
+});
 
 const pages = [
   [
@@ -1694,8 +1699,6 @@ const pages = [
       cycler: useCycleList(["Pair via Unique QR"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
-  ],
-  [
     {
       name: "Ping Connected Phone 1",
       deactivated: isPingingPhone1 && lockPingingPhone1,
@@ -1707,6 +1710,8 @@ const pages = [
       cycler: useCycleList(["Ping Connected Phone 1"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "S3", "Exhibition"],
     },
+  ],
+  [
     {
       name: "Ping Connected Phone 2",
       deactivated: isPingingPhone2 && lockPingingPhone2,
@@ -1719,6 +1724,35 @@ const pages = [
       modes: ["All", "Dev", "Testing", "QR", "S1", "S3", "Exhibition"],
     },
     {
+      name: "Haptic Grid",
+      clickFunction: click_hapticGridMedium,
+      html: "Haptic Grid",
+      imgSrc: "/icons/hapticGridMedium.svg",
+      explanationSrc: "/sounds/explanations/hapticGrid.mp3",
+      cycler: useCycleList([
+        "Haptic Grid",
+      ]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S3", "Exhibition"],
+    },
+    {
+      name: "Discover More",
+      clickFunction: () => {
+        discoverMoreSound.play();
+      },
+      html: computed(() => {
+        return `
+        <div class='text-23px'>There is much more to explore. Check out the other smartphones!</div>
+      `;
+      }),
+      explanationSrc: "/sounds/explanations/checkOutTheOtherSmartphones.mp3",
+      cycler: useCycleList([
+        "Discover More",
+      ]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S3", "Exhibition"],
+    },
+  ],
+  [
+    {
       name: "Ping Connected Phone 3",
       deactivated: isPingingPhone3 && lockPingingPhone3,
       deactivatedText: computed(() => `Pinging Phone 3... Watch smartphone on ${store.modesCycler.state.name === "S1" ? 'your right' : 'your left'}. Wait a moment to ping again.`),
@@ -1728,6 +1762,78 @@ const pages = [
       explanationSrc: "/sounds/explanations/phonePinger.mp3",
       cycler: useCycleList(["Ping Connected Phone 3"]),
       modes: ["All", "Dev", "Testing", "QR", "S1", "S2", "Exhibition"],
+    },
+    {
+      name: "Bug Slider",
+      clickFunction: click_slider,
+      imgSrc: "/icons/slider.svg",
+      explanationSrc: "/sounds/explanations/bugSlider.mp3",
+      html: "Bug Slider",
+      cycler: useCycleList(["Bug Slider"]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S2", "Exhibition"],
+    },
+    {
+      name: "Gyros Controller",
+      deactivated: computed(() => store.alphaController),
+      deactivatedText: "Gyros Controller is active. Rotate your device to rotate the view. Tap to turn it off.",
+      clickFunction: setAlphaController,
+      imgSrc: "/icons/gyros.svg",
+      explanationSrc: "/sounds/explanations/gyrosController.mp3",
+      html: "Toggle Gyros Controller",
+      cycler: useCycleList(["Gyros Controller"]),
+      modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo", "S2", "Exhibition"],
+    },
+    // {
+    //   name: "Toggle Cochonnet / Starting Point",
+    //   clickFunction: click_toggleCochonnetStartingPoint,
+    //   imgSrc: computedIconToggleCochonnetStartingPoint,
+    //   explanationSrc: "/sounds/explanations/flyToCochonnet.mp3",
+    //   html: "Fly to cochonnet",
+    //   cycler: useCycleList(["Toggle Cochonnet / Starting Point"]),
+    //   modes: ["All", "Dev", "Testing", "SBV", "Player", "S2", "Exhibition"],
+    // },
+    {
+      name: "Discover More",
+      clickFunction: () => {
+        discoverMoreSound.play();
+      },
+      html: computed(() => {
+        return `
+        <div class='text-23px'>There is much more to explore. Check out the other smartphones!</div>
+      `;
+      }),
+      explanationSrc: "/sounds/explanations/checkOutTheOtherSmartphones.mp3",
+      cycler: useCycleList([
+        "Discover More",
+      ]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S2", "Exhibition"],
+    },
+  ],
+  [
+    {
+      name: "Toggle Top Camera",
+      clickFunction: click_toggleTopCameraSlider,
+      imgSrc: "/icons/topGrid.svg",
+      explanationSrc: "/sounds/explanations/topCameraToggler.mp3",
+      html: "Toggle Top Camera",
+      cycler: useCycleList(["Toggle Top Camera"]),
+      modes: ["All", "Dev", "Testing", "Player", "S1", "Exhibition"],
+    },
+    {
+      name: "Discover More",
+      clickFunction: () => {
+        discoverMoreSound.play();
+      },
+      html: computed(() => {
+        return `
+        <div class='text-23px'>There is much more to explore. Check out the other smartphones!</div>
+      `;
+      }),
+      explanationSrc: "/sounds/explanations/checkOutTheOtherSmartphones.mp3",
+      cycler: useCycleList([
+        "Discover More",
+      ]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
   ],
   [

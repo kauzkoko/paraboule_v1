@@ -18,7 +18,7 @@
                         </p>
                     </div>
                     <div v-if="store.infoStepper.isCurrent('disclaimer')" class="flex flex-col items-center disclaimer">
-                        <h1 v-html="store.infoStepper.current.title"></h1>
+                        <h1 v-html="store.infoStepper.current.title" class="border-solid border-3px"></h1>
                         <p class="mt-10px! mb-40px!" v-html="store.infoStepper.current.upperText"></p>
                     </div>
                     <div v-else>
@@ -35,7 +35,7 @@
                             @click="nextFunction()"><span class="color-hex-00ff00!">LEARN MORE</span></div>
                     </div>
                     <div v-if="store.infoStepper.isCurrent('role')">
-                        <p
+                        <p class="mt--20px!"
                             v-html="store.infoStepper.current[store.modesCycler.state.name === 'S1' || store.modesCycler.state.name === 'S2' || store.modesCycler.state.name === 'S3' ? store.modesCycler.state.name : 'Empty'].bottomText">
                         </p>
                     </div>
@@ -132,7 +132,7 @@ const close = () => {
     // please uncomment this before exhibition
     store.unmute3dAudio();
     setTimeout(() => {
-        store.setIntersectionsByNumber(1);
+        // store.setIntersectionsByNumber(1);
     }, 1000)
     // store.toggle3dAudio();
     // console.log('close');

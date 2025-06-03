@@ -4,6 +4,7 @@
   <TresMesh v-for="(boule, index) in boulesToDisplay" :key="index" :iClass="boule.class" ref="boulesRefs"
     :position="[boule.x, 0, boule.y]">
     <TresSphereGeometry :args="[boule.size, 24, 24]" />
+    <TresMeshPhysicalMaterial :roughness=".2" :metalness="1" :emissive="boule.color" />
     <CustomShaderMaterial v-bind="boule.player === 1
       ? materialPropsRed
       : boule.player === 2
@@ -18,7 +19,6 @@
           ? '/sounds/strudel/simplebeat.mp3'
           : '/strudel/still.mp3'
       " />
-    <!-- <TresMeshPhysicalMaterial :roughness=".2" :metalness="1" :emissive="boule.color" /> -->
   </TresMesh>
   <StundenOrientation :startPoint="startPoint" />
   <Sky v-if="store.isSky" :elevation="1" :distance="20" />
