@@ -11,11 +11,18 @@
 <script setup>
 const store = useProtoStore();
 let inactivityTimer = null;
-let inactivityTimeInSeconds = 120
+let inactivityTimeInSeconds = 90
 
 const handleInactivity = () => {
   // console.log(`No activity for ${inactivityTimeInSeconds} seconds - running inactivity function`);
   store.infoScreen = true
+  store.isTappingOnHaptic = false
+  store.isTouchingSlider = false
+  store.isTappingOnTopCameraSlider = false
+  store.predictionVisualiser = false
+  store.predictionVisualiser = false
+  store.alphaController = false
+  // focus all boules
 };
 
 const resetInactivityTimer = () => {

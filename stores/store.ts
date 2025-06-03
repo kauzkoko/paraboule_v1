@@ -27,7 +27,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const bus = useEventBus("protoboules");
 
   const modesCycler = useCycleList(modesList);
-  const initIndex = modesList.findIndex((mode) => mode.name === "S3");
+  const initIndex = modesList.findIndex((mode) => mode.name === "S1");
   modesCycler.go(initIndex);
 
   const prevMode = computed(() => {
@@ -566,7 +566,7 @@ export const useProtoStore = defineStore("protoStore", () => {
       img: '/icons/paraboule_black.svg',
       // subtitle: 'PARABOULE is an exploration<br> of spatial audio and object detection in Pétanque. It is built with accessibility in mind and assists you in playing Boule by binaural hearing.',
       subtitle: 'PARABOULE is an assistive tool for visually impaired and sighted players to play Pétanque by binaural hearing and haptic feedback. <span class="important text-red!">This is the exhibition version of the app.</span>',
-      bottomText: 'PARABOULE explores<br> spatial audio and object detection technologies in Pétanque. It is built with accessibility considerations in mind and meant to be used in a real game of Pétanque.'
+      bottomText: 'PARABOULE explores<br> spatial audio and object detection technologies in Pétanque. It is built with accessibility considerations in mind.'
     },
     'role': {
       'S1': {

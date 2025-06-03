@@ -31,8 +31,8 @@
                     <div v-if="store.infoStepper.isCurrent('welcome')"
                         class="flex justify-center flex-col items-center">
                         <p class="mt-50px!" v-html="store.infoStepper.current.bottomText"></p>
-                        <div class="button-container info-next mb-10px border-black!"
-                            @click="nextFunction()"><span class="color-black!">LEARN MORE</span></div>
+                        <div class="button-container info-next mb-10px border-hex-00ff00!"
+                            @click="nextFunction()"><span class="color-hex-00ff00!">LEARN MORE</span></div>
                     </div>
                     <div v-if="store.infoStepper.isCurrent('role')">
                         <p
@@ -108,7 +108,7 @@ setInterval(() => {
         store.buttonTransitionIndex = counter % 4;
         counter = counter + .5;
     }
-}, 3000);
+}, 4000);
 
 const toggleInfoScreen = () => {
     if (store.infoScreen) {
@@ -246,7 +246,7 @@ const close = () => {
     font-weight: bold;
     font-size: 2rem;
     z-index: 1000;
-    mix-blend-mode: exclusion;
+    /* mix-blend-mode: exclusion; */
     padding: 0;
     margin: 0;
     border-color: black;

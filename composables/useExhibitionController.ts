@@ -26,6 +26,15 @@ export function useExhibitionController() {
     })
     .on("broadcast", { event: "stopPingStartingPoint" }, (event) => {
       stopPingStartingPoint(false);
+    })
+    .on("broadcast", { event: "pingPhone1Supabase" }, (event) => {
+      bus.emit("pingPhone1", event.payload);
+    })
+    .on("broadcast", { event: "pingPhone2Supabase" }, (event) => {
+      bus.emit("pingPhone2", event.payload);
+    })
+    .on("broadcast", { event: "pingPhone3Supabase" }, (event) => {
+      bus.emit("pingPhone3", event.payload);
     });
 
   function playFilm(broadcast = true) {
@@ -78,6 +87,30 @@ export function useExhibitionController() {
         payload: { playedCount, scheduledTime },
       });
     }
+  }
+
+  function pingPhone1Supabase({ from }: { from: string }) {
+      exhibitionController.send({
+        type: "broadcast",
+        event: "pingPhone1Supabase",
+        payload: { from },
+      });
+  }
+
+  function pingPhone2Supabase({ from }: { from: string }) {
+    exhibitionController.send({
+      type: "broadcast",
+      event: "pingPhone2Supabase",
+      payload: { from },
+    });
+  }
+
+  function pingPhone3Supabase({ from }: { from: string }) {
+    exhibitionController.send({
+      type: "broadcast",
+      event: "pingPhone3Supabase",
+      payload: { from },
+    });
   }
 
   function pingCochonnet(broadcast = true) {
@@ -133,5 +166,8 @@ export function useExhibitionController() {
     stopPingCochonnet,
     pingStartingPoint,
     stopPingStartingPoint,
+    pingPhone1Supabase,
+    pingPhone2Supabase,
+    pingPhone3Supabase,
   };
 }

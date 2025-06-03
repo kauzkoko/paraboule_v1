@@ -7,10 +7,11 @@
     @touchstart="isTouchingSliderTouchStartHandler">
     <div class="container">
       <div class="big">
+        <UpDown />
         <div v-show="!store.isTappingOnSlider">
           <div>
-            Press and hold while sliding your finger vertically on the screen to
-            navigate through the scene. A single tap will exit.
+            Press and hold, then slide your finger vertically to explore the scene. Listen to the Boules around you.
+            Tap once to exit.
           </div>
         </div>
       </div>
@@ -19,10 +20,12 @@
   <div class="outer" v-show="store.isTouchingTopCameraSlider" @click="onClickTopCameraSliderComponent">
     <div class="container">
       <div class="big">
+        <UpDown />
         <div v-show="!store.isTappingOnTopCameraSlider">
           <div>
-            Press and hold while sliding your finger vertically on the screen to
-            set height of camera. A single tap will exit.
+            Press and hold, then slide your finger vertically to adjust the camera height. See how the Boules are
+            positioned and if they are correctly recognised.
+            Tap once to exit.
           </div>
         </div>
       </div>
@@ -33,8 +36,8 @@
       <div class="big">
         <div v-show="!store.isTappingOnHaptic">
           <div>
-            Tap, hold and move across the screen to navigate. Tap once to exit.
-          </div>
+            Press and hold, then slide your finger to explore the scene. You will feel a vibration when near a Boule.
+            When you are perfectly aligned, you will hear a sound. Tap once to exit.</div>
         </div>
       </div>
     </div>
@@ -43,7 +46,8 @@
     <div class="container scannerClass">
       <div class="big">
         <div v-show="!store.predictionVisualiser || !store.scannerOpen">
-          <div>Tap once to exit.</div>
+          <div>Watch how the app identifies the playground. Tap once to exit.
+          </div>
         </div>
       </div>
     </div>
@@ -65,7 +69,7 @@
               touchedIndex === index ? 'all 100ms' : 'all 500ms',
             opacity: getItem(item).deactivated
               ? getItem(item).deactivated.value
-                ? 0.5
+                ? 1
                 : 1
               : 1,
             borderBottomRightRadius: swipe && index === 0 ? '100px' : index === 0 && !swipe ? '60px' : '5px',
@@ -76,25 +80,59 @@
           }">
           <div class="absolute text-[var(--border-color)] text-14px font-bold pl-7px pr-7px py-4px" :class="{
             'top-0 left-0': index === 0,
-            'top-0 right-0': index === 1,
+            'top-0 right-0 text-right': index === 1,
             'bottom-0 left-0': index === 2,
             'bottom-0 right-0': index === 3,
           }">
-            {{ getItem(item).name }}
-            <div v-if="index === 0" :style="{ opacity: swipe ? .3 : 0 }"
-              class="transition-opacity duration-3000 children:text-red!">
+            <div v-if="index === 3" :style="{ opacity: swipe ? maxOpacityTapIcons : 0 }"
+              class="transition-opacity duration-3000 children:text-hex-ff0000! mt-3px text-right">
               <span>
-                <DotSmall class="mr-2px" />TAP TO ACTIVATE
+                <DotSmall />
               </span><br>
               <span>
-                <LongPressSmall class="mr--48px" />EXPLANATION
+                <LongPressSmallRight />
               </span>
+            </div>
+            <div v-if="index === 2" :style="{ opacity: swipe ? maxOpacityTapIcons : 0 }"
+              class="transition-opacity duration-3000 children:text-hex-ff0000! mt-3px">
+              <span>
+                <DotSmall class="mr-2px" />
+              </span><br>
+              <span>
+                <LongPressSmall class="mr--48px" />
+              </span>
+            </div>
+            {{ getItem(item).name }}
+            <div v-if="index === 0" :style="{ opacity: swipe ? maxOpacityTapIcons : 0 }"
+              class="transition-opacity duration-3000 children:text-hex-ff0000! mt-3px">
+              <span>
+                <LongPressSmall class="mr--48px" />EXPLANATION
+              </span><br>
+              <span>
+                <DotSmall class="mr-2px" />TAP TO ACTIVATE
+              </span>
+            </div>
+            <div v-if="index === 1" :style="{ opacity: swipe ? maxOpacityTapIcons : 0 }"
+              class="transition-opacity duration-3000 children:text-hex-ff0000! mt-3px text-right">
+
+              <span>
+                <LongPressSmallRight />
+              </span><br>
+              <span>
+                <DotSmall />
+              </span>
+
             </div>
           </div>
           <div
             class="flex justify-center items-center w-full h-full children:w-70% children:h-70% transition-opacity duration-1000"
             :class="{ 'bg-[rgb(255,78,78)]!': getItem(item).name === 'Toggle Light Mode', 'opacity-0': store.infoScreen, 'opacity-100': !store.infoScreen }">
-            <SvgIcon v-if="getItem(item).imgSrc && !getItem(item).imgSrc.value && getItem(item).imgSrc.includes('.svg')"
+            <div v-if="getItem(item).deactivated && getItem(item).deactivated.value"
+              class="bg-transparent text-hex-ff0000! text-18px font-bold w-full h-full flexCenter text-center">
+              <div>{{ getItem(item).deactivatedText }}</div>
+            </div>
+            <SvgIcon
+              v-else-if="getItem(item).imgSrc && !getItem(item).imgSrc.value && getItem(item).imgSrc.includes('.svg')"
               :name="getIconName(getItem(item).imgSrc)" />
             <img
               :class="getItem(item).imgSrc.value ?? (getItem(item).imgSrc.startsWith('data') || getItem(item).imgSrc.includes('.png')) ? 'h-initial' : 'initial'"
@@ -147,12 +185,23 @@
   </VibrationGrid>
   <PredictionVisualiser></PredictionVisualiser>
   <Scanner></Scanner>
+  <div v-if="beingWatchedInfo"
+    class="fixed left-0 top-0 w-100dvw h-100dvh bg-black/80 z-999999999999999999 text-center flexCenter flex-col"
+    @click="closeBeingWatchedInfo()">
+    <div class="text-white text-24px font-bold max-w-80% uppercase">
+      Someone on your {{ directionPingedPhone }} is watching you!<br>
+    </div>
+    <div class="text-white text-14px font-bold max-w-80% uppercase mt-5px">
+      Tap to close.
+    </div>
+  </div>
 </template>
 
 <script setup>
 import { Howler } from "howler";
 import { useQRCode } from "@vueuse/integrations/useQRCode";
-
+import { DotSmall } from "#components";
+const maxOpacityTapIcons = ref(0.5)
 await preloadComponents(['SvgIcon'])
 
 const store = useProtoStore();
@@ -169,7 +218,10 @@ const {
   pingStartingPoint,
   stopPingStartingPoint,
   pingCochonnet,
-  stopPingCochonnet
+  stopPingCochonnet,
+  pingPhone1Supabase,
+  pingPhone2Supabase,
+  pingPhone3Supabase
 } = useExhibitionController();
 
 const onTappingOnHaptic = () => {
@@ -184,6 +236,46 @@ const onTappingOnTopCameraSlider = () => {
   store.isTappingOnTopCameraSlider = !store.isTappingOnTopCameraSlider;
 };
 
+const lastFrom = ref(null)
+const lastBeingPingedPhone = ref(null);
+const beingWatchedInfo = ref(false);
+const closeBeingWatchedInfo = () => {
+  beingWatchedInfo.value = false;
+};
+bus.on((message, payload) => {
+  if (message === "pingPhone1" && store.modesCycler.state.name === "S1") {
+    console.log("received pingPhone1", payload)
+    lastBeingPingedPhone.value = "pingPhone1";
+    lastFrom.value = payload.from;
+    beingWatchedInfo.value = true;
+  }
+  if (message === "pingPhone2" && store.modesCycler.state.name === "S2") {
+    console.log("received pingPhone2", payload)
+    lastBeingPingedPhone.value = "pingPhone2";
+    lastFrom.value = payload.from;
+    beingWatchedInfo.value = true;
+
+  }
+  if (message === "pingPhone3" && store.modesCycler.state.name === "S3") {
+    console.log("received pingPhone3", payload)
+    lastBeingPingedPhone.value = "pingPhone3";
+    lastFrom.value = payload.from;
+    beingWatchedInfo.value = true;
+  }
+})
+
+const directionPingedPhone = computed(() => {
+  if (lastBeingPingedPhone.value === "pingPhone1") {
+    return lastFrom.value === "S2" ? "left" : "right";
+  }
+  if (lastBeingPingedPhone.value === "pingPhone2") {
+    return lastFrom.value === "S1" ? "right" : "left";
+  }
+  if (lastBeingPingedPhone.value === "pingPhone3") {
+    return lastFrom.value === "S1" ? "left" : "right";
+  }
+  return "left or right"
+});
 
 const {
   vibrateOnce,
@@ -374,10 +466,15 @@ const setPointsFromLatestScan = () => {
   store.setScoreFromPoints();
 };
 
+const isPingingCochonnet = ref(false)
 const click_pingCochonnet = () => {
   if (!afterLongPress) {
-    sendPlayCochonnet(5000);
+    isPingingCochonnet.value = true
+    // sendPlayCochonnet(5000);
     pingCochonnet();
+    setTimeout(() => {
+      isPingingCochonnet.value = false
+    }, 3000);
   }
 };
 
@@ -697,17 +794,74 @@ const scoreStandings = () => {
   }
 };
 
+const isPingingShoes = ref(false);
 const pingShoes = () => {
   // console.log("pingShoes");
+  console.log("pingShoes");
   if (!afterLongPress) {
     sendPlayHoola();
+    isPingingShoes.value = true;
     pingStartingPoint();
+    setTimeout(() => {
+      console.log("pingShoes timeout");
+      isPingingShoes.value = false;
+    }, 3000);
   }
 };
 
-const pingPhone = () => {
+
+
+const lockPingingPhone1 = ref(false)
+const isPingingPhone1 = ref(false)
+const pingPhone1 = () => {
+  if (!afterLongPress && !lockPingingPhone1.value) {
+    isPingingPhone1.value = true
+    lockPingingPhone1.value = true
+    // sendPlayPhone(7);]
+    console.log(store.modesCycler.state.name)
+    pingPhone1Supabase({ from: store.modesCycler.state.name })
+    setTimeout(() => {
+      isPingingPhone1.value = false
+    }, 3000);
+    setTimeout(() => {
+      lockPingingPhone1.value = false
+    }, 20000);
+  }
+};
+
+const deactivatedTextPingPhone1 = computed(() => {
+  return `Pinging Phone 1... Watch smartphone on ${store.modesCycler.state.name === "S2" ? 'your right' : 'your left'}. Wait a moment to ping again.`
+})
+
+const lockPingingPhone2 = ref(false)
+const isPingingPhone2 = ref(false)
+const pingPhone2 = () => {
   if (!afterLongPress) {
-    sendPlayPhone(7);
+    isPingingPhone2.value = true
+    lockPingingPhone2.value = true
+    pingPhone2Supabase({ from: store.modesCycler.state.name })
+    setTimeout(() => {
+      isPingingPhone2.value = false
+    }, 3000);
+    setTimeout(() => {
+      lockPingingPhone2.value = false
+    }, 20000);
+  }
+};
+
+const lockPingingPhone3 = ref(false)
+const isPingingPhone3 = ref(false)
+const pingPhone3 = () => {
+  if (!afterLongPress) {
+    isPingingPhone3.value = true
+    lockPingingPhone3.value = true
+    pingPhone3Supabase({ from: store.modesCycler.state.name })
+    setTimeout(() => {
+      isPingingPhone3.value = false
+    }, 3000);
+    setTimeout(() => {
+      lockPingingPhone3.value = false
+    }, 20000);
   }
 };
 
@@ -812,8 +966,11 @@ const computedUniqueQrHtml = computed(() => {
     </div>`;
 });
 
+const isTossingCoin = ref(false);
 const coinImgSrc = ref("/icons/coinFlip.svg");
 const tossCoin = () => {
+  if (isTossingCoin.value) return;
+  isTossingCoin.value = true;
   const totalTime = 6000;
   const count = 5;
   coinImgSrc.value = "/icons/fragezeichen.svg";
@@ -829,6 +986,7 @@ const tossCoin = () => {
     const random = Math.random();
     coinImgSrc.value = random < 0.5 ? "/icons/coinFlip.svg" : "/icons/zahl.svg";
     speak(`The coin landed on ${random < 0.5 ? "heads" : "tails"}.`)
+    isTossingCoin.value = false;
   }, totalTime);
 };
 
@@ -877,6 +1035,8 @@ const pages = [
   [
     {
       name: "Gyros Controller",
+      deactivated: computed(() => store.alphaController),
+      deactivatedText: "Gyros Controller is active. Rotate your device to rotate the view. Tap to turn it off.",
       clickFunction: setAlphaController,
       imgSrc: "/icons/gyros.svg",
       explanationSrc: "/sounds/explanations/gyrosController.mp3",
@@ -885,12 +1045,12 @@ const pages = [
       modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo", "S1", "Exhibition"],
     },
     {
-      name: "Bug",
+      name: "Bug Slider",
       clickFunction: click_slider,
       imgSrc: "/icons/slider.svg",
       explanationSrc: "/sounds/explanations/bugSlider.mp3",
-      html: "Bug",
-      cycler: useCycleList(["Bug"]),
+      html: "Bug Slider",
+      cycler: useCycleList(["Bug Slider"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
@@ -942,6 +1102,8 @@ const pages = [
     },
     {
       name: "Ping Cochonnet",
+      deactivated: isPingingCochonnet,
+      deactivatedText: "Pinging Cochonnet... Watch the floor TV screen.",
       clickFunction: click_pingCochonnet,
       imgSrc: "/icons/cocho.svg",
       explanationSrc: "/sounds/explanations/pingCochonnet.mp3",
@@ -950,10 +1112,12 @@ const pages = [
     },
     {
       name: "Ping Starting Point",
+      deactivated: isPingingShoes,
+      deactivatedText: "Pinging Starting Point... Watch the vertical TV screen.",
       clickFunction: pingShoes,
       imgSrc: "/icons/hoolahoop.svg",
       explanationSrc: "/sounds/explanations/pingStartingPoint.mp3",
-      cycler: useCycleList(["Ping Starting Point", "Ping Cochonnet"]),
+      cycler: useCycleList(["Ping Starting Point"]),
       modes: ["All", "Dev", "Testing", "Player", "S2", "S1", "Exhibition"],
     },
   ],
@@ -961,6 +1125,8 @@ const pages = [
     {
       name: "Switch Boule Fokuss <3",
       deactivated: computed(() => store.boulesCount < 1),
+      deactivatedText: "Available after detection of the Cochonnet. Wait few seconds for the video to trigger a throw.",
+
       clickFunction: () => {
         const currentBouleFocuserFunction = flatPages.find(
           (item) => item.name === store.bouleFocuserCycler.state
@@ -983,6 +1149,7 @@ const pages = [
     {
       name: "Focus Big Boules",
       deactivated: computed(() => store.boulesCount < 2),
+      deactivatedText: "Available after detection of at least 1 Boule. Wait few seconds for the video to trigger a throw.",
       clickFunction: () => click_bouleFocuser("all"),
       explanationSrc: "/sounds/explanations/focusBigBoules.mp3",
       imgSrc: "/icons/focusAllBlur2.png",
@@ -995,6 +1162,8 @@ const pages = [
     {
       name: "Focus Team Blue",
       deactivated: computed(() => store.boulesCount < 2),
+      deactivatedText: "Available after detection of at least 1 Boule of Team Blue. Wait few seconds for the video to trigger a throw.",
+
       clickFunction: () => {
         const blueBoules = store.boulesToDisplay
           .map((boule, index) => ({ index, class: boule.class }))
@@ -1013,7 +1182,7 @@ const pages = [
     {
       name: "Focus Team Red",
       deactivated: computed(() => store.boulesCount < 2),
-
+      deactivatedText: "Available after detection of at least 1 Boule of Team Red. Wait few seconds for the video to trigger a throw.",
       clickFunction: () => {
         const redBoules = store.boulesToDisplay
           .map((boule, index) => ({ index, class: boule.class }))
@@ -1370,6 +1539,8 @@ const pages = [
 
     {
       name: "Ping Starting Point",
+      deactivated: isPingingShoes,
+      deactivatedText: "Pinging Starting Point (vertical TV screen)",
       clickFunction: pingShoes,
       imgSrc: "/icons/hoolahoop.svg",
       explanationSrc: "/sounds/explanations/pingStartingPoint.mp3",
@@ -1512,15 +1683,6 @@ const pages = [
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
     {
-      name: "Ping Connected Phone",
-      clickFunction: pingPhone,
-      imgSrc: "/icons/pingPhone.svg",
-      html: "Ping Connected Phone",
-      explanationSrc: "/sounds/explanations/phonePinger.mp3",
-      cycler: useCycleList(["Ping Connected Phone"]),
-      modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
-    },
-    {
       name: "Scan QR",
       clickFunction: scanqr,
       imgSrc: "/icons/scanQR.svg",
@@ -1538,6 +1700,41 @@ const pages = [
       explanationSrc: "/sounds/explanations/uniqueQrCode.mp3",
       cycler: useCycleList(["Pair via Unique QR"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
+    },
+  ],
+  [
+    {
+      name: "Ping Connected Phone 1",
+      deactivated: isPingingPhone1 && lockPingingPhone1,
+      deactivatedText: deactivatedTextPingPhone1,
+      clickFunction: pingPhone1,
+      imgSrc: "/icons/pingPhone1.svg",
+      html: "Ping Connected Phone",
+      explanationSrc: "/sounds/explanations/phonePinger.mp3",
+      cycler: useCycleList(["Ping Connected Phone 1"]),
+      modes: ["All", "Dev", "Testing", "QR", "S2", "S3", "Exhibition"],
+    },
+    {
+      name: "Ping Connected Phone 2",
+      deactivated: isPingingPhone2,
+      deactivatedText: computed(() => `Pinging Phone 2... Watch smartphone on ${store.modesCycler.state.name === "S1" ? 'your left' : 'your right'}.`),
+      clickFunction: pingPhone2,
+      imgSrc: "/icons/pingPhone2.svg",
+      html: "Ping Connected Phone",
+      explanationSrc: "/sounds/explanations/phonePinger.mp3",
+      cycler: useCycleList(["Ping Connected Phone 2"]),
+      modes: ["All", "Dev", "Testing", "QR", "S1", "S3", "Exhibition"],
+    },
+    {
+      name: "Ping Connected Phone 3",
+      deactivated: isPingingPhone3,
+      deactivatedText: computed(() => `Pinging Phone 3... Watch smartphone on ${store.modesCycler.state.name === "S1" ? 'your right' : 'your left'}.`),
+      clickFunction: pingPhone3,
+      imgSrc: "/icons/pingPhone3.svg",
+      html: "Ping Connected Phone",
+      explanationSrc: "/sounds/explanations/phonePinger.mp3",
+      cycler: useCycleList(["Ping Connected Phone 3"]),
+      modes: ["All", "Dev", "Testing", "QR", "S1", "S2", "Exhibition"],
     },
   ],
   [
@@ -1933,8 +2130,8 @@ onLongPress(refs, longPressCallback, {
   },
   // distanceThreshold: 5,
   onMouseUp: (duration, distance, isLongPress) => {
-    console.log(duration, distance, isLongPress)
-    console.log("mouse up");
+    // console.log(duration, distance, isLongPress)
+    // console.log("mouse up");
     // if (distance < 200) Howler.stop();
     Howler.stop();
     setTimeout(() => {
@@ -2093,22 +2290,32 @@ onMounted(() => {
   grid-row: span 2;
   grid-column: span 2;
   border-radius: 5px;
+  position: relative;
 
   >div {
     width: 100%;
     height: 100%;
     display: flex;
     justify-content: center;
-    align-items: top;
+    align-items: center;
+  }
 
-    div {
-      margin-top: 10px;
-      text-align: center;
-      font-size: 30px;
-      font-weight: 400;
-      color: red;
-      width: 80%;
-    }
+  div {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 23px;
+    font-weight: bold;
+    color: red;
+    width: 90%;
   }
 }
 
