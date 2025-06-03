@@ -1888,6 +1888,10 @@ const pageAnnouncerExplanation = useSoundComposable(
   "/sounds/explanations/navigationCircle.mp3"
 );
 
+const { x, y } = useMouse();
+let startX = 0;
+let startY = 0;
+let canTurnOff = true;
 let lastIndex = 0;
 const longPressCallback = (e) => {
   afterLongPress = true;
@@ -1917,8 +1921,10 @@ onLongPress(refs, longPressCallback, {
     prevent: true,
   },
   // distanceThreshold: 5,
-  onMouseUp: () => {
+  onMouseUp: (duration, distance, isLongPress) => {
+    console.log(duration, distance, isLongPress)
     console.log("mouse up");
+    // if (distance < 200) Howler.stop();
     Howler.stop();
     setTimeout(() => {
       afterLongPress = false;

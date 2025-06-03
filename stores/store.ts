@@ -565,8 +565,8 @@ export const useProtoStore = defineStore("protoStore", () => {
       title: 'Welcome to',
       img: '/icons/paraboule_black.svg',
       // subtitle: 'PARABOULE is an exploration<br> of spatial audio and object detection in Pétanque. It is built with accessibility in mind and assists you in playing Boule by binaural hearing.',
-      subtitle: 'PARABOULE is an assistive tool for visually impaired and sighted players to play Pétanque by binaural hearing and haptic feedback.',
-      bottomText: 'PARABOULE is an exploration<br> of spatial audio and object detection technologies in Pétanque. It is built with accessibility considerations in mind.'
+      subtitle: 'PARABOULE is an assistive tool for visually impaired and sighted players to play Pétanque by binaural hearing and haptic feedback. <span class="important text-red!">This is the exhibition version of the app.</span>',
+      bottomText: 'PARABOULE explores<br> spatial audio and object detection technologies in Pétanque. It is built with accessibility considerations in mind and meant to be used in a real game of Pétanque.'
     },
     'role': {
       'S1': {
@@ -602,7 +602,7 @@ export const useProtoStore = defineStore("protoStore", () => {
     },
     'disclaimer': {
       title: 'Disclaimer',
-      upperText: 'This version of PARABOULE is curated for exhibition purposes and, in this exact composition, is not intended for real-life gameplay. Many functions are staged or simplified.',
+      upperText: 'This version of PARABOULE is curated for exhibition purposes and, in this exact composition, is not intended for real-life gameplay. Many functions are staged, simplified or not implemented.',
       bottomText: 'This app is designed to make Pétanque accessible to visually impaired players. Every part of the interface should be fully usable without sight and support intuitive long-term use. Some elements may not be intuitively understandable in the exhibition setting.'
     }
   })

@@ -9,31 +9,31 @@ export function useAssistantController() {
   let assistantController = supabase.channel("assistant-controller");
   assistantController.subscribe();
 
-  assistantController.on("broadcast", { event: "toggle3dAudio" }, (event) => {
-    if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
-      Howler.stop();
-      store.toggle3dAudio();
-      window.speechSynthesis.cancel();
-    }
-  });
+  // assistantController.on("broadcast", { event: "toggle3dAudio" }, (event) => {
+  //   if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
+  //     Howler.stop();
+  //     store.toggle3dAudio();
+  //     window.speechSynthesis.cancel();
+  //   }
+  // });
 
-  assistantController.on("broadcast", { event: "mute" }, (event) => {
-    if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
-      // console.log("mute");
-      Howler.stop();
-      store.mute3dAudio();
-      window.speechSynthesis.cancel();
-    }
-  });
+  // assistantController.on("broadcast", { event: "mute" }, (event) => {
+  //   if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
+  //     // console.log("mute");
+  //     Howler.stop();
+  //     store.mute3dAudio();
+  //     window.speechSynthesis.cancel();
+  //   }
+  // });
 
-  assistantController.on("broadcast", { event: "unmute" }, (event) => {
-    if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
-      // console.log("unmute");
-      Howler.stop();
-      store.unmute3dAudio();
-      window.speechSynthesis.cancel();
-    }
-  });
+  // assistantController.on("broadcast", { event: "unmute" }, (event) => {
+  //   if (!includesArray.some(mode => store.modesCycler.state.name.includes(mode))) {
+  //     // console.log("unmute");
+  //     Howler.stop();
+  //     store.unmute3dAudio();
+  //     window.speechSynthesis.cancel();
+  //   }
+  // });
 
   function sendMute(broadcast = true) {
     if (broadcast) {

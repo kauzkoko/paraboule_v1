@@ -1,5 +1,5 @@
 <template>
-  <div @click="logActivity">
+  <div @touchstart="logActivity">
     <NuxtPwaManifest />
     <NuxtLoadingIndicator />
     <NuxtLayout>

@@ -120,7 +120,7 @@ const toggleInfoScreen = () => {
 
 const nextFunction = () => {
     store.infoStepper.goToNext();
-    store.unmute3dAudio();
+    // store.unmute3dAudio();
 }
 
 const computedTransition = computed(() => {
@@ -129,9 +129,10 @@ const computedTransition = computed(() => {
 
 // store.infoStepper.goTo('functions');
 const close = () => {
-    store.unmute3dAudio();
+    // please uncomment this before exhibition
+    // store.unmute3dAudio();
     setTimeout(() => {
-        store.setIntersectionsByNumber(1);
+        // store.setIntersectionsByNumber(1);
     }, 1000)
     // store.toggle3dAudio();
     // console.log('close');
@@ -149,8 +150,8 @@ const close = () => {
 
     transform: translate(-50%, 50%);
 
-    width: 160dvw;
-    height: 160dvw;
+    width: 170dvw;
+    height: 170dvw;
     aspect-ratio: 1/1;
     border-radius: 50%;
     background-color: var(--info-background);
