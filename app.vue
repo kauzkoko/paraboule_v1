@@ -12,6 +12,9 @@
 const store = useProtoStore();
 let inactivityTimer = null;
 let inactivityTimeInSeconds = 90
+const {
+flyToStart,
+} = useAnimationController();
 
 const handleInactivity = () => {
   // console.log(`No activity for ${inactivityTimeInSeconds} seconds - running inactivity function`);
@@ -22,7 +25,7 @@ const handleInactivity = () => {
   store.predictionVisualiser = false
   store.predictionVisualiser = false
   store.alphaController = false
-  // focus all boules
+  flyToStart()
 };
 
 const resetInactivityTimer = () => {

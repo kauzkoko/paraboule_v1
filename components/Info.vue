@@ -130,9 +130,9 @@ const computedTransition = computed(() => {
 // store.infoStepper.goTo('functions');
 const close = () => {
     // please uncomment this before exhibition
-    // store.unmute3dAudio();
+    store.unmute3dAudio();
     setTimeout(() => {
-        // store.setIntersectionsByNumber(1);
+        store.setIntersectionsByNumber(1);
     }, 1000)
     // store.toggle3dAudio();
     // console.log('close');

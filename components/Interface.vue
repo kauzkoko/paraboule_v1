@@ -817,8 +817,6 @@ const pingPhone1 = () => {
   if (!afterLongPress && !lockPingingPhone1.value) {
     isPingingPhone1.value = true
     lockPingingPhone1.value = true
-    // sendPlayPhone(7);]
-    console.log(store.modesCycler.state.name)
     pingPhone1Supabase({ from: store.modesCycler.state.name })
     setTimeout(() => {
       isPingingPhone1.value = false
@@ -828,10 +826,6 @@ const pingPhone1 = () => {
     }, 20000);
   }
 };
-
-const deactivatedTextPingPhone1 = computed(() => {
-  return `Pinging Phone 1... Watch smartphone on ${store.modesCycler.state.name === "S2" ? 'your right' : 'your left'}. Wait a moment to ping again.`
-})
 
 const lockPingingPhone2 = ref(false)
 const isPingingPhone2 = ref(false)
@@ -1124,9 +1118,8 @@ const pages = [
   [
     {
       name: "Switch Boule Fokuss <3",
-      deactivated: computed(() => store.boulesCount < 1),
-      deactivatedText: "Available after detection of the Cochonnet. Wait few seconds for the video to trigger a throw.",
-
+      deactivated: computed(() => store.boulesCount < 2),
+      deactivatedText: "Available after detection of at least 1 Boule. Wait few seconds for the video to trigger a throw.",
       clickFunction: () => {
         const currentBouleFocuserFunction = flatPages.find(
           (item) => item.name === store.bouleFocuserCycler.state
@@ -1706,7 +1699,7 @@ const pages = [
     {
       name: "Ping Connected Phone 1",
       deactivated: isPingingPhone1 && lockPingingPhone1,
-      deactivatedText: deactivatedTextPingPhone1,
+      deactivatedText: computed(() => `Pinging Phone 1... Watch smartphone on ${store.modesCycler.state.name === "S2" ? 'your right' : 'your left'}. Wait a moment to ping again.`),
       clickFunction: pingPhone1,
       imgSrc: "/icons/pingPhone1.svg",
       html: "Ping Connected Phone",
@@ -1716,8 +1709,8 @@ const pages = [
     },
     {
       name: "Ping Connected Phone 2",
-      deactivated: isPingingPhone2,
-      deactivatedText: computed(() => `Pinging Phone 2... Watch smartphone on ${store.modesCycler.state.name === "S1" ? 'your left' : 'your right'}.`),
+      deactivated: isPingingPhone2 && lockPingingPhone2,
+      deactivatedText: computed(() => `Pinging Phone 2... Watch smartphone on ${store.modesCycler.state.name === "S1" ? 'your left' : 'your right'}. Wait a moment to ping again.`),
       clickFunction: pingPhone2,
       imgSrc: "/icons/pingPhone2.svg",
       html: "Ping Connected Phone",
@@ -1727,8 +1720,8 @@ const pages = [
     },
     {
       name: "Ping Connected Phone 3",
-      deactivated: isPingingPhone3,
-      deactivatedText: computed(() => `Pinging Phone 3... Watch smartphone on ${store.modesCycler.state.name === "S1" ? 'your right' : 'your left'}.`),
+      deactivated: isPingingPhone3 && lockPingingPhone3,
+      deactivatedText: computed(() => `Pinging Phone 3... Watch smartphone on ${store.modesCycler.state.name === "S1" ? 'your right' : 'your left'}. Wait a moment to ping again.`),
       clickFunction: pingPhone3,
       imgSrc: "/icons/pingPhone3.svg",
       html: "Ping Connected Phone",
