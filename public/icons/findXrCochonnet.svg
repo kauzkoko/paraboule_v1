@@ -1,0 +1,13 @@
+<svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="75" cy="75" r="23.5" stroke="#FF0000" stroke-width="3"/>
+<path d="M0 75H10H20M150 75H140H130" stroke="#FF0000" stroke-width="3"/>
+<path d="M10 113L18.6603 108M139.904 38L131.244 43" stroke="#FF0000" stroke-width="3"/>
+<path d="M10 38L18.6603 43M139.904 113L131.244 108" stroke="#FF0000" stroke-width="3"/>
+<path d="M37 139.904L42 131.244M112 10L107 18.6603" stroke="#FF0000" stroke-width="3"/>
+<path d="M37 10L42 18.6603M112 139.904L107 131.244" stroke="#FF0000" stroke-width="3"/>
+<path d="M75 150V140V130M75 0V10V20" stroke="#FF0000" stroke-width="3"/>
+<rect x="50.5" y="51.5" width="48" height="48" stroke="#FF0000" stroke-width="3"/>
+<circle cx="75.5" cy="74.5" r="39" stroke="#FF0000" stroke-width="3"/>
+<rect x="34.5" y="35.5" width="80" height="80" stroke="#FF0000" stroke-width="3"/>
+<path d="M75.5418 82.264C71.9998 82.264 70.0198 79.932 70.0198 76.5C70.0198 73.09 72.2638 70.802 75.5638 70.802C77.4558 70.802 79.3918 71.572 80.3598 73.596L77.7418 74.542C77.3678 73.64 76.5978 73.244 75.7178 73.244C74.4418 73.244 73.2098 74.124 73.2098 76.5C73.2098 78.942 74.4638 79.822 75.7178 79.822C76.6858 79.822 77.3678 79.382 77.7638 78.722L80.3378 79.646C79.2598 81.538 77.3018 82.264 75.5418 82.264Z" fill="#FF0000"/>
+</svg>

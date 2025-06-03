@@ -56,7 +56,7 @@
     ">
     <div class="container">
       <template v-for="(item, index) in currentPage" :key="'grid-item-' + index">
-        <div :ref="refs.set" class="grid-item" :index="getIndex(item)" @touchend="onTouchEnd"
+        <div :ref="refs.set" class="grid-item over" :index="getIndex(item)" @touchend="onTouchEnd"
           v-show="getItem(item).name !== 'Placeholder'" v-touch:swipe="(dir, e) => onSwipe(dir, e, index, item)"
           @click="onClick(item, index)" @touchstart="onTouchStart(index)" :style="{
             background:
@@ -74,7 +74,7 @@
             borderTopLeftRadius: swipe && index === 3 ? '100px !important' : index === 3 && !swipe ? '60px' : '5px',
             boxShadow: touchedIndex === index || (store.infoStepper.isCurrent('functions') && index === store.buttonTransitionIndex && store.buttonTransition) ? '0px 4px 38.4px 22px #616BFF inset, 6px 20px 119.6px 52px #FFF inset' : 'none',
           }">
-          <div class="absolute text-[var(--border-color)] text-14px font-bold pl-7px py-4px" :class="{
+          <div class="absolute text-[var(--border-color)] text-14px font-bold pl-7px pr-7px py-4px" :class="{
             'top-0 left-0': index === 0,
             'top-0 right-0': index === 1,
             'bottom-0 left-0': index === 2,
@@ -274,14 +274,14 @@ pause()
 //   glowingCircle.value = !glowingCircle.value
 // }, glowingCircleTimeout, { immediate: false })
 
-const exhibitionModes = ["S1", "S2", "S3"]
+const exhibitionModes = ["S1", "S2", "S3", "Exhibition"]
 const exhibitionModeCycler = useCycleList(exhibitionModes)
 
 const onSwipe = (direction, e, index, item) => {
   if (direction === "right") {
     currentPage.value[index].cycler.next();
     console.log(item.name)
-    if (item.name === "Scan Field") {
+    if (item.name === "Scan Field" || item.name === "Fly to Starting Point" || item.name === "Find XR Cochonnet") {
       let shouldGoToS3 = exhibitionModeCycler.state.value
       console.log(shouldGoToS3)
       const findExhibitionModeIndex = modesList.findIndex(
@@ -1186,7 +1186,7 @@ const pages = [
       clickFunction: refreshPage,
       html: "F5",
       cycler: useCycleList(["Refresh page"]),
-      modes: ["All", "Dev", "Testing", "Exhibition", "S1"],
+      modes: ["All", "Dev", "Testing", "Exhibition"],
     },
     {
       name: "Toggle Light Mode",
@@ -1196,7 +1196,7 @@ const pages = [
       html: "Toggle Light Mode",
       explanationSrc: "/sounds/explanations/lightModeToggler.mp3",
       cycler: useCycleList(["Toggle Light Mode"]),
-      modes: ["All", "Dev", "Testing", "Exhibition", "S1"],
+      modes: ["All", "Dev", "Testing", "Exhibition"],
     },
     {
       name: "Exhibition Mode",
@@ -1485,6 +1485,7 @@ const pages = [
       clickFunction: () => {
       },
       html: "Find XR Starting Point",
+      imgSrc: "/icons/findXrStartingPoint.svg",
       explanationSrc: "/sounds/explanations/findXrStartingPoint.mp3",
       cycler: useCycleList(["Find XR Starting Point"]),
       modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
@@ -1494,6 +1495,7 @@ const pages = [
       clickFunction: () => {
       },
       html: "Find XR Cochonnet",
+      imgSrc: "/icons/findXrCochonnet.svg",
       explanationSrc: "/sounds/explanations/findXrCochonnet.mp3",
       cycler: useCycleList(["Find XR Cochonnet"]),
       modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
@@ -1524,17 +1526,17 @@ const pages = [
       imgSrc: "/icons/scanQR.svg",
       html: "Scan QR",
       explanationSrc: "/sounds/explanations/qrScanner.mp3",
-      cycler: useCycleList(["Scan QR", "Pair via Unique QR"]),
+      cycler: useCycleList(["Scan QR"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
     {
       name: "Pair via Unique QR",
       clickFunction: qr,
-      imgSrc: qrcode,
+      imgSrc: "/icons/qrCode.png",
       html: "Pair via Unique QR",
       // html: computedUniqueQrHtml",
       explanationSrc: "/sounds/explanations/uniqueQrCode.mp3",
-      cycler: useCycleList(["Pair via Unique QR", "Scan QR"]),
+      cycler: useCycleList(["Pair via Unique QR"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
   ],
@@ -1642,7 +1644,7 @@ const pages = [
       },
       html: "Mock Intersections",
       cycler: useCycleList(["Mock Intersections"]),
-      modes: ["All", "Dev", "Testing", "Referee", "Assistant", "S1"],
+      modes: ["All", "Dev", "Testing", "Referee", "Assistant", "Exhibition"],
     },
     {
       name: "Raw Intersections",
@@ -1761,7 +1763,7 @@ const pages = [
       html: "Toggle Light Mode",
       explanationSrc: "/sounds/explanations/lightModeToggler.mp3",
       cycler: useCycleList(["Toggle Light Mode"]),
-      modes: ["All", "Dev", "Testing", "Exhibition", "S2"],
+      modes: ["All", "Dev", "Testing", "Exhibition"],
     },
     {
       name: "Exhibition Mode",
@@ -1783,7 +1785,7 @@ const pages = [
       },
       html: "Prediction Visualiser",
       cycler: useCycleList(["Prediction Visualiser"]),
-      modes: ["All", "Dev", "Testing", "Referee", "Exhibition", "S2"],
+      modes: ["All", "Dev", "Testing", "Referee", "Exhibition"],
     },
   ]
 ];
