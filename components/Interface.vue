@@ -378,7 +378,7 @@ const onSwipe = (direction, e, index, item) => {
   if (direction === "right") {
     currentPage.value[index].cycler.next();
     console.log(item.name)
-    if (item.name === "Scan Field" || item.name === "Fly to Starting Point" || item.name === "Find XR Cochonnet") {
+    if (item.name === "Scan Field" || item.name === "Fly to Starting Point" || item.name === "Find XR Cochonnet" || item.name === "Discover More") {
       let shouldGoToS3 = exhibitionModeCycler.state.value
       console.log(shouldGoToS3)
       const findExhibitionModeIndex = modesList.findIndex(
@@ -1649,25 +1649,45 @@ const pages = [
     },
   ],
   [
+    // {
+    //   name: "Find XR Starting Point",
+    //   clickFunction: () => {
+    //   },
+    //   html: "Find XR Starting Point",
+    //   imgSrc: "/icons/findXrStartingPoint.svg",
+    //   explanationSrc: "/sounds/explanations/findXrStartingPoint.mp3",
+    //   cycler: useCycleList(["Find XR Starting Point"]),
+    //   modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
+    // },
+    // {
+    //   name: "Find XR Cochonnet",
+    //   clickFunction: () => {
+    //   },
+    //   html: "Find XR Cochonnet",
+    //   imgSrc: "/icons/findXrCochonnet.svg",
+    //   explanationSrc: "/sounds/explanations/findXrCochonnet.mp3",
+    //   cycler: useCycleList(["Find XR Cochonnet"]),
+    //   modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
+    // },
     {
-      name: "Find XR Starting Point",
-      clickFunction: () => {
-      },
-      html: "Find XR Starting Point",
-      imgSrc: "/icons/findXrStartingPoint.svg",
-      explanationSrc: "/sounds/explanations/findXrStartingPoint.mp3",
-      cycler: useCycleList(["Find XR Starting Point"]),
-      modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
+      name: "Gyros Controller",
+      deactivated: computed(() => store.alphaController),
+      deactivatedText: "Gyros Controller is active. Rotate your device to rotate the view. Tap to turn it off.",
+      clickFunction: setAlphaController,
+      imgSrc: "/icons/gyros.svg",
+      explanationSrc: "/sounds/explanations/gyrosController.mp3",
+      html: "Toggle Gyros Controller",
+      cycler: useCycleList(["Gyros Controller"]),
+      modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo", "S2", "Exhibition"],
     },
     {
-      name: "Find XR Cochonnet",
-      clickFunction: () => {
-      },
-      html: "Find XR Cochonnet",
-      imgSrc: "/icons/findXrCochonnet.svg",
-      explanationSrc: "/sounds/explanations/findXrCochonnet.mp3",
-      cycler: useCycleList(["Find XR Cochonnet"]),
-      modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
+      name: "Bug Slider",
+      clickFunction: click_slider,
+      imgSrc: "/icons/slider.svg",
+      explanationSrc: "/sounds/explanations/bugSlider.mp3",
+      html: "Bug Slider",
+      cycler: useCycleList(["Bug Slider"]),
+      modes: ["All", "Dev", "Testing", "SBV", "Player", "S2", "Exhibition"],
     },
   ],
   [
@@ -1764,25 +1784,49 @@ const pages = [
       modes: ["All", "Dev", "Testing", "QR", "S1", "S2", "Exhibition"],
     },
     {
-      name: "Bug Slider",
-      clickFunction: click_slider,
-      imgSrc: "/icons/slider.svg",
-      explanationSrc: "/sounds/explanations/bugSlider.mp3",
-      html: "Bug Slider",
-      cycler: useCycleList(["Bug Slider"]),
-      modes: ["All", "Dev", "Testing", "SBV", "Player", "S2", "Exhibition"],
+      name: "Find XR Starting Point",
+      deactivated: computed(() => true),
+      deactivatedText: "Didn't make it to the vernissage :/ Coming soon...",
+      clickFunction: () => {
+      },
+      html: "Find XR Starting Point",
+      imgSrc: "/icons/findXrStartingPoint.svg",
+      explanationSrc: "/sounds/explanations/findXrStartingPoint.mp3",
+      cycler: useCycleList(["Find XR Starting Point"]),
+      modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
     },
     {
-      name: "Gyros Controller",
-      deactivated: computed(() => store.alphaController),
-      deactivatedText: "Gyros Controller is active. Rotate your device to rotate the view. Tap to turn it off.",
-      clickFunction: setAlphaController,
-      imgSrc: "/icons/gyros.svg",
-      explanationSrc: "/sounds/explanations/gyrosController.mp3",
-      html: "Toggle Gyros Controller",
-      cycler: useCycleList(["Gyros Controller"]),
-      modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo", "S2", "Exhibition"],
+      name: "Find XR Cochonnet",
+      deactivated: computed(() => true),
+      deactivatedText: "Didn't make it to the vernissage :/ Coming soon...",
+      clickFunction: () => {
+      },
+      html: "Find XR Cochonnet",
+      imgSrc: "/icons/findXrCochonnet.svg",
+      explanationSrc: "/sounds/explanations/findXrCochonnet.mp3",
+      cycler: useCycleList(["Find XR Cochonnet"]),
+      modes: ["All", "Dev", "Testing", "S2", "Exhibition"],
     },
+    // {
+    //   name: "Bug Slider",
+    //   clickFunction: click_slider,
+    //   imgSrc: "/icons/slider.svg",
+    //   explanationSrc: "/sounds/explanations/bugSlider.mp3",
+    //   html: "Bug Slider",
+    //   cycler: useCycleList(["Bug Slider"]),
+    //   modes: ["All", "Dev", "Testing", "SBV", "Player", "S2", "Exhibition"],
+    // },
+    // {
+    //   name: "Gyros Controller",
+    //   deactivated: computed(() => store.alphaController),
+    //   deactivatedText: "Gyros Controller is active. Rotate your device to rotate the view. Tap to turn it off.",
+    //   clickFunction: setAlphaController,
+    //   imgSrc: "/icons/gyros.svg",
+    //   explanationSrc: "/sounds/explanations/gyrosController.mp3",
+    //   html: "Toggle Gyros Controller",
+    //   cycler: useCycleList(["Gyros Controller"]),
+    //   modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo", "S2", "Exhibition"],
+    // },
     // {
     //   name: "Toggle Cochonnet / Starting Point",
     //   clickFunction: click_toggleCochonnetStartingPoint,
@@ -1799,7 +1843,7 @@ const pages = [
       },
       html: computed(() => {
         return `
-        <div class='text-23px'>There is much more to explore. Check out the other smartphones!</div>
+        <div class='text-23px'>There is more to explore. Check out the other smartphones!</div>
       `;
       }),
       explanationSrc: "/sounds/explanations/checkOutTheOtherSmartphones.mp3",
@@ -1826,7 +1870,7 @@ const pages = [
       },
       html: computed(() => {
         return `
-        <div class='text-23px'>There is much more to explore. Check out the other smartphones!</div>
+        <div class='text-23px'>There is more to explore. Check out the other smartphones!</div>
       `;
       }),
       explanationSrc: "/sounds/explanations/checkOutTheOtherSmartphones.mp3",
