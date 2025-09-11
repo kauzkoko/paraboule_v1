@@ -6,9 +6,10 @@
     <div class="text-white max-w-25dvw hidden md:block">
       <div class="mb-3">
         PARABOULE is an assistive system that enables visually impaired players
-        to play Boule. It is designed and developed for (Android) smartphones with touchscreen,
-        AR-capabilities, haptic feedback and spatial audio. Support for other
-        devices is limited. The use of headphones is highly recommended.
+        to play Boule. It is designed and developed for (Android) smartphones
+        with touchscreen, AR-capabilities, haptic feedback and spatial audio.
+        Support for other devices is limited. The use of headphones is highly
+        recommended.
       </div>
       <a
         href="https://github.com/kauzkoko/paraboule"
@@ -34,10 +35,10 @@
         <div class="text-white ml-2">Find source code on Github</div>
       </a>
       <a
-        href="https://github.com/kauzkoko/paraboule"
+        href="https://interactiondesign.zhdk.ch/diploma-2025/projekte/paraboule/"
         class="no-underline flex flex-row items-center mt-3"
-        @click.prevent="visitLinkZhdk"
-        @keydown.enter.prevent="visitLinkZhdk"
+        @click.prevent="visitZhdk"
+        @keydown.enter.prevent="visitZhdk"
         role="link"
         tabindex="0"
       >
