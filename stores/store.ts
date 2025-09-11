@@ -27,7 +27,7 @@ export const useProtoStore = defineStore("protoStore", () => {
   const bus = useEventBus("protoboules");
 
   const modesCycler = useCycleList(modesList);
-  const initIndex = modesList.findIndex((mode) => mode.name === "All");
+  const initIndex = modesList.findIndex((mode) => mode.name === "Exhibition");
   modesCycler.go(initIndex);
 
   const prevMode = computed(() => {
@@ -569,30 +569,30 @@ export const useProtoStore = defineStore("protoStore", () => {
       subtitle: 'PARABOULE is an assistive tool to play Pétanque by binaural hearing and haptic feedback. <span class="important text-red!">This is the exhibition version of the app.</span>',
       bottomText: 'PARABOULE explores<br> spatial audio and object detection technologies in Pétanque. It is built with accessibility considerations in mind.'
     },
-    'role': {
-      'S1': {
-        title: 'Smartphone 1:<br>The shot',
-        upperText: 'You are using the first of three smartphone interfaces in the exhibition. Each smartphone demonstrates specific functions of PARABOULE being used in a real game of Pétanque.',
-        bottomText: 'This smartphone lets you analyze the game situation through spatial audio and haptic feedback. The feedback will help you understand the game situation and make strategic decisions in a real game of Pétanque.'
-      },
-      'S2': {
-        title: 'Smartphone 2:<br>Orientation',
-        upperText: 'You are using the second of three smartphone interfaces in the exhibition. Each smartphone demonstrates specific functions of PARABOULE being used in a real game of Pétanque.',
-        bottomText: 'This smartphone shows features that help you identify the playground and starting point without using sight. It also demonstrates how to connect to other smartphones running PARABOULE.'
-      },
-      'S3': {
-        title: 'Smartphone 3:<br>The VAR',
-        upperText: 'You are using the first of three smartphone interfaces in the exhibition. Each smartphone demonstrates specific functions of PARABOULE being used in a real game of Pétanque.',
-        bottomText: 'This smartphone showcases the role of a VAR (Virtual Assistant Referee) in PARABOULE. The VAR is continuously scanning the Boule field and tracking the current score.',
-        // additionalText: 'Use this smartphone to provide real-time data. This enables the player on Smartphone 1 to receive spatial audio feedback, helping them understand the positions of the boules and prepare for their next shot.'
-      },
-      'Empty': {
-        title: 'Empty Title',
-        upperText: '',
-        bottomText: ''
+    // 'role': {
+    //   'S1': {
+    //     title: 'Smartphone 1:<br>The shot',
+    //     upperText: 'You are using the first of three smartphone interfaces in the exhibition. Each smartphone demonstrates specific functions of PARABOULE being used in a real game of Pétanque.',
+    //     bottomText: 'This smartphone lets you analyze the game situation through spatial audio and haptic feedback. The feedback will help you understand the game situation and make strategic decisions in a real game of Pétanque.'
+    //   },
+    //   'S2': {
+    //     title: 'Smartphone 2:<br>Orientation',
+    //     upperText: 'You are using the second of three smartphone interfaces in the exhibition. Each smartphone demonstrates specific functions of PARABOULE being used in a real game of Pétanque.',
+    //     bottomText: 'This smartphone shows features that help you identify the playground and starting point without using sight. It also demonstrates how to connect to other smartphones running PARABOULE.'
+    //   },
+    //   'S3': {
+    //     title: 'Smartphone 3:<br>The VAR',
+    //     upperText: 'You are using the first of three smartphone interfaces in the exhibition. Each smartphone demonstrates specific functions of PARABOULE being used in a real game of Pétanque.',
+    //     bottomText: 'This smartphone showcases the role of a VAR (Virtual Assistant Referee) in PARABOULE. The VAR is continuously scanning the Boule field and tracking the current score.',
+    //     // additionalText: 'Use this smartphone to provide real-time data. This enables the player on Smartphone 1 to receive spatial audio feedback, helping them understand the positions of the boules and prepare for their next shot.'
+    //   },
+    //   'Empty': {
+    //     title: 'Empty Title',
+    //     upperText: '',
+    //     bottomText: ''
 
-      }
-    },
+    //   }
+    // },
     'functions': {
       title: 'How to use<br> the Buttons',
       subtitle: 'Each button triggers a function that demonstrates a specific feature of PARABOULE. <span class="important text-red!">You can always PRESS and HOLD on the button to hear what it is supposed to do and how it works.</span>',

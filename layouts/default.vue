@@ -2,4 +2,5 @@
   <main>
     <slot />
   </main>
+  <Github />
 </template>

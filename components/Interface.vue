@@ -1,144 +1,241 @@
 <template>
-  <div class="outer fixed left-0 transform-gpu  w-100dvw h-100dvh" :class="{ 'translate-y--11px': !store.isSky }"
-    @click="onFullscreenClick()">
+  <div
+    class="outer fixed left-0 transform-gpu w-100dvw h-100dvh transition-blur"
+    :class="{ 'translate-y--11px': !store.isSky, 'blur-md': store.infoScreen }"
+    @click="onFullscreenClick()"
+  >
     <VirtualAudioSpace :trigger="audioTrigger"></VirtualAudioSpace>
   </div>
-  <div class="outer" v-show="store.isTouchingSlider" @click="onClickSliderComponent"
-    @touchstart="isTouchingSliderTouchStartHandler">
+  <div
+    class="outer"
+    v-show="store.isTouchingSlider"
+    @click="onClickSliderComponent"
+    @touchstart="isTouchingSliderTouchStartHandler"
+  >
     <div class="container">
       <div class="big">
         <UpDown />
         <div v-show="!store.isTappingOnSlider">
           <div>
-            Press and hold, then slide your finger vertically to explore the scene. Listen to the Boules around you.
-            Tap once to exit.
+            Press and hold, then slide your finger vertically to explore the
+            scene. Listen to the Boules around you. Tap once to exit.
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="outer" v-show="store.isTouchingTopCameraSlider" @click="onClickTopCameraSliderComponent">
+  <div
+    class="outer"
+    v-show="store.isTouchingTopCameraSlider"
+    @click="onClickTopCameraSliderComponent"
+  >
     <div class="container">
       <div class="big">
         <UpDown />
         <div v-show="!store.isTappingOnTopCameraSlider">
           <div>
-            Press and hold, then slide your finger vertically to adjust the camera height. See how the Boules are
-            positioned and if they are correctly recognised.
-            Tap once to exit.
+            Press and hold, then slide your finger vertically to adjust the
+            camera height. See how the Boules are positioned and if they are
+            correctly recognised. Tap once to exit.
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="outer" v-show="store.isTouchingHaptic" @click="onClickHapticGridComponent">
+  <div
+    class="outer"
+    v-show="store.isTouchingHaptic"
+    @click="onClickHapticGridComponent"
+  >
     <div class="container">
       <div class="big">
         <div v-show="!store.isTappingOnHaptic">
           <div>
-            Press and hold, then slide your finger to explore the scene. You will feel a vibration when near a Boule.
-            When you are perfectly aligned, you will hear a sound. Tap once to exit.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="outer pointer-events-none" v-show="store.predictionVisualiser || store.scannerOpen">
-    <div class="container scannerClass">
-      <div class="big">
-        <div v-show="!store.predictionVisualiser || !store.scannerOpen">
-          <div>Watch how the app identifies the playground. Tap once to exit.
+            Press and hold, then slide your finger to explore the scene. You
+            will feel a vibration when near a Boule. When you are perfectly
+            aligned, you will hear a sound. Tap once to exit.
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="outer" ref="el" v-show="!store.isTouchingHaptic &&
-    !store.isTouchingSlider &&
-    !store.isTouchingTopCameraSlider &&
-    !store.predictionVisualiser &&
-    !store.scannerOpen
-    ">
+  <div
+    class="outer pointer-events-none"
+    v-show="store.predictionVisualiser || store.scannerOpen"
+  >
+    <div class="container scannerClass">
+      <div class="big">
+        <div v-show="!store.predictionVisualiser || !store.scannerOpen">
+          <div>
+            Watch how the app identifies the playground. Tap once to exit.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="outer"
+    ref="el"
+    v-show="
+      !store.isTouchingHaptic &&
+      !store.isTouchingSlider &&
+      !store.isTouchingTopCameraSlider &&
+      !store.predictionVisualiser &&
+      !store.scannerOpen
+    "
+  >
     <div class="container">
-      <template v-for="(item, index) in currentPage" :key="'grid-item-' + index">
-        <div :ref="refs.set" class="grid-item over" :index="getIndex(item)" @touchend="onTouchEnd"
-          v-show="getItem(item).name !== 'Placeholder'" v-touch:swipe="(dir, e) => onSwipe(dir, e, index, item)"
-          @click="onClick(item, index)" @touchstart="onTouchStart(index)" :style="{
+      <template
+        v-for="(item, index) in currentPage"
+        :key="'grid-item-' + index"
+      >
+        <div
+          :ref="refs.set"
+          class="grid-item over"
+          :index="getIndex(item)"
+          @touchend="onTouchEnd"
+          v-show="getItem(item).name !== 'Placeholder'"
+          v-touch:swipe="(dir, e) => onSwipe(dir, e, index, item)"
+          @click="onClick(item, index)"
+          @touchstart="onTouchStart(index)"
+          :style="{
             background:
               touchedIndex === index ? 'red !important' : 'transparent',
-            transition:
-              touchedIndex === index ? 'all 100ms' : 'all 500ms',
+            transition: touchedIndex === index ? 'all 100ms' : 'all 500ms',
             opacity: getItem(item).deactivated
               ? getItem(item).deactivated.value
                 ? 1
                 : 1
               : 1,
-            borderBottomRightRadius: swipe && index === 0 ? '100px' : index === 0 && !swipe ? '60px' : '5px',
-            borderBottomLeftRadius: swipe && index === 1 ? '100px' : index === 1 && !swipe ? '60px' : '5px',
-            borderTopRightRadius: swipe && index === 2 ? '100px !important' : index === 2 && !swipe ? '60px' : '5px',
-            borderTopLeftRadius: swipe && index === 3 ? '100px !important' : index === 3 && !swipe ? '60px' : '5px',
-            boxShadow: touchedIndex === index || (store.infoStepper.isCurrent('functions') && index === store.buttonTransitionIndex && store.buttonTransition) ? '0px 4px 38.4px 22px #616BFF inset, 6px 20px 119.6px 52px #FFF inset' : 'none',
-          }">
-          <div class="absolute text-[var(--border-color)] text-14px font-bold pl-7px pr-7px py-4px" :class="{
-            'top-0 left-0': index === 0,
-            'top-0 right-0 text-right': index === 1,
-            'bottom-0 left-0': index === 2,
-            'bottom-0 right-0': index === 3,
-          }">
-            <div v-if="index === 3" :style="{ opacity: swipe ? maxOpacityTapIcons : 0 }"
-              class="transition-opacity duration-3000 children:text-hex-ff0000! mt-3px text-right">
+            borderBottomRightRadius:
+              swipe && index === 0
+                ? '100px'
+                : index === 0 && !swipe
+                ? '60px'
+                : '5px',
+            borderBottomLeftRadius:
+              swipe && index === 1
+                ? '100px'
+                : index === 1 && !swipe
+                ? '60px'
+                : '5px',
+            borderTopRightRadius:
+              swipe && index === 2
+                ? '100px !important'
+                : index === 2 && !swipe
+                ? '60px'
+                : '5px',
+            borderTopLeftRadius:
+              swipe && index === 3
+                ? '100px !important'
+                : index === 3 && !swipe
+                ? '60px'
+                : '5px',
+            boxShadow:
+              touchedIndex === index ||
+              (store.infoStepper.isCurrent('functions') &&
+                index === store.buttonTransitionIndex &&
+                store.buttonTransition)
+                ? '0px 4px 38.4px 22px #616BFF inset, 6px 20px 119.6px 52px #FFF inset'
+                : 'none',
+          }"
+        >
+          <div
+            class="absolute text-[var(--border-color)] text-14px font-bold pl-7px pr-7px py-4px"
+            :class="{
+              'top-0 left-0': index === 0,
+              'top-0 right-0 text-right': index === 1,
+              'bottom-0 left-0': index === 2,
+              'bottom-0 right-0': index === 3,
+            }"
+          >
+            <div
+              v-if="index === 3"
+              :style="{ opacity: swipe ? maxOpacityTapIcons : 0 }"
+              class="transition-opacity duration-3000 children:text-hex-ff0000! mt-3px text-right"
+            >
               <span>
-                <DotSmall />
-              </span><br>
+                <DotSmall /> </span
+              ><br />
               <span>
                 <LongPressSmallRight />
               </span>
             </div>
-            <div v-if="index === 2" :style="{ opacity: swipe ? maxOpacityTapIcons : 0 }"
-              class="transition-opacity duration-3000 children:text-hex-ff0000! mt-3px">
+            <div
+              v-if="index === 2"
+              :style="{ opacity: swipe ? maxOpacityTapIcons : 0 }"
+              class="transition-opacity duration-3000 children:text-hex-ff0000! mt-3px"
+            >
               <span>
-                <DotSmall class="mr-2px" />
-              </span><br>
+                <DotSmall class="mr-2px" /> </span
+              ><br />
               <span>
                 <LongPressSmall class="mr--48px" />
               </span>
             </div>
             {{ getItem(item).name }}
-            <div v-if="index === 0" :style="{ opacity: swipe ? maxOpacityTapIcons : 0 }"
-              class="transition-opacity duration-3000 children:text-hex-ff0000! mt-3px">
-              <span>
-                <LongPressSmall class="mr--48px" />EXPLANATION
-              </span><br>
-              <span>
-                <DotSmall class="mr-2px" />TAP TO ACTIVATE
-              </span>
+            <div
+              v-if="index === 0"
+              :style="{ opacity: swipe ? maxOpacityTapIcons : 0 }"
+              class="transition-opacity duration-3000 children:text-hex-ff0000! mt-3px"
+            >
+              <span> <LongPressSmall class="mr--48px" />EXPLANATION </span
+              ><br />
+              <span> <DotSmall class="mr-2px" />TAP TO ACTIVATE </span>
             </div>
-            <div v-if="index === 1" :style="{ opacity: swipe ? maxOpacityTapIcons : 0 }"
-              class="transition-opacity duration-3000 children:text-hex-ff0000! mt-3px text-right">
-
+            <div
+              v-if="index === 1"
+              :style="{ opacity: swipe ? maxOpacityTapIcons : 0 }"
+              class="transition-opacity duration-3000 children:text-hex-ff0000! mt-3px text-right"
+            >
               <span>
-                <LongPressSmallRight />
-              </span><br>
+                <LongPressSmallRight /> </span
+              ><br />
               <span>
                 <DotSmall />
               </span>
-
             </div>
           </div>
           <div
             class="flex justify-center items-center w-full h-full children:w-70% children:h-70% transition-opacity duration-1000"
-            :class="{ 'bg-[rgb(255,78,78)]!': getItem(item).name === 'Toggle Light Mode', 'opacity-0': store.infoScreen, 'opacity-100': !store.infoScreen }">
-            <div v-if="getItem(item).deactivated && getItem(item).deactivated.value"
-              class="bg-transparent text-hex-ff0000! text-18px font-bold w-full h-full flexCenter text-center">
+            :class="{
+              'bg-[rgb(255,78,78)]!':
+                getItem(item).name === 'Toggle Light Mode',
+              'opacity-0': store.infoScreen,
+              'opacity-100': !store.infoScreen,
+            }"
+          >
+            <div
+              v-if="
+                getItem(item).deactivated && getItem(item).deactivated.value
+              "
+              class="bg-transparent text-hex-ff0000! text-18px font-bold w-full h-full flexCenter text-center"
+            >
               <div>{{ getItem(item).deactivatedText }}</div>
             </div>
             <SvgIcon
-              v-else-if="getItem(item).imgSrc && !getItem(item).imgSrc.value && getItem(item).imgSrc.includes('.svg')"
-              :name="getIconName(getItem(item).imgSrc)" />
+              v-else-if="
+                getItem(item).imgSrc &&
+                !getItem(item).imgSrc.value &&
+                getItem(item).imgSrc.includes('.svg')
+              "
+              :name="getIconName(getItem(item).imgSrc)"
+            />
             <img
-              :class="getItem(item).imgSrc.value ?? (getItem(item).imgSrc.startsWith('data') || getItem(item).imgSrc.includes('.png')) ? 'h-initial' : 'initial'"
-              v-else-if="getItem(item).imgSrc" :src="getItem(item).imgSrc.value ?? getItem(item).imgSrc" />
-            <div v-else-if="getItem(item).html"
-              class="text-[var(--border-color)] text-24px font-bold text-center flexCenter max-w-80%">
+              :class="
+                getItem(item).imgSrc.value ??
+                (getItem(item).imgSrc.startsWith('data') ||
+                  getItem(item).imgSrc.includes('.png'))
+                  ? 'h-initial'
+                  : 'initial'
+              "
+              v-else-if="getItem(item).imgSrc"
+              :src="getItem(item).imgSrc.value ?? getItem(item).imgSrc"
+            />
+            <div
+              v-else-if="getItem(item).html"
+              class="text-[var(--border-color)] text-24px font-bold text-center flexCenter max-w-80%"
+            >
               <div v-html="getItem(item).html.value ?? ''"></div>
               <!-- <div v-html="getItem(item).html.value ?? getItem(item).html"></div> -->
             </div>
@@ -150,51 +247,87 @@
           </div>
         </div>
       </template>
-      <div class="center-circle" ref="swiper" :index="'pageAnnouncer'" @click="onSingleClick"
-        @touchstart="onTouchStart('pageAnnouncer')" @touchend="onTouchEnd" :style="{
+      <div
+        class="center-circle"
+        ref="swiper"
+        :index="'pageAnnouncer'"
+        @click="onSingleClick"
+        @touchstart="onTouchStart('pageAnnouncer')"
+        @touchend="onTouchEnd"
+        :style="{
           background:
-            touchedIndex === 'pageAnnouncer'
-              ? 'transparent'
-              : 'black',
+            touchedIndex === 'pageAnnouncer' ? 'transparent' : 'black',
           transition:
+            touchedIndex === 'pageAnnouncer' ? 'all 300ms' : 'all 300ms',
+          boxShadow:
             touchedIndex === 'pageAnnouncer'
-              ? 'all 300ms'
-              : 'all 300ms',
-          boxShadow: touchedIndex === 'pageAnnouncer' ? '0px 0px 50px 50px var(--border-color) inset' : 'none',
-          borderWidth: store.infoStepper.isCurrent('center-circle') ? '3px' : centerCircleBorderWidth + 'px',
-        }">
-        <div class="text-[var(--border-color)] text-30px font-medium color-black!" :style="{}" :index="'pageAnnouncer'">
-          <span class="transition-all duration-200 color-black!"> {{ swipe ? '' : stepperIndex + 1 }}</span>
+              ? '0px 0px 50px 50px var(--border-color) inset'
+              : 'none',
+          borderWidth: store.infoStepper.isCurrent('center-circle')
+            ? '3px'
+            : centerCircleBorderWidth + 'px',
+        }"
+      >
+        <div
+          class="text-[var(--border-color)] text-30px font-medium color-black!"
+          :style="{}"
+          :index="'pageAnnouncer'"
+        >
+          <span class="transition-all duration-200 color-black!">
+            {{ swipe ? "" : stepperIndex + 1 }}</span
+          >
         </div>
       </div>
     </div>
-    <div v-if="swipe"
+    <div
+      v-if="swipe"
       class="text-30px font-medium fixed top-50% left-50% transform translate-x--50% translate-y--50% transition-color duration-0"
-      :style="{ color: swipeColor }">
-      SWIPE</div>
-    <QrScanner v-if="scanForQr" :scanForQr="scanForQr" @qrCodeFound="onQrCode"></QrScanner>
-    <div v-if="lastQrCode" class="fixed left-0 top-0 w-100dvw h-100dvh bg-black/50 z-1000 flexCenter"
-      @click="lastQrCode = null">
+      :style="{ color: swipeColor }"
+    >
+      SWIPE
+    </div>
+    <QrScanner
+      v-if="scanForQr"
+      :scanForQr="scanForQr"
+      @qrCodeFound="onQrCode"
+    ></QrScanner>
+    <div
+      v-if="lastQrCode"
+      class="fixed left-0 top-0 w-100dvw h-100dvh bg-black/50 z-1000 flexCenter"
+      @click="lastQrCode = null"
+    >
       <div class="text-white text-24px font-bold max-w-80%">
         <div>
-          Wow, you fucked up the app.<br> Ege was that you?<br>Nevermind. You get the idea. Scan a QR code from another
-          PARABOULE session to add an additional smartphone. Tap to close.
+          Wow, you fucked up the app.<br />
+          Ege was that you?<br />Nevermind. You get the idea. Scan a QR code
+          from another PARABOULE session to add an additional smartphone. Tap to
+          close.
         </div>
       </div>
     </div>
   </div>
-  @click="onClickSliderComponent" @touchstart="onTappingOnSlider" @touchend="onTappingOnSlider" />
-  <TopCameraSlider @click="onClickToggleTopCameraSliderComponent" @touchstart="onTappingOnTopCameraSlider"
-    @touchend="onTappingOnTopCameraSlider" />
-  <VibrationGrid @click="onClickHapticGridComponent" @touchstart="onTappingOnHaptic" @touchend="onTappingOnHaptic">
+  @click="onClickSliderComponent" @touchstart="onTappingOnSlider"
+  @touchend="onTappingOnSlider" />
+  <TopCameraSlider
+    @click="onClickToggleTopCameraSliderComponent"
+    @touchstart="onTappingOnTopCameraSlider"
+    @touchend="onTappingOnTopCameraSlider"
+  />
+  <VibrationGrid
+    @click="onClickHapticGridComponent"
+    @touchstart="onTappingOnHaptic"
+    @touchend="onTappingOnHaptic"
+  >
   </VibrationGrid>
   <PredictionVisualiser></PredictionVisualiser>
   <Scanner></Scanner>
-  <div v-if="beingWatchedInfo"
+  <div
+    v-if="beingWatchedInfo"
     class="fixed left-0 top-0 w-100dvw h-100dvh bg-black/80 z-999999999999999999 text-center flexCenter flex-col"
-    @click="closeBeingWatchedInfo()">
+    @click="closeBeingWatchedInfo()"
+  >
     <div class="text-white text-24px font-bold max-w-80% uppercase">
-      Someone on your {{ directionPingedPhone }} is watching you!<br>
+      Someone on your {{ directionPingedPhone }} is watching you!<br />
     </div>
     <div class="text-white text-14px font-bold max-w-80% uppercase mt-5px">
       Tap to close.
@@ -206,8 +339,8 @@
 import { Howler } from "howler";
 import { useQRCode } from "@vueuse/integrations/useQRCode";
 import { DotSmall } from "#components";
-const maxOpacityTapIcons = ref(0.5)
-await preloadComponents(['SvgIcon'])
+const maxOpacityTapIcons = ref(0.5);
+await preloadComponents(["SvgIcon"]);
 
 const store = useProtoStore();
 const { speak } = useSpeech();
@@ -226,7 +359,7 @@ const {
   stopPingCochonnet,
   pingPhone1Supabase,
   pingPhone2Supabase,
-  pingPhone3Supabase
+  pingPhone3Supabase,
 } = useExhibitionController();
 
 const onTappingOnHaptic = () => {
@@ -241,7 +374,7 @@ const onTappingOnTopCameraSlider = () => {
   store.isTappingOnTopCameraSlider = !store.isTappingOnTopCameraSlider;
 };
 
-const lastFrom = ref(null)
+const lastFrom = ref(null);
 const lastBeingPingedPhone = ref(null);
 const beingWatchedInfo = ref(false);
 const closeBeingWatchedInfo = () => {
@@ -249,25 +382,24 @@ const closeBeingWatchedInfo = () => {
 };
 bus.on((message, payload) => {
   if (message === "pingPhone1" && store.modesCycler.state.name === "S1") {
-    console.log("received pingPhone1", payload)
+    console.log("received pingPhone1", payload);
     lastBeingPingedPhone.value = "pingPhone1";
     lastFrom.value = payload.from;
     beingWatchedInfo.value = true;
   }
   if (message === "pingPhone2" && store.modesCycler.state.name === "S2") {
-    console.log("received pingPhone2", payload)
+    console.log("received pingPhone2", payload);
     lastBeingPingedPhone.value = "pingPhone2";
     lastFrom.value = payload.from;
     beingWatchedInfo.value = true;
-
   }
   if (message === "pingPhone3" && store.modesCycler.state.name === "S3") {
-    console.log("received pingPhone3", payload)
+    console.log("received pingPhone3", payload);
     lastBeingPingedPhone.value = "pingPhone3";
     lastFrom.value = payload.from;
     beingWatchedInfo.value = true;
   }
-})
+});
 
 const directionPingedPhone = computed(() => {
   if (lastBeingPingedPhone.value === "pingPhone1") {
@@ -279,7 +411,7 @@ const directionPingedPhone = computed(() => {
   if (lastBeingPingedPhone.value === "pingPhone3") {
     return lastFrom.value === "S1" ? "left" : "right";
   }
-  return "left or right"
+  return "left or right";
 });
 
 const {
@@ -328,33 +460,39 @@ watch(
   }
 );
 
-const swipeColor = ref('black')
-const swipe = ref(true)
-const centerCircleBorderWidth = ref(0)
-let centerCircleTimeout = 5000
-let centerCircleOpacityMin = 0
+const swipeColor = ref("black");
+const swipe = ref(true);
+const centerCircleBorderWidth = ref(0);
+let centerCircleTimeout = 5000;
+let centerCircleOpacityMin = 0;
 const centerCircleOpacity = ref(centerCircleOpacityMin);
-const { pause, resume, isActive } = useIntervalFn(() => {
-  let isMinimum = centerCircleOpacity.value === centerCircleOpacityMin
-  centerCircleOpacity.value = isMinimum ? 1 : centerCircleOpacityMin
-  centerCircleBorderWidth.value = 3
-  swipe.value = isMinimum ? true : false
-  swipeColor.value = isMinimum ? 'black' : 'red'
-}, centerCircleTimeout, { immediate: false })
+const { pause, resume, isActive } = useIntervalFn(
+  () => {
+    let isMinimum = centerCircleOpacity.value === centerCircleOpacityMin;
+    centerCircleOpacity.value = isMinimum ? 1 : centerCircleOpacityMin;
+    centerCircleBorderWidth.value = 3;
+    swipe.value = isMinimum ? true : false;
+    swipeColor.value = isMinimum ? "black" : "red";
+  },
+  centerCircleTimeout,
+  { immediate: false }
+);
 
-watch(() => store.infoScreen, () => {
-  if (store.infoScreen) {
-    centerCircleOpacity.value = 0
-    centerCircleBorderWidth.value = 0
-    pause()
-  } else {
-    centerCircleOpacity.value = 0
-    centerCircleBorderWidth.value = 3
-    resume()
+watch(
+  () => store.infoScreen,
+  () => {
+    if (store.infoScreen) {
+      centerCircleOpacity.value = 0;
+      centerCircleBorderWidth.value = 0;
+      pause();
+    } else {
+      centerCircleOpacity.value = 0;
+      centerCircleBorderWidth.value = 3;
+      resume();
+    }
   }
-})
-pause()
-
+);
+pause();
 
 // const glowingCircle = ref(false)
 // watch(() => store.infoStepper.isCurrent('center-circle'), (newVal) => {
@@ -371,16 +509,21 @@ pause()
 //   glowingCircle.value = !glowingCircle.value
 // }, glowingCircleTimeout, { immediate: false })
 
-const exhibitionModes = ["S1", "S2", "S3", "Exhibition"]
-const exhibitionModeCycler = useCycleList(exhibitionModes)
+const exhibitionModes = ["S1", "S2", "S3", "Exhibition"];
+const exhibitionModeCycler = useCycleList(exhibitionModes);
 
 const onSwipe = (direction, e, index, item) => {
   if (direction === "right") {
     currentPage.value[index].cycler.next();
-    console.log(item.name)
-    if (item.name === "Scan Field" || item.name === "Fly to Starting Point" || item.name === "Find XR Cochonnet" || item.name === "Discover More") {
-      let shouldGoToS3 = exhibitionModeCycler.state.value
-      console.log(shouldGoToS3)
+    console.log(item.name);
+    if (
+      item.name === "Scan Field" ||
+      item.name === "Fly to Starting Point" ||
+      item.name === "Find XR Cochonnet" ||
+      item.name === "Discover More"
+    ) {
+      let shouldGoToS3 = exhibitionModeCycler.state.value;
+      console.log(shouldGoToS3);
       const findExhibitionModeIndex = modesList.findIndex(
         (mode) => mode.name === shouldGoToS3
       );
@@ -419,10 +562,13 @@ const setAlphaController = () => {
   // console.log("in setAlphaController", store.alphaController);
 };
 
-whenever(() => !store.alphaController, () => {
-  // console.log('test')
-  flyToStart()
-})
+whenever(
+  () => !store.alphaController,
+  () => {
+    // console.log('test')
+    flyToStart();
+  }
+);
 
 const onFullscreenClick = () => {
   if (store.alphaController) {
@@ -430,8 +576,8 @@ const onFullscreenClick = () => {
     flyToStart();
   }
 
-  if (store.scannerOpen) store.scannerOpen = false
-  if (store.predictionVisualiser) store.predictionVisualiser = false
+  if (store.scannerOpen) store.scannerOpen = false;
+  if (store.predictionVisualiser) store.predictionVisualiser = false;
   // // console.log("in onFullscreenClick", store.alphaController);
 };
 
@@ -471,14 +617,14 @@ const setPointsFromLatestScan = () => {
   store.setScoreFromPoints();
 };
 
-const isPingingCochonnet = ref(false)
+const isPingingCochonnet = ref(false);
 const click_pingCochonnet = () => {
   if (!afterLongPress) {
-    isPingingCochonnet.value = true
+    isPingingCochonnet.value = true;
     // sendPlayCochonnet(5000);
     pingCochonnet();
     setTimeout(() => {
-      isPingingCochonnet.value = false
+      isPingingCochonnet.value = false;
     }, 3000);
   }
 };
@@ -495,10 +641,11 @@ const flyCochoBack = () => {
   }
 };
 
-const toggleStateCochonnetStartingPoint = ref(false)
+const toggleStateCochonnetStartingPoint = ref(false);
 const click_toggleCochonnetStartingPoint = () => {
   if (!afterLongPress) {
-    toggleStateCochonnetStartingPoint.value = !toggleStateCochonnetStartingPoint.value
+    toggleStateCochonnetStartingPoint.value =
+      !toggleStateCochonnetStartingPoint.value;
     if (toggleStateCochonnetStartingPoint.value) {
       flyToCochonnet();
     } else {
@@ -528,8 +675,8 @@ const click_stalefish180 = () => {
 const click_bouleFocuser = (bouleIndex) => {
   store.volume = 1;
   // click_toggleMute()
-  store.unmute3dAudio()
-  if (bouleIndex === 'all') store.bouleFocuserCycler.go(0);
+  store.unmute3dAudio();
+  if (bouleIndex === "all") store.bouleFocuserCycler.go(0);
   store.focusBoules(bouleIndex);
 };
 
@@ -541,14 +688,9 @@ const pairingStatusAnnouncer = useSoundComposable(
   "/sounds/elevenlabs/click_pairingStatusAnnouncer.mp3"
 );
 
+const coinFlipSound = useSoundComposable("/sounds/clickers/coinFlip.mp3");
 
-const coinFlipSound = useSoundComposable(
-  "/sounds/clickers/coinFlip.mp3"
-);
-
-const discoverMoreSound = useSoundComposable(
-  "/sounds/clickers/okay.mp3"
-);
+const discoverMoreSound = useSoundComposable("/sounds/clickers/okay.mp3");
 
 const qrStatus = () => {
   pairingStatusAnnouncer.play();
@@ -764,9 +906,11 @@ const computedScoreStandingsHtml = computed(() => {
 const text = ref("");
 const announceBallsPlayed = () => {
   // console.log("announceBallsPlayed");
-  text.value = `Player 1 has played ${store.players.player1.shotsTaken} ${store.players.player1.shotsTaken === 1 ? "ball" : "balls"
-    }. Player 2 has played ${store.players.player2.shotsTaken} ${store.players.player2.shotsTaken === 1 ? "ball" : "balls"
-    }. `;
+  text.value = `Player 1 has played ${store.players.player1.shotsTaken} ${
+    store.players.player1.shotsTaken === 1 ? "ball" : "balls"
+  }. Player 2 has played ${store.players.player2.shotsTaken} ${
+    store.players.player2.shotsTaken === 1 ? "ball" : "balls"
+  }. `;
   if (isNextRound.value) {
     text.value +=
       "Current round is over. Start new round by pressing any plus button below.";
@@ -809,9 +953,11 @@ const scoreStandings = () => {
   const index = store.players.player1.score * 14 + store.players.player2.score;
   // scoresSounds[index].play();
   if (store.players.player1.score === 0 && store.players.player2.score === 0) {
-    speak(`The last game is over. Tap any + below to start new game.`)
+    speak(`The last game is over. Tap any + below to start new game.`);
   } else {
-    speak(`The score is ${store.players.player1.score} to ${store.players.player2.score}.`)
+    speak(
+      `The score is ${store.players.player1.score} to ${store.players.player2.score}.`
+    );
   }
 };
 
@@ -830,52 +976,50 @@ const pingShoes = () => {
   }
 };
 
-
-
-const lockPingingPhone1 = ref(false)
-const isPingingPhone1 = ref(false)
+const lockPingingPhone1 = ref(false);
+const isPingingPhone1 = ref(false);
 const pingPhone1 = () => {
   if (!afterLongPress && !lockPingingPhone1.value) {
-    isPingingPhone1.value = true
-    lockPingingPhone1.value = true
-    pingPhone1Supabase({ from: store.modesCycler.state.name })
+    isPingingPhone1.value = true;
+    lockPingingPhone1.value = true;
+    pingPhone1Supabase({ from: store.modesCycler.state.name });
     setTimeout(() => {
-      isPingingPhone1.value = false
+      isPingingPhone1.value = false;
     }, 3000);
     setTimeout(() => {
-      lockPingingPhone1.value = false
+      lockPingingPhone1.value = false;
     }, 20000);
   }
 };
 
-const lockPingingPhone2 = ref(false)
-const isPingingPhone2 = ref(false)
+const lockPingingPhone2 = ref(false);
+const isPingingPhone2 = ref(false);
 const pingPhone2 = () => {
   if (!afterLongPress) {
-    isPingingPhone2.value = true
-    lockPingingPhone2.value = true
-    pingPhone2Supabase({ from: store.modesCycler.state.name })
+    isPingingPhone2.value = true;
+    lockPingingPhone2.value = true;
+    pingPhone2Supabase({ from: store.modesCycler.state.name });
     setTimeout(() => {
-      isPingingPhone2.value = false
+      isPingingPhone2.value = false;
     }, 3000);
     setTimeout(() => {
-      lockPingingPhone2.value = false
+      lockPingingPhone2.value = false;
     }, 20000);
   }
 };
 
-const lockPingingPhone3 = ref(false)
-const isPingingPhone3 = ref(false)
+const lockPingingPhone3 = ref(false);
+const isPingingPhone3 = ref(false);
 const pingPhone3 = () => {
   if (!afterLongPress) {
-    isPingingPhone3.value = true
-    lockPingingPhone3.value = true
-    pingPhone3Supabase({ from: store.modesCycler.state.name })
+    isPingingPhone3.value = true;
+    lockPingingPhone3.value = true;
+    pingPhone3Supabase({ from: store.modesCycler.state.name });
     setTimeout(() => {
-      isPingingPhone3.value = false
+      isPingingPhone3.value = false;
     }, 3000);
     setTimeout(() => {
-      lockPingingPhone3.value = false
+      lockPingingPhone3.value = false;
     }, 20000);
   }
 };
@@ -887,22 +1031,24 @@ const refreshPage = () => {
 
 const onClickSliderComponent = () => {
   // console.log("onClickSliderComponent");
-  store.isTouchingSliderTimeout = true
+  store.isTouchingSliderTimeout = true;
   store.isTouchingSlider = !store.isTouchingSlider;
 };
 
 const click_slider = () => {
   store.isTouchingSlider = !store.isTouchingSlider;
-
 };
 
 const isTouchingSliderTouchStartHandler = () => {
-  store.isTouchingSliderTimeout = false
-}
+  store.isTouchingSliderTimeout = false;
+};
 
-whenever(() => !store.isTouchingSlider, () => {
-  flyToStart()
-})
+whenever(
+  () => !store.isTouchingSlider,
+  () => {
+    flyToStart();
+  }
+);
 
 const onClickToggleTopCameraSliderComponent = () => {
   store.isTouchingTopCameraSlider = !store.isTouchingTopCameraSlider;
@@ -939,7 +1085,7 @@ const click_hapticGridNear = () => {
 
 const click_hapticGridMedium = () => {
   store.currentHapticGrid = "medium";
-  flyToStart(true, true)
+  flyToStart(true, true);
 };
 
 const click_hapticGridFar = () => {
@@ -1000,7 +1146,7 @@ const tossCoin = () => {
     coinFlipSound.stop();
     const random = Math.random();
     coinImgSrc.value = random < 0.5 ? "/icons/coinFlip.svg" : "/icons/zahl.svg";
-    speak(`The coin landed on ${random < 0.5 ? "heads" : "tails"}.`)
+    speak(`The coin landed on ${random < 0.5 ? "heads" : "tails"}.`);
     isTossingCoin.value = false;
   }, totalTime);
 };
@@ -1027,7 +1173,9 @@ const onTouchEnd = () => {
 };
 
 const computedIconToggleCochonnetStartingPoint = computed(() => {
-  return !toggleStateCochonnetStartingPoint.value ? "/icons/flyToCochonnet.svg" : "/icons/flyToStart.svg";
+  return !toggleStateCochonnetStartingPoint.value
+    ? "/icons/flyToCochonnet.svg"
+    : "/icons/flyToStart.svg";
 });
 
 const pages = [
@@ -1035,13 +1183,23 @@ const pages = [
     {
       name: "Gyros Controller",
       deactivated: computed(() => store.alphaController),
-      deactivatedText: "Gyros Controller is active. Rotate your device to rotate the view. Tap to turn it off.",
+      deactivatedText:
+        "Gyros Controller is active. Rotate your device to rotate the view. Tap to turn it off.",
       clickFunction: setAlphaController,
       imgSrc: "/icons/gyros.svg",
       explanationSrc: "/sounds/explanations/gyrosController.mp3",
       html: "Toggle Gyros Controller",
       cycler: useCycleList(["Gyros Controller"]),
-      modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo", "S1", "Exhibition"],
+      modes: [
+        "All",
+        "Dev",
+        "Testing",
+        "Player",
+        "SBV",
+        "Solo",
+        "S1",
+        "Exhibition",
+      ],
     },
     {
       name: "Bug Slider",
@@ -1094,9 +1252,7 @@ const pages = [
       html: "Haptic Grid",
       imgSrc: "/icons/hapticGridMedium.svg",
       explanationSrc: "/sounds/explanations/hapticGrid.mp3",
-      cycler: useCycleList([
-        "Haptic Grid",
-      ]),
+      cycler: useCycleList(["Haptic Grid"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
@@ -1107,12 +1263,22 @@ const pages = [
       imgSrc: "/icons/cocho.svg",
       explanationSrc: "/sounds/explanations/pingCochonnet.mp3",
       cycler: useCycleList(["Ping Cochonnet"]),
-      modes: ["All", "Dev", "Testing", "Player", "Solo", "S1", "S2", "Exhibition"],
+      modes: [
+        "All",
+        "Dev",
+        "Testing",
+        "Player",
+        "Solo",
+        "S1",
+        "S2",
+        "Exhibition",
+      ],
     },
     {
       name: "Ping Starting Point",
       deactivated: isPingingShoes,
-      deactivatedText: "Pinging Starting Point... Watch the vertical TV screen.",
+      deactivatedText:
+        "Pinging Starting Point... Watch the vertical TV screen.",
       clickFunction: pingShoes,
       imgSrc: "/icons/hoolahoop.svg",
       explanationSrc: "/sounds/explanations/pingStartingPoint.mp3",
@@ -1124,7 +1290,8 @@ const pages = [
     {
       name: "Switch Boule Fokuss <3",
       deactivated: computed(() => store.boulesCount < 2),
-      deactivatedText: "Available after detection of at least 1 Boule. Wait few seconds for the video to trigger a throw.",
+      deactivatedText:
+        "Available after detection of at least 1 Boule. Wait few seconds for the video to trigger a throw.",
       clickFunction: () => {
         const currentBouleFocuserFunction = flatPages.find(
           (item) => item.name === store.bouleFocuserCycler.state
@@ -1136,7 +1303,6 @@ const pages = [
           store.bouleFocuserCycler.next();
         }
         // console.log(currentBouleFocuserFunction)
-
       },
       imgSrc: "/icons/heart.png",
       html: "Switch Boule Fokuss <3",
@@ -1147,28 +1313,28 @@ const pages = [
     {
       name: "Focus Big Boules",
       deactivated: computed(() => store.boulesCount < 2),
-      deactivatedText: "Available after detection of at least 1 Boule. Wait few seconds for the video to trigger a throw.",
+      deactivatedText:
+        "Available after detection of at least 1 Boule. Wait few seconds for the video to trigger a throw.",
       clickFunction: () => click_bouleFocuser("all"),
       explanationSrc: "/sounds/explanations/focusBigBoules.mp3",
       imgSrc: "/icons/focusAllBlur2.png",
       html: "Focus all Boules",
-      cycler: useCycleList([
-        "Focus Big Boules",
-      ]),
+      cycler: useCycleList(["Focus Big Boules"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
     {
       name: "Focus Team Blue",
       deactivated: computed(() => store.boulesCount < 2),
-      deactivatedText: "Available after detection of at least 1 Boule of Team Blue. Wait few seconds for the video to trigger a throw.",
+      deactivatedText:
+        "Available after detection of at least 1 Boule of Team Blue. Wait few seconds for the video to trigger a throw.",
 
       clickFunction: () => {
         const blueBoules = store.boulesToDisplay
           .map((boule, index) => ({ index, class: boule.class }))
-          .filter(boule => boule.class === "light")
-          .map(boule => boule.index);
+          .filter((boule) => boule.class === "light")
+          .map((boule) => boule.index);
         store.selectedBoules = blueBoules;
-        store.unmute3dAudio()
+        store.unmute3dAudio();
         // store.volumePulse++;
       },
       explanationSrc: "/sounds/explanations/focusTeamBlue.mp3",
@@ -1180,14 +1346,15 @@ const pages = [
     {
       name: "Focus Team Red",
       deactivated: computed(() => store.boulesCount < 2),
-      deactivatedText: "Available after detection of at least 1 Boule of Team Red. Wait few seconds for the video to trigger a throw.",
+      deactivatedText:
+        "Available after detection of at least 1 Boule of Team Red. Wait few seconds for the video to trigger a throw.",
       clickFunction: () => {
         const redBoules = store.boulesToDisplay
           .map((boule, index) => ({ index, class: boule.class }))
-          .filter(boule => boule.class === "dark")
-          .map(boule => boule.index);
+          .filter((boule) => boule.class === "dark")
+          .map((boule) => boule.index);
         store.selectedBoules = redBoules;
-        store.unmute3dAudio()
+        store.unmute3dAudio();
         // store.volumePulse++;
       },
       explanationSrc: "/sounds/explanations/focusTeamRed.mp3",
@@ -1323,7 +1490,11 @@ const pages = [
     {
       name: "O'Clock Toggler Old",
       clickFunction: startCocho,
-      cycler: useCycleList(["O'Clock Toggler Old", "Boomerang", "Stalefish 180"]),
+      cycler: useCycleList([
+        "O'Clock Toggler Old",
+        "Boomerang",
+        "Stalefish 180",
+      ]),
       modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
     {
@@ -1422,9 +1593,7 @@ const pages = [
       clickFunction: () => click_bouleFocuser(4),
       imgSrc: "/icons/focus4.svg",
       html: "Focus on Boule 4",
-      cycler: useCycleList([
-        "Focus Boule 4",
-      ]),
+      cycler: useCycleList(["Focus Boule 4"]),
       modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
     {
@@ -1433,9 +1602,7 @@ const pages = [
       clickFunction: () => click_bouleFocuser(5),
       imgSrc: "/icons/focus5.svg",
       html: "Focus on Boule 5",
-      cycler: useCycleList([
-        "Focus Boule 5",
-      ]),
+      cycler: useCycleList(["Focus Boule 5"]),
       modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
     {
@@ -1444,9 +1611,7 @@ const pages = [
       clickFunction: () => click_bouleFocuser(6),
       imgSrc: "/icons/focus6.svg",
       html: "Focus on Boule 6",
-      cycler: useCycleList([
-        "Focus Boule 6",
-      ]),
+      cycler: useCycleList(["Focus Boule 6"]),
       modes: ["All", "Dev", "Testing", "Player", "Exhibition"],
     },
     {
@@ -1558,7 +1723,7 @@ const pages = [
       name: "Scan Field",
       clickFunction: () => {
         // console.log("open scan field")
-        store.scannerOpen = !store.scannerOpen
+        store.scannerOpen = !store.scannerOpen;
         // store.predictionVisualiser = !store.predictionVisualiser;
       },
       imgSrc: "/icons/scanField.svg",
@@ -1590,9 +1755,7 @@ const pages = [
       clickFunction: incrementPlayer1,
       imgSrc: "/icons/plus.svg",
       explanationSrc: "/sounds/explanations/incrementShotsTeam1.mp3",
-      cycler: useCycleList([
-        "Increment Shots Team 1",
-      ]),
+      cycler: useCycleList(["Increment Shots Team 1"]),
       modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
     },
     {
@@ -1600,9 +1763,7 @@ const pages = [
       clickFunction: incrementPlayer2,
       imgSrc: "/icons/plus.svg",
       explanationSrc: "/sounds/explanations/incrementShotsTeam2.mp3",
-      cycler: useCycleList([
-        "Increment Shots Team 2",
-      ]),
+      cycler: useCycleList(["Increment Shots Team 2"]),
       modes: ["All", "Dev", "Testing", "S3", "Exhibition"],
     },
   ],
@@ -1612,9 +1773,7 @@ const pages = [
       clickFunction: scoreStandings,
       html: computedScoreStandingsHtml,
       explanationSrc: "/sounds/explanations/totalScore.mp3",
-      cycler: useCycleList([
-        "Total Score (Game)",
-      ]),
+      cycler: useCycleList(["Total Score (Game)"]),
       modes: ["All", "Dev", "Testing", "Referee", "S3", "Exhibition"],
     },
     {
@@ -1631,9 +1790,7 @@ const pages = [
       imgSrc: "/icons/plus.svg",
       html: "Increment Score Team 1",
       explanationSrc: "/sounds/explanations/incrementTotalScoreTeam1.mp3",
-      cycler: useCycleList([
-        "Increment Score Team 1",
-      ]),
+      cycler: useCycleList(["Increment Score Team 1"]),
       modes: ["All", "Dev", "Testing", "Solo", "S3", "Exhibition"],
     },
     {
@@ -1642,9 +1799,7 @@ const pages = [
       imgSrc: "/icons/plus.svg",
       html: "Increment Score Team 2",
       explanationSrc: "/sounds/explanations/incrementTotalScoreTeam2.mp3",
-      cycler: useCycleList([
-        "Increment Score Team 2",
-      ]),
+      cycler: useCycleList(["Increment Score Team 2"]),
       modes: ["All", "Dev", "Testing", "Solo", "S3", "Exhibition"],
     },
   ],
@@ -1672,13 +1827,23 @@ const pages = [
     {
       name: "Gyros Controller",
       deactivated: computed(() => store.alphaController),
-      deactivatedText: "Gyros Controller is active. Rotate your device to rotate the view. Tap to turn it off.",
+      deactivatedText:
+        "Gyros Controller is active. Rotate your device to rotate the view. Tap to turn it off.",
       clickFunction: setAlphaController,
       imgSrc: "/icons/gyros.svg",
       explanationSrc: "/sounds/explanations/gyrosController.mp3",
       html: "Toggle Gyros Controller",
       cycler: useCycleList(["Gyros Controller"]),
-      modes: ["All", "Dev", "Testing", "Player", "SBV", "Solo", "S2", "Exhibition"],
+      modes: [
+        "All",
+        "Dev",
+        "Testing",
+        "Player",
+        "SBV",
+        "Solo",
+        "S2",
+        "Exhibition",
+      ],
     },
     {
       name: "Bug Slider",
@@ -1694,9 +1859,8 @@ const pages = [
     {
       name: "Pairing Status",
       clickFunction: qrStatus,
-      explanationSrc:
-        "/sounds/explanations/pairingStatusAnnouncer.mp3",
-      html: { "value": "Status:<br>Paired with<br> Smartphone 1 and 3" },
+      explanationSrc: "/sounds/explanations/pairingStatusAnnouncer.mp3",
+      html: { value: "Status:<br>Paired with<br> Smartphone 1 and 3" },
       cycler: useCycleList(["Pairing Status"]),
       modes: ["All", "Dev", "Testing", "QR", "S2", "Exhibition"],
     },
@@ -1722,7 +1886,12 @@ const pages = [
     {
       name: "Ping Connected Phone 1",
       deactivated: isPingingPhone1 && lockPingingPhone1,
-      deactivatedText: computed(() => `Pinging Phone 1... Watch smartphone on ${store.modesCycler.state.name === "S2" ? 'your right' : 'your left'}. Wait a moment to ping again.`),
+      deactivatedText: computed(
+        () =>
+          `Pinging Phone 1... Watch smartphone on ${
+            store.modesCycler.state.name === "S2" ? "your right" : "your left"
+          }. Wait a moment to ping again.`
+      ),
       clickFunction: pingPhone1,
       imgSrc: "/icons/pingPhone1.svg",
       html: "Ping Connected Phone",
@@ -1735,7 +1904,12 @@ const pages = [
     {
       name: "Ping Connected Phone 2",
       deactivated: isPingingPhone2 && lockPingingPhone2,
-      deactivatedText: computed(() => `Pinging Phone 2... Watch smartphone on ${store.modesCycler.state.name === "S1" ? 'your left' : 'your right'}. Wait a moment to ping again.`),
+      deactivatedText: computed(
+        () =>
+          `Pinging Phone 2... Watch smartphone on ${
+            store.modesCycler.state.name === "S1" ? "your left" : "your right"
+          }. Wait a moment to ping again.`
+      ),
       clickFunction: pingPhone2,
       imgSrc: "/icons/pingPhone2.svg",
       html: "Ping Connected Phone",
@@ -1749,9 +1923,7 @@ const pages = [
       html: "Haptic Grid",
       imgSrc: "/icons/hapticGridMedium.svg",
       explanationSrc: "/sounds/explanations/hapticGrid.mp3",
-      cycler: useCycleList([
-        "Haptic Grid",
-      ]),
+      cycler: useCycleList(["Haptic Grid"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S3", "Exhibition"],
     },
     {
@@ -1765,9 +1937,7 @@ const pages = [
       `;
       }),
       explanationSrc: "/sounds/explanations/checkOutTheOtherSmartphones.mp3",
-      cycler: useCycleList([
-        "Discover More",
-      ]),
+      cycler: useCycleList(["Discover More"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S3", "Exhibition"],
     },
   ],
@@ -1775,7 +1945,12 @@ const pages = [
     {
       name: "Ping Connected Phone 3",
       deactivated: isPingingPhone3 && lockPingingPhone3,
-      deactivatedText: computed(() => `Pinging Phone 3... Watch smartphone on ${store.modesCycler.state.name === "S1" ? 'your right' : 'your left'}. Wait a moment to ping again.`),
+      deactivatedText: computed(
+        () =>
+          `Pinging Phone 3... Watch smartphone on ${
+            store.modesCycler.state.name === "S1" ? "your right" : "your left"
+          }. Wait a moment to ping again.`
+      ),
       clickFunction: pingPhone3,
       imgSrc: "/icons/pingPhone3.svg",
       html: "Ping Connected Phone",
@@ -1787,8 +1962,7 @@ const pages = [
       name: "Find XR Starting Point",
       deactivated: computed(() => true),
       deactivatedText: "Didn't make it to the vernissage :/ Coming soon...",
-      clickFunction: () => {
-      },
+      clickFunction: () => {},
       html: "Find XR Starting Point",
       imgSrc: "/icons/findXrStartingPoint.svg",
       explanationSrc: "/sounds/explanations/findXrStartingPoint.mp3",
@@ -1799,8 +1973,7 @@ const pages = [
       name: "Find XR Cochonnet",
       deactivated: computed(() => true),
       deactivatedText: "Didn't make it to the vernissage :/ Coming soon...",
-      clickFunction: () => {
-      },
+      clickFunction: () => {},
       html: "Find XR Cochonnet",
       imgSrc: "/icons/findXrCochonnet.svg",
       explanationSrc: "/sounds/explanations/findXrCochonnet.mp3",
@@ -1847,9 +2020,7 @@ const pages = [
       `;
       }),
       explanationSrc: "/sounds/explanations/checkOutTheOtherSmartphones.mp3",
-      cycler: useCycleList([
-        "Discover More",
-      ]),
+      cycler: useCycleList(["Discover More"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S2", "Exhibition"],
     },
   ],
@@ -1874,9 +2045,7 @@ const pages = [
       `;
       }),
       explanationSrc: "/sounds/explanations/checkOutTheOtherSmartphones.mp3",
-      cycler: useCycleList([
-        "Discover More",
-      ]),
+      cycler: useCycleList(["Discover More"]),
       modes: ["All", "Dev", "Testing", "SBV", "Player", "S1", "Exhibition"],
     },
   ],
@@ -1918,7 +2087,15 @@ const pages = [
       },
       html: "Activate All Mode",
       cycler: useCycleList(["All Mode"]),
-      modes: ["Dev", "Testing", "Player", "Referee", "Solo", "All", "Exhibition"],
+      modes: [
+        "Dev",
+        "Testing",
+        "Player",
+        "Referee",
+        "Solo",
+        "All",
+        "Exhibition",
+      ],
     },
     {
       name: "Change Mode",
@@ -2014,9 +2191,7 @@ const pages = [
       deactivated: computed(() => !store.arSupported),
       clickFunction: scanCamera,
       imgSrc: "/icons/scanCamera.svg",
-      cycler: useCycleList([
-        "Scan Field",
-      ]),
+      cycler: useCycleList(["Scan Field"]),
       modes: ["All", "Dev", "Testing", "Solo", "Referee", "Player"],
     },
     {
@@ -2046,18 +2221,14 @@ const pages = [
       name: "Haptic grid near",
       clickFunction: click_hapticGridNear,
       html: "Haptic grid near",
-      cycler: useCycleList([
-        "Haptic grid near",
-      ]),
+      cycler: useCycleList(["Haptic grid near"]),
       modes: ["All", "Dev", "Testing", "Exhibition"],
     },
     {
       name: "Haptic grid far",
       clickFunction: click_hapticGridFar,
       html: "Haptic grid far",
-      cycler: useCycleList([
-        "Haptic grid far",
-      ]),
+      cycler: useCycleList(["Haptic grid far"]),
       modes: ["All", "Dev", "Testing", "Exhibition"],
     },
     {
@@ -2127,7 +2298,7 @@ const pages = [
       cycler: useCycleList(["Prediction Visualiser"]),
       modes: ["All", "Dev", "Testing", "Referee", "Exhibition"],
     },
-  ]
+  ],
 ];
 
 const flatPages = pages.flat();
@@ -2224,7 +2395,7 @@ const getItem = (item) => {
 const getIconName = (imgSrc) => {
   const src = imgSrc.value ?? imgSrc;
   // Extract filename without extension from path like "/icons/gyros.svg"
-  return src.split('/').pop().replace('.svg', '');
+  return src.split("/").pop().replace(".svg", "");
 };
 
 const onClick = (item, index) => {
@@ -2300,7 +2471,7 @@ onLongPress(swiper, longPressCallback, {
 const { isSwiping, direction } = useSwipe(swiper);
 watch(isSwiping, (val) => {
   if (val) {
-    store.showStundenOrientation = false
+    store.showStundenOrientation = false;
     if (direction.value === "left") {
       if (isLast.value) {
         const firstStep = stepNames.value[0];
@@ -2374,7 +2545,7 @@ onKeyStroke(["1", "2", "3", "4", "5", "6", "7", "8", "9"], (e) => {
 onMounted(() => {
   // goTo(stepNames.value[2]);
   // store.toggle3dAudio();
-})
+});
 </script>
 
 <style>
@@ -2408,6 +2579,7 @@ onMounted(() => {
     ". ."
     ". .";
   user-select: none;
+  @apply: sm:max-w-500px sm:max-h-1000px;
 }
 
 @keyframes fadeRedToWhite {
@@ -2435,7 +2607,7 @@ onMounted(() => {
   border-radius: 5px;
   position: relative;
 
-  >div {
+  > div {
     width: 100%;
     height: 100%;
     display: flex;
@@ -2472,18 +2644,15 @@ onMounted(() => {
   position: relative;
   mix-blend-mode: difference;
 
-
   div {
     pointer-events: none;
     mix-blend-mode: difference;
   }
 
-
   &:first-child {
     border-bottom-right-radius: 60px;
     /* padding-left: 10px; */
   }
-
 
   &:nth-child(2) {
     border-bottom-left-radius: 60px;
@@ -2518,11 +2687,10 @@ onMounted(() => {
   clip-path: circle(50% at 50% 50%);
   transition: border 1000ms ease-in-out;
 
-
   /* box-shadow: 0px 0px 35px 14px var(--center-circle-shadow) inset; */
   /* background-color: var(--center-circle-background); */
 
-  >div {
+  > div {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -2545,15 +2713,14 @@ onMounted(() => {
     } */
     /* opacity: 0.5; */
     background-color: red;
-    background: linear-gradient(180deg, #F00 0%, #900 100%);
+    background: linear-gradient(180deg, #f00 0%, #900 100%);
     /* background: transparent; */
     opacity: v-bind(centerCircleOpacity);
     transition: opacity 5000ms ease-in-out;
     clip-path: circle(50% at 50% 50%);
-
   }
 
-  >* {
+  > * {
     pointer-events: none;
   }
 }
