@@ -36,7 +36,7 @@
       <a
         href="https://github.com/kauzkoko/paraboule"
         class="no-underline flex flex-row items-center mt-3"
-        @click.prevent="visitLink"
+        @click.prevent="visitLinkZhdk"
         @keydown.enter.prevent="visitLinkZhdk"
         role="link"
         tabindex="0"

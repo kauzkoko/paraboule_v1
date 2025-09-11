@@ -85,7 +85,7 @@
               class="button-container info-next mb-10px border-hex-00ff00!"
               @click="nextFunction()"
             >
-              <span class="color-hex-00ff00!">LEARN MORE</span>
+              <span class="color-hex-00ff00!">HOW TO USE</span>
             </div>
           </div>
           <div v-if="store.infoStepper.isCurrent('role')">
