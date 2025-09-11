@@ -78,19 +78,20 @@
             class="flex justify-center flex-col items-center"
           >
             <p
-              class="mt-50px!"
+              class="mt-50px"
+              :class="{ 'mt--50px': smallHeight }"
               v-html="store.infoStepper.current.bottomText"
             ></p>
             <div
               class="button-container info-next mb-10px border-hex-00ff00!"
               @click="nextFunction()"
             >
-              <span class="color-hex-00ff00!">HOW TO USE</span>
+              <span class="color-hex-00ff00!">LEARN MORE</span>
             </div>
           </div>
           <div v-if="store.infoStepper.isCurrent('role')">
             <p
-              class="mt--20px!"
+              class="mt-50px!"
               v-html="
                 store.infoStepper.current[
                   store.modesCycler.state.name === 'S1' ||
@@ -178,7 +179,11 @@
     >
       <div class="button-container info-close" @click="close()">CLOSE</div>
       <div
-        v-if="smallHeight && !store.infoStepper.isLast"
+        v-if="
+          smallHeight &&
+          !store.infoStepper.isLast &&
+          !store.infoStepper.isCurrent('welcome')
+        "
         class="button-container info-close ml-10"
         style="border-color: var(--green); color: var(--green)"
         @click="nextFunction()"
@@ -294,7 +299,7 @@ const close = () => {
     max-width: 90dvw;
     @apply: md:text-26px;
     @media (max-height: 750px) {
-      font-size: 19px;
+      font-size: 17px;
     }
   }
 
@@ -303,6 +308,11 @@ const close = () => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
+    @media (max-height: 750px) {
+          /* visibility: hidden; */
+          padding-top: 50px;
+        }
 
     div {
       /* margin-top: 112px; */
@@ -316,13 +326,13 @@ const close = () => {
         margin-bottom: 10px;
         mix-blend-mode: normal;
         @media (max-height: 750px) {
-          visibility: hidden;
+          /* visibility: hidden; */
         }
       }
 
       img {
         @media (max-height: 750px) {
-          visibility: hidden;
+          /* visibility: hidden; */
         }
         width: 84dvw;
         margin-top: -20px;
@@ -343,6 +353,10 @@ const close = () => {
 
     > div {
       max-width: 80%;
+    }
+
+    @media (max-height: 750px) {
+      font-size: 17px;
     }
   }
 }
@@ -428,7 +442,7 @@ const close = () => {
   border-color: var(--green);
   color: var(--green) !important;
   @media (max-height: 750px) {
-    margin-top: 10px;
+    margin-top: 20px;
   }
 }
 

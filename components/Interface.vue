@@ -1,7 +1,11 @@
 <template>
   <div
     class="outer fixed left-0 transform-gpu w-100dvw h-100dvh transition-blur"
-    :class="{ 'translate-y--11px': !store.isSky, 'blur-md': store.infoScreen }"
+    :class="{
+      'translate-y--11px': !store.isSky,
+      'blur-md': store.infoScreen,
+      'blur-3px!': store.infoStepper.isCurrent('welcome') && store.infoScreen,
+    }"
     @click="onFullscreenClick()"
   >
     <VirtualAudioSpace :trigger="audioTrigger"></VirtualAudioSpace>
@@ -154,9 +158,7 @@
               :style="{ opacity: swipe ? maxOpacityTapIcons : 0 }"
               class="transition-opacity duration-3000 children:text-hex-ff0000! mt-3px text-right"
             >
-              <span>
-                <DotSmall /> </span
-              ><br />
+              <span> <DotSmall /> </span><br />
               <span>
                 <LongPressSmallRight />
               </span>
@@ -166,9 +168,7 @@
               :style="{ opacity: swipe ? maxOpacityTapIcons : 0 }"
               class="transition-opacity duration-3000 children:text-hex-ff0000! mt-3px"
             >
-              <span>
-                <DotSmall class="mr-2px" /> </span
-              ><br />
+              <span> <DotSmall class="mr-2px" /> </span><br />
               <span>
                 <LongPressSmall class="mr--48px" />
               </span>
@@ -188,9 +188,7 @@
               :style="{ opacity: swipe ? maxOpacityTapIcons : 0 }"
               class="transition-opacity duration-3000 children:text-hex-ff0000! mt-3px text-right"
             >
-              <span>
-                <LongPressSmallRight /> </span
-              ><br />
+              <span> <LongPressSmallRight /> </span><br />
               <span>
                 <DotSmall />
               </span>

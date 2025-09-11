@@ -6,7 +6,7 @@
     <div class="text-white max-w-25dvw hidden md:block">
       <div class="mb-3">
         PARABOULE is an assistive system that enables visually impaired players
-        to play Boule. It is designed for smartphones with touchscreen,
+        to play Boule. It is designed and developed for (Android) smartphones with touchscreen,
         AR-capabilities, haptic feedback and spatial audio. Support for other
         devices is limited. The use of headphones is highly recommended.
       </div>
@@ -63,7 +63,7 @@
     class="fixed top-0 right-0 m-5 mt-4 z-999999999999999999"
     v-show="!store.infoScreen"
   >
-    <div class="mt-0 text-white max-w-25dvw hidden md:block">
+    <div class="mt-0 text-white max-w-20dvw hidden md:block">
       Controls on non-touchscreen devices:
       <ul class="pl-5 mt-2 children:my-2">
         <li>
@@ -98,3 +98,9 @@ const visitZhdk = () => {
 
 const store = useProtoStore();
 </script>
+
+<style scoped>
+div {
+  @apply xl:text-22px;
+}
+</style>

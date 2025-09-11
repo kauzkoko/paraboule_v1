@@ -566,8 +566,8 @@ export const useProtoStore = defineStore("protoStore", () => {
       title: 'Welcome to',
       img: '/icons/paraboule_black.svg',
       // subtitle: 'PARABOULE is an exploration<br> of spatial audio and object detection in Pétanque. It is built with accessibility in mind and assists you in playing Boule by binaural hearing.',
-      subtitle: 'PARABOULE is an assistive tool to play Pétanque by binaural hearing and haptic feedback. <span class="important text-red!">This is the exhibition version of the app.</span>',
-      bottomText: 'PARABOULE explores<br> spatial audio and object detection technologies in Pétanque. It is built with accessibility considerations in mind.'
+      bottomText: 'PARABOULE is an assistive tool to play Pétanque by binaural hearing and haptic feedback. It is built with accessibility considerations in mind.',
+      // bottomText: 'PARABOULE explores<br> spatial audio and object detection technologies in Pétanque. '
     },
     // 'role': {
     //   'S1': {
